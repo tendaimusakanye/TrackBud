@@ -1,11 +1,13 @@
-package com.tendai.musicx
+package com.tendai.musicx.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.tendai.musicx.R
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
     }
+
 }
