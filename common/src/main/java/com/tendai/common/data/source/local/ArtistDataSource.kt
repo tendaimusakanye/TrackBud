@@ -1,26 +1,10 @@
 package com.tendai.common.data.source.local
 
-import com.tendai.common.data.model.Artist
 import com.tendai.common.data.DataSource
+import com.tendai.common.data.model.Artist
 
-class ArtistDataSource : DataSource.ArtistSource {
-    override suspend fun getArtists(): List<Artist> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun insertArtist(vararg artist: Artist) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteArtist(vararg artist: Artist) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun updateNumberOfTracksForArtist(numberOfTracks: Int, artistId: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun updateNumberOfAlbumsForArtist(numberOfAlbums: Int, artistId: Int) {
+class ArtistDataSource : DataSource.Artists {
+    override suspend fun getAllArtists(): List<Artist> {
         TODO("Not yet implemented")
     }
 

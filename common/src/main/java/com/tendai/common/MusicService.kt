@@ -7,7 +7,6 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.tendai.common.playback.PlaybackManager
-import java.util.concurrent.ThreadPoolExecutor
 
 class MusicService : MediaBrowserServiceCompat() {
 
@@ -50,7 +49,6 @@ class MusicService : MediaBrowserServiceCompat() {
             //todo: I also can set this in the onPlay method of My media session callback.
             isActive = true
         }
-        val executor :ThreadPoolExecutor = ThreadPoolExecutor(1,3,3,null,null)
 
         // Setting  the media session token
         sessionToken = mediaSession.sessionToken
@@ -69,7 +67,7 @@ class MusicService : MediaBrowserServiceCompat() {
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
 
-        TODO("Retrieve song from localStorage/ database")
+        TODO("Retrieve song from localStorage")
     }
 
     override fun onGetRoot(
