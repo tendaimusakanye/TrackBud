@@ -25,7 +25,10 @@ interface DataSource {
     interface Albums {
         suspend fun getAlbums(limit: Int): List<Album>
 
-        suspend fun getAlbumsForArtist(artistId: Long): List<Album>
+        suspend fun getAlbumsForArtist(artistId: Int): List<Album>
+
+        suspend fun getAlbum(id: Int): Album
+
 
     }
 

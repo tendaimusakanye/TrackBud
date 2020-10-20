@@ -1,20 +1,17 @@
 package com.tendai.common.data.model
 
-import android.graphics.Bitmap
-
 
 data class Track(
-   var trackId: Long,
+    var id: Int = -1,
+    var trackId: Int,
     var trackName: String,
-    var albumId: Long,
+    var albumId: Int,
     var albumName: String,
-    var artistId: Long,
+    var artistId: Int,
     var artistName: String,
-    var trackLength: Long,
+    var duration: Int,
     var trackGenre: String,
     var trackNumber: Int,
-    var playlistId: String,
-    var trackPath: String,
-    var albumArt: Bitmap
+    var playlistId: String
 
 )
