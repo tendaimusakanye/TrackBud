@@ -34,7 +34,7 @@ class MusicService : MediaBrowserServiceCompat() {
     override fun onCreate() {
         super.onCreate()
 
-        //todo: initiliaze or setUp my music source.
+        //todo: initialize or setUp my music source.
         //Pending intent to launch the Ui of the Music Player from the notification Panel
         val sessionPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
@@ -67,7 +67,7 @@ class MusicService : MediaBrowserServiceCompat() {
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
 
-        TODO("Retrieve song from localStorage")
+        TODO("Retrieve songs from localStorage")
     }
 
     override fun onGetRoot(
@@ -75,7 +75,7 @@ class MusicService : MediaBrowserServiceCompat() {
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot? {
-        TODO("Not yet implemented")
+        TODO("Browsable etc etc. to build a representation of the UI etc etc.")
     }
 
     override fun onDestroy() {

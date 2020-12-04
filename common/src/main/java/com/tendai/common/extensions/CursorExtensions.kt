@@ -2,6 +2,8 @@ package com.tendai.common.extensions
 
 import android.database.Cursor
 
+//function to map cursor results to a generic list which could either be an Album ,Track , Playlist
+// or Artist
  fun <T> Cursor.mapList(
     cursor: Cursor,
     mapper: T
@@ -14,6 +16,7 @@ import android.database.Cursor
             } while (cursor.moveToNext())
             result
         } else {
+            //return an empty arrayList either way.
             result
         }
     }

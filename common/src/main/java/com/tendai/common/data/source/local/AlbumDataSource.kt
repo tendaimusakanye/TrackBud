@@ -1,94 +1,112 @@
 package com.tendai.common.data.source.local
 
-import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns._ID
 import android.provider.MediaStore.Audio.AlbumColumns.*
-import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.util.Log
-import com.tendai.common.data.DataSource
 import com.tendai.common.data.model.Album
 import com.tendai.common.extensions.mapList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
 
-//TODO: Make these data source classes thread-safe and singletons.
 class AlbumDataSource(private val context: Context) : DataSource.Albums {
 
     companion object {
         private val TAG = AlbumDataSource::class.simpleName
+
+        @Volatile
+        private var INSTANCE: AlbumDataSource? = null
+
+        fun getInstance(context: Context): AlbumDataSource? {
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: AlbumDataSource(context)
+            }
+            return INSTANCE
+        }
     }
 
-    private val contentResolver: ContentResolver = context.contentResolver
-    private val projection: Array<String> = arrayOf(
-        _ID, ALBUM_ID, ALBUM, ARTIST_ID, NUMBER_OF_SONGS
+    private val contentResolver = context.contentResolver
+    private val projection = arrayOf(
+        _ID, ALBUM_ID, ALBUM, ARTIST, ARTIST_ID, FIRST_YEAR, NUMBER_OF_SONGS
     )
 
-    override suspend fun getAlbums(limit: Int): List<Album> {
-        val cursor = getCursor(sortOrder = "LIMIT $limit")
-
-        return cursor!!.let {
-            it.mapList(it, createAlbum(it))
-        }
-    }
-
-    override suspend fun getAlbumsForArtist(artistId: Int): List<Album> {
-        val cursor = getCursor("$ARTIST_ID = ?", arrayOf(artistId.toString()), "$ALBUM ASC")
-
-        return cursor!!.let {
-            it.mapList(it, createAlbum(it))
-        }
-    }
-
-
-    //retrieving an album using a cursor object.
-    // throws a null pointer exception if the cursor is null for some reason.
-    override suspend fun getAlbum(id: Int): Album {
-        val cursor = getCursor("$_ID = ?", arrayOf(id.toString()))
-
-        return cursor?.use {
-            if (cursor.moveToFirst()) {
-                //creating album from cursor
-                createAlbum(cursor)
-            } else {
-                //returning an empty album if cursor returns an empty list
-                Log.i(TAG, "Empty result. No album matching ${id}? could be found")
-                null
-            }
-        } ?: Album()
-    }
-
-    /**
-     * @param selection is similar to sql's WHERE clause e.g WHERE name = "Tendai"
-     * @param selectionArgs is similar to the "Tendai" string above except it should be an array when working with
-     * content resolvers.
-     */
-    private fun getCursor(
-        selection: String? = null,
-        selectionArgs: Array<String>? = null,
-        sortOrder: String? = null
-    ): Cursor? =
-        contentResolver.query(
-            EXTERNAL_CONTENT_URI,
-            projection,
-            selection,
-            selectionArgs,
-            sortOrder
-        )
-
-
-    //mapping results from the cursor to the album.
-    private fun createAlbum(cursor: Cursor): Album =
-        with(cursor) {
-            Album(
-                id = getInt(getColumnIndex(_ID)),
-                albumId = getInt(getColumnIndex(ALBUM_ID)),
-                albumTitle = getString(getColumnIndex(ALBUM)),
-                artistName = getString(getColumnIndex(ARTIST)),
-                numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS)),
-                yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
-                artistId = getInt(getColumnIndex(ARTIST_ID))
+    //getAlbums for the discover page
+    override suspend fun getAlbums(limit: Int): List<Album>? {
+        return withContext(Dispatchers.IO) {
+            val cursor = getCursor(
+                contentResolver = contentResolver,
+                uri = ALBUMS_URI,
+                projection = projection,
+                sortOrder = "LIMIT $limit"
             )
+
+            cursor?.let {
+                it.mapList(it, mapToAlbum(it))
+            } ?: listOf()
+
         }
+    }
+
+    override suspend fun getAlbumsForArtist(artistId: Int): List<Album>? {
+        return withContext(Dispatchers.IO) {
+            val uri = getContentUri("external", artistId.toLong())
+            val cursor = getCursor(
+                contentResolver = contentResolver,
+                uri = uri,
+                projection = projection,
+                sortOrder = "$ALBUM ASC"
+            )
+
+            cursor?.let {
+                it.mapList(it, mapToAlbum(it))
+            } ?: listOf()
+        }
+    }
+
+    override suspend fun getAlbum(albumId: Int): Album? {
+        return withContext(Dispatchers.IO) {
+            val cursor = getCursor(
+                contentResolver = contentResolver,
+                uri = ALBUMS_URI,
+                projection = projection,
+                selection = "$_ID = ?",
+                selectionArgs = arrayOf(albumId.toString())
+            )
+            cursor?.use {
+                if (cursor.count != 0) {
+                    //creating album from cursor
+                    mapToAlbum(cursor)
+                } else {
+                    //returning an empty album if cursor returns an empty list
+                    Log.i(TAG, "Empty result. No album matching ${albumId}? could be found")
+                    null
+                }
+            } ?: Album()
+        }
+    }
+
+    private fun mapToAlbum(cursor: Cursor): Album {
+        return if (cursor.moveToFirst()) {
+            with(cursor) {
+                Album(
+                    id = getLong(getColumnIndex(_ID)),
+                    albumId = getInt(getColumnIndex(ALBUM_ID)),
+                    albumTitle = getString(getColumnIndex(ALBUM)),
+                    artistName = getString(getColumnIndex(ARTIST)),
+                    numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS)),
+                    yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
+                    artistId = getInt(getColumnIndex(ARTIST_ID))
+                )
+            }
+        } else {
+            Album()
+        }
+    }
 }
 
-//TODO: Is artist Id backward compatible
+//TODO: Make these data source classes thread-safe and singletons.
+//TODO: Handle ARTIST_ID for lower APIs
+//TODO: Implement Error handling not just return empty lists and objects.
