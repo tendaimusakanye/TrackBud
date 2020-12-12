@@ -5,43 +5,33 @@ import com.tendai.common.data.model.Playlist
 import com.tendai.common.data.source.local.PlaylistDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.SupervisorJob
 
 class PlaylistRepository(private val playlistDataSource: PlaylistDataSource) :
-    Repository.Playlists {
+    DataSource.Playlists {
 
-    private var scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    override fun getAllPlaylists(limit: Int): List<Playlist>? {
-        var playlists: List<Playlist>? = null
+    override suspend fun getAllPlaylists(limit: Int): List<Playlist> =
+        retrieveMediaItemList(limit, scope) { playlistDataSource.getAllPlaylists(limit) }
 
-        return if (playlists == null) {
-            scope.launch {
-                playlists = playlistDataSource.getAllPlaylists(limit)
-            }
-            playlists
-        } else {
-            playlists
-        }
-    }
-
-    override fun createNewPlaylist(name: String): Uri? {
+    override suspend fun createNewPlaylist(name: String): Uri? {
         TODO("Not yet implemented")
     }
 
-    override fun deletePlaylist(playlistId: Int): Int {
+    override suspend fun deletePlaylist(playlistId: Int): Int {
         TODO("Not yet implemented")
     }
 
-    override fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int {
+    override suspend fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int {
         TODO("Not yet implemented")
     }
 
-    override fun removeTrackFromPlaylist(trackId: Long): Int {
+    override suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int {
         TODO("Not yet implemented")
     }
 
-    override fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
+    override suspend fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
         TODO("Not yet implemented")
     }
 

@@ -4,58 +4,28 @@ import com.tendai.common.data.model.Track
 import com.tendai.common.data.source.local.TracksDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.SupervisorJob
 
-class TracksRepository(private val tracksDataSource: TracksDataSource) : Repository.Tracks {
+class TracksRepository(private val tracksDataSource: TracksDataSource) : DataSource.Tracks {
 
-    private val scope = CoroutineScope(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    override fun getTracks(): List<Track>? {
-        var tracks: List<Track>? = null
-        return if (tracks.isNullOrEmpty()) {
-            scope.launch {
-                tracks = tracksDataSource.getTracks()
-            }
-            tracks
-        } else {
-            tracks
-        }
-    }
+    override suspend fun getTrackDetails(trackId: Int): Track =
+        retrieveMediaItemDetails(trackId, scope) { tracksDataSource.getTrackDetails(trackId) }
 
-    override fun getTracksForArtist(artistId: Long): List<Track>? {
-        var tracks: List<Track>? = null
-        return if (tracks.isNullOrEmpty()) {
-            scope.launch {
-                tracks = tracksDataSource.getTracksForArtist(artistId)
-            }
-            tracks
-        } else {
-            tracks
-        }
-    }
+    override suspend fun getTracks(): List<Track> =
+        retrieveMediaItemList(scope = scope) { tracksDataSource.getTracks() }
 
-    override fun getTracksForAlbums(albumId: Long): List<Track>? {
-        var tracks: List<Track>? = null
-        return if (tracks.isNullOrEmpty()) {
-            scope.launch {
-                tracks = tracksDataSource.getTracksForAlbum(albumId)
-            }
-            tracks
-        } else {
-            tracks
-        }
-    }
+    override suspend fun getTracksForArtist(artistId: Int): List<Track> =
+        retrieveMediaItemList(artistId, scope) { tracksDataSource.getTracksForArtist(artistId) }
 
-    override fun getTracksForPlaylist(playlistId: Long): List<Track>? {
-        var tracks: List<Track>? = null
-        return if (tracks.isNullOrEmpty()) {
-            scope.launch {
-                tracks = tracksDataSource.getTracksForPlaylist(playlistId)
-            }
-            tracks
-        } else {
-            tracks
-        }
-    }
+    override suspend fun getTracksForAlbum(albumId: Int): List<Track> =
+        retrieveMediaItemList(albumId, scope) { getTracksForAlbum(albumId) }
 
+    override suspend fun getTracksForPlaylist(playlistId: Int): List<Track> =
+        retrieveMediaItemList(
+            playlistId,
+            scope
+        ) { tracksDataSource.getTracksForPlaylist(playlistId) }
 }
+// TODO: Check if getTracks()works since it has no int parameter

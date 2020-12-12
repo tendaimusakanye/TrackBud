@@ -2,8 +2,13 @@ package com.tendai.common.data.source.local
 
 import android.content.Context
 import android.database.Cursor
-import android.provider.MediaStore.Audio.AudioColumns.*
+import android.provider.MediaStore.Audio.AudioColumns.IS_MUSIC
+import android.provider.MediaStore.Audio.Media.*
+import android.provider.MediaStore.Audio.Playlists.Members.DURATION
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
+import android.util.Log
+import com.tendai.common.data.DataSource
+import com.tendai.common.data.getCursor
 import com.tendai.common.data.model.Track
 import com.tendai.common.extensions.mapList
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +22,23 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
         _ID, TITLE, ALBUM_ID, ALBUM, ARTIST, ARTIST_ID, TRACK, DURATION
     )
 
-    override suspend fun getTracks(): List<Track>? {
+    override suspend fun getTrackDetails(trackId: Int): Track {
+        return withContext(Dispatchers.IO) {
+            val cursor = getCursor(
+                contentResolver,
+                TRACKS_URI,
+                projection,
+                "$_ID = ? AND ${IS_MUSIC}= 1 AND $TITLE != ''",
+                selectionArgs = arrayOf(trackId.toString())
+            )
+            cursor!!.use {
+                mapToTrack(it)
+            }
+        }
+
+    }
+
+    override suspend fun getTracks(): List<Track> {
         return withContext(Dispatchers.IO) {
             val cursor = getCursor(
                 contentResolver,
@@ -25,65 +46,61 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
                 projection,
                 "${IS_MUSIC}=1 AND $TITLE != ''"
             )
-
-            cursor?.let {
-                it.mapList(it, mapToTrack(it))
-            } ?: listOf()
+            cursor!!.use {
+                it.mapList(mapToTrack(it))
+            }
         }
     }
 
-    override suspend fun getTracksForArtist(artistId: Long): List<Track>? {
+    override suspend fun getTracksForArtist(artistId: Int): List<Track> {
         return withContext(Dispatchers.IO) {
             val cursor = getCursor(
                 contentResolver,
                 TRACKS_URI,
                 projection,
                 "${IS_MUSIC}=1 AND $TITLE != ''AND $ARTIST_ID = ?",
-                arrayOf(artistId.toString())
+                selectionArgs = arrayOf(artistId.toString())
             )
-            cursor?.let {
-                it.mapList(it, mapToTrack(it))
-            } ?: listOf()
+            cursor!!.use {
+                it.mapList(mapToTrack(it))
+            }
         }
 
     }
 
-    override suspend fun getTracksForAlbum(albumId: Long): List<Track>? {
+    override suspend fun getTracksForAlbum(albumId: Int): List<Track> {
         return withContext(Dispatchers.IO) {
             val cursor = getCursor(
                 contentResolver,
                 TRACKS_URI,
                 projection,
                 "${IS_MUSIC}=1 AND $TITLE != ''AND $ALBUM_ID = ?",
-                arrayOf(albumId.toString())
+                selectionArgs = arrayOf(albumId.toString())
             )
-
-            cursor?.let {
-                it.mapList(it, mapToTrack(it))
-            } ?: listOf()
+            cursor!!.use {
+                it.mapList(mapToTrack(it))
+            }
         }
     }
 
-    override suspend fun getTracksForPlaylist(playlistId: Long): List<Track>? {
+    override suspend fun getTracksForPlaylist(playlistId: Int): List<Track> {
         return withContext(Dispatchers.IO) {
             //this is how you properly get tracks from a given playlistId
-            val uri = getContentUri("external", playlistId)
+            val uri = getContentUri("external", playlistId.toLong())
             val cursor = getCursor(
                 contentResolver,
                 uri,
                 projection
             )
-
-            cursor?.let {
-                it.mapList(it, mapToTrack(it))
-            } ?: listOf()
+            cursor!!.use {
+                it.mapList(mapToTrack(it))
+            }
         }
-
     }
 
     private fun mapToTrack(cursor: Cursor): Track {
         return if (cursor.moveToFirst()) {
-            with(cursor) {
+            cursor.run {
                 Track(
                     duration = getInt(getColumnIndex(DURATION)),
                     id = getInt(getColumnIndex(_ID)),
@@ -96,8 +113,9 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
                 )
             }
         } else {
+            Log.e(TAG, "Cursor was empty")
             Track()
         }
     }
 }
-
+private const val TAG = "TracksDataSource"

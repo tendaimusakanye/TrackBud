@@ -3,9 +3,12 @@ package com.tendai.common.data.source.local
 import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns._ID
-import android.provider.MediaStore.Audio.AlbumColumns.*
+import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
+import android.provider.MediaStore.Audio.Media.ARTIST_ID
 import android.util.Log
+import com.tendai.common.data.DataSource
+import com.tendai.common.data.getCursor
 import com.tendai.common.data.model.Album
 import com.tendai.common.extensions.mapList
 import kotlinx.coroutines.Dispatchers
@@ -14,44 +17,37 @@ import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_U
 
 class AlbumDataSource(private val context: Context) : DataSource.Albums {
 
-    companion object {
-        private val TAG = AlbumDataSource::class.simpleName
-
-        @Volatile
-        private var INSTANCE: AlbumDataSource? = null
-
-        fun getInstance(context: Context): AlbumDataSource? {
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: AlbumDataSource(context)
-            }
-            return INSTANCE
-        }
-    }
-
+    private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
     private val projection = arrayOf(
-        _ID, ALBUM_ID, ALBUM, ARTIST, ARTIST_ID, FIRST_YEAR, NUMBER_OF_SONGS
+        _ID, ALBUM, ARTIST, ARTIST_ID, FIRST_YEAR, NUMBER_OF_SONGS
     )
 
     //getAlbums for the discover page
-    override suspend fun getAlbums(limit: Int): List<Album>? {
-        return withContext(Dispatchers.IO) {
+    // Do not use the let scope function on the cursor as it does not close the cursor in case of
+    // an error or something else.
+    override suspend fun getAlbums(limit: Int): List<Album> {
+        return withContext(ioDispatcher) {
             val cursor = getCursor(
                 contentResolver = contentResolver,
                 uri = ALBUMS_URI,
                 projection = projection,
                 sortOrder = "LIMIT $limit"
             )
-
-            cursor?.let {
-                it.mapList(it, mapToAlbum(it))
-            } ?: listOf()
+            cursor!!.use {
+                it.mapList(mapToAlbum(it))
+            }
 
         }
     }
 
-    override suspend fun getAlbumsForArtist(artistId: Int): List<Album>? {
-        return withContext(Dispatchers.IO) {
+    // I am using the getCursor method for the flexibility of named arguments.
+    // The content resolver's query method does not offer the flexibility named arguments.
+    // if the cursor is null then something drastic happened. Let NPE be thrown otherwise we found
+    // Nothing. therefore return an empty list or empty mediaItem.
+    // are always returned.
+    override suspend fun getAlbumsForArtist(artistId: Int): List<Album> {
+        return withContext(ioDispatcher) {
             val uri = getContentUri("external", artistId.toLong())
             val cursor = getCursor(
                 contentResolver = contentResolver,
@@ -59,15 +55,14 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
                 projection = projection,
                 sortOrder = "$ALBUM ASC"
             )
-
-            cursor?.let {
-                it.mapList(it, mapToAlbum(it))
-            } ?: listOf()
+            cursor!!.use {
+                it.mapList(mapToAlbum(it))
+            }
         }
     }
 
-    override suspend fun getAlbum(albumId: Int): Album? {
-        return withContext(Dispatchers.IO) {
+    override suspend fun getAlbum(albumId: Int): Album {
+        return withContext(ioDispatcher) {
             val cursor = getCursor(
                 contentResolver = contentResolver,
                 uri = ALBUMS_URI,
@@ -75,38 +70,40 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
                 selection = "$_ID = ?",
                 selectionArgs = arrayOf(albumId.toString())
             )
-            cursor?.use {
-                if (cursor.count != 0) {
-                    //creating album from cursor
-                    mapToAlbum(cursor)
-                } else {
-                    //returning an empty album if cursor returns an empty list
-                    Log.i(TAG, "Empty result. No album matching ${albumId}? could be found")
-                    null
-                }
-            } ?: Album()
+            cursor!!.use {
+                mapToAlbum(it)
+            }
         }
     }
 
+
+    /**
+     * create an album from the cursor.
+     * if moveToFirst is zero then no album or albums were found. return an empty list or an empty album
+     * which makes sense as the cursor returns an empty list as well.
+     *
+     * run scope function is better when returning the lambda result and in the presence of object
+     * initialization See @link https://kotlinlang.org/docs/reference/scope-functions.html
+     */
     private fun mapToAlbum(cursor: Cursor): Album {
         return if (cursor.moveToFirst()) {
-            with(cursor) {
+            cursor.run {
                 Album(
                     id = getLong(getColumnIndex(_ID)),
-                    albumId = getInt(getColumnIndex(ALBUM_ID)),
                     albumTitle = getString(getColumnIndex(ALBUM)),
                     artistName = getString(getColumnIndex(ARTIST)),
-                    numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS)),
+                    artistId = getInt(getColumnIndex(ARTIST_ID)),
                     yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
-                    artistId = getInt(getColumnIndex(ARTIST_ID))
+                    numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS))
                 )
             }
         } else {
+            Log.i(TAG, "Cursor was empty")
             Album()
         }
     }
 }
 
-//TODO: Make these data source classes thread-safe and singletons.
-//TODO: Handle ARTIST_ID for lower APIs
-//TODO: Implement Error handling not just return empty lists and objects.
+private const val TAG = "AlbumDataSource"
+
+//TODO: check if list is empty or not in-place of error handling list.isEmpty()

@@ -4,20 +4,19 @@ import android.database.Cursor
 
 //function to map cursor results to a generic list which could either be an Album ,Track , Playlist
 // or Artist
- fun <T> Cursor.mapList(
-    cursor: Cursor,
+fun <T> Cursor.mapList(
     mapper: T
 ): List<T> {
-    val result = arrayListOf<T>()
-    return cursor.use {
-        if (cursor.moveToFirst()) {
+    return this.use {
+        if (it.moveToFirst()) {
+            val result = arrayListOf<T>()
             do {
                 result.add(mapper)
-            } while (cursor.moveToNext())
+            } while (it.moveToNext())
             result
         } else {
-            //return an empty arrayList either way.
-            result
+            //return an empty read-only list either way.
+            listOf()
         }
     }
 }

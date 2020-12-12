@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media.MediaBrowserServiceCompat
-import com.tendai.common.playback.PlaybackManager
 
 class MusicService : MediaBrowserServiceCompat() {
 
@@ -27,14 +26,13 @@ class MusicService : MediaBrowserServiceCompat() {
 
     }
 
-    private lateinit var playbackManager: PlaybackManager
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaNotificationManager: MediaNotificationManager
 
     override fun onCreate() {
         super.onCreate()
 
-        //todo: initialize or setUp my music source.
+        //todo: initialize or setUp my music source. i.e. local storage
         //Pending intent to launch the Ui of the Music Player from the notification Panel
         val sessionPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->

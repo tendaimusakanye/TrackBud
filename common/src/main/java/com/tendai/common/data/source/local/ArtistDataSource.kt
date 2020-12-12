@@ -4,20 +4,26 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore.Audio.ArtistColumns.*
 import android.provider.MediaStore.Audio.Artists._ID
+import android.util.Log
+import com.tendai.common.data.DataSource
+import com.tendai.common.data.getCursor
 import com.tendai.common.data.model.Artist
 import com.tendai.common.extensions.mapList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import android.provider.MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI as ARTISTS_URI
 
 class ArtistDataSource(private val context: Context) : DataSource.Artists {
 
+    private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
     private val projection = arrayOf(
         _ID, ARTIST, NUMBER_OF_ALBUMS, NUMBER_OF_TRACKS
     )
 
-    override fun getAllArtists(): List<Artist>? {
+    override suspend fun getAllArtists(): List<Artist> {
         //this is where execution is moved to a different thread
-//     / /  return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val cursor =
                 getCursor(
                     contentResolver,
@@ -25,16 +31,15 @@ class ArtistDataSource(private val context: Context) : DataSource.Artists {
                     projection,
                     sortOrder = "$ARTIST  ASC"
                 )
-
-         return   cursor?.let {
-                it.mapList(it, mapToArtist(it))
-            } ?: listOf()
-//       / }
+            cursor!!.use {
+                it.mapList(mapToArtist(it))
+            }
+        }
     }
 
     private fun mapToArtist(cursor: Cursor): Artist {
         return if (cursor.moveToFirst()) {
-            with(cursor) {
+            cursor.run{
                 Artist(
                     artistId = getInt(getColumnIndex(_ID)),
                     artistName = getString(getColumnIndex(ARTIST)),
@@ -43,9 +48,12 @@ class ArtistDataSource(private val context: Context) : DataSource.Artists {
                 )
             }
         } else {
+            Log.e(TAG, "Cursor was empty")
             Artist()
         }
     }
 }
-
-//TODO: Check the size of the list before calling the get function.
+private const val TAG = "ArtistDataSource"
+//TODO: Check the size of the list/ check if list is empty always before re
+// retrieving any before calling the get function on variables.
+//TODO: Singletons or not ?? why did I abandon them by the way ?

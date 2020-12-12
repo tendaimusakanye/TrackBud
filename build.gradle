@@ -9,7 +9,7 @@ buildscript {
         appCompatVersion = '1.2.0'
 
         //coroutines
-        coroutinesVersion = '1.2.1'
+        coroutinesVersion = '1.4.0'
     }
 
     repositories {
