@@ -4,7 +4,6 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore.Audio.ArtistColumns.*
 import android.provider.MediaStore.Audio.Artists._ID
-import android.util.Log
 import com.tendai.common.data.DataSource
 import com.tendai.common.data.getCursor
 import com.tendai.common.data.model.Artist
@@ -31,27 +30,22 @@ class ArtistDataSource(private val context: Context) : DataSource.Artists {
                     projection,
                     sortOrder = "$ARTIST  ASC"
                 )
-            cursor!!.use {
-                it.mapList(mapToArtist(it))
+            cursor!!.use { result ->
+                result.mapList { mapToArtist(it) }
             }
         }
     }
 
-    private fun mapToArtist(cursor: Cursor): Artist {
-        return if (cursor.moveToFirst()) {
-            cursor.run{
-                Artist(
-                    artistId = getInt(getColumnIndex(_ID)),
-                    artistName = getString(getColumnIndex(ARTIST)),
-                    numberOfAlbums = getInt(getColumnIndex(NUMBER_OF_ALBUMS)),
-                    numberOfTracks = getInt(getColumnIndex(NUMBER_OF_TRACKS))
-                )
-            }
-        } else {
-            Log.e(TAG, "Cursor was empty")
-            Artist()
+    private fun mapToArtist(cursor: Cursor): Artist =
+        cursor.run {
+            Artist(
+                artistId = getInt(getColumnIndex(_ID)),
+                artistName = getString(getColumnIndex(ARTIST)),
+                numberOfAlbums = getInt(getColumnIndex(NUMBER_OF_ALBUMS)),
+                numberOfTracks = getInt(getColumnIndex(NUMBER_OF_TRACKS))
+            )
         }
-    }
+
 }
 private const val TAG = "ArtistDataSource"
 //TODO: Check the size of the list/ check if list is empty always before re

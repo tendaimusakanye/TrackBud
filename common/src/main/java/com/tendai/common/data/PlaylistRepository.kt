@@ -31,7 +31,7 @@ class PlaylistRepository(private val playlistDataSource: PlaylistDataSource) :
         TODO("Not yet implemented")
     }
 
-    override suspend fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
+    override fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
         TODO("Not yet implemented")
     }
 

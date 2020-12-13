@@ -6,7 +6,6 @@ import android.provider.MediaStore.Audio.AudioColumns.IS_MUSIC
 import android.provider.MediaStore.Audio.Media.*
 import android.provider.MediaStore.Audio.Playlists.Members.DURATION
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
-import android.util.Log
 import com.tendai.common.data.DataSource
 import com.tendai.common.data.getCursor
 import com.tendai.common.data.model.Track
@@ -46,8 +45,8 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
                 projection,
                 "${IS_MUSIC}=1 AND $TITLE != ''"
             )
-            cursor!!.use {
-                it.mapList(mapToTrack(it))
+            cursor!!.use { result ->
+                result.mapList { mapToTrack(it) }
             }
         }
     }
@@ -61,8 +60,8 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
                 "${IS_MUSIC}=1 AND $TITLE != ''AND $ARTIST_ID = ?",
                 selectionArgs = arrayOf(artistId.toString())
             )
-            cursor!!.use {
-                it.mapList(mapToTrack(it))
+            cursor!!.use { result ->
+                result.mapList { mapToTrack(it) }
             }
         }
 
@@ -77,8 +76,8 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
                 "${IS_MUSIC}=1 AND $TITLE != ''AND $ALBUM_ID = ?",
                 selectionArgs = arrayOf(albumId.toString())
             )
-            cursor!!.use {
-                it.mapList(mapToTrack(it))
+            cursor!!.use { result ->
+                result.mapList { mapToTrack(it) }
             }
         }
     }
@@ -92,30 +91,28 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
                 uri,
                 projection
             )
-            cursor!!.use {
-                it.mapList(mapToTrack(it))
+            cursor!!.use { result ->
+                result.mapList { mapToTrack(it) }
             }
         }
     }
 
-    private fun mapToTrack(cursor: Cursor): Track {
-        return if (cursor.moveToFirst()) {
-            cursor.run {
-                Track(
-                    duration = getInt(getColumnIndex(DURATION)),
-                    id = getInt(getColumnIndex(_ID)),
-                    trackName = getString(getColumnIndex(TITLE)),
-                    albumId = getInt(getColumnIndex(ALBUM_ID)),
-                    albumName = getString(getColumnIndex(ALBUM)),
-                    artistId = getInt(getColumnIndex(ARTIST_ID)),
-                    artistName = getString(getColumnIndex(ARTIST)),
-                    trackNumber = getInt(getColumnIndex(TRACK))
-                )
-            }
-        } else {
-            Log.e(TAG, "Cursor was empty")
-            Track()
+    private fun mapToTrack(cursor: Cursor): Track =
+        cursor.run {
+            Track(
+                duration = getInt(getColumnIndex(DURATION)),
+                id = getInt(getColumnIndex(_ID)),
+                trackName = getString(getColumnIndex(TITLE)),
+                albumId = getInt(getColumnIndex(ALBUM_ID)),
+                albumName = getString(getColumnIndex(ALBUM)),
+                artistId = getInt(getColumnIndex(ARTIST_ID)),
+                artistName = getString(getColumnIndex(ARTIST)),
+                trackNumber = getInt(getColumnIndex(TRACK))
+            )
         }
-    }
+
 }
+
 private const val TAG = "TracksDataSource"
+
+//todo: _id or track_id or album_id which is which android ?

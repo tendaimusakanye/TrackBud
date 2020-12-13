@@ -6,7 +6,6 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
-import android.util.Log
 import com.tendai.common.data.DataSource
 import com.tendai.common.data.getCursor
 import com.tendai.common.data.model.Album
@@ -34,10 +33,9 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
                 projection = projection,
                 sortOrder = "LIMIT $limit"
             )
-            cursor!!.use {
-                it.mapList(mapToAlbum(it))
+            cursor!!.use { result ->
+                result.mapList { mapToAlbum(it) }
             }
-
         }
     }
 
@@ -55,8 +53,8 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
                 projection = projection,
                 sortOrder = "$ALBUM ASC"
             )
-            cursor!!.use {
-                it.mapList(mapToAlbum(it))
+            cursor!!.use { result ->
+                result.mapList { mapToAlbum(it) }
             }
         }
     }
@@ -85,23 +83,17 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
      * run scope function is better when returning the lambda result and in the presence of object
      * initialization See @link https://kotlinlang.org/docs/reference/scope-functions.html
      */
-    private fun mapToAlbum(cursor: Cursor): Album {
-        return if (cursor.moveToFirst()) {
-            cursor.run {
-                Album(
-                    id = getLong(getColumnIndex(_ID)),
-                    albumTitle = getString(getColumnIndex(ALBUM)),
-                    artistName = getString(getColumnIndex(ARTIST)),
-                    artistId = getInt(getColumnIndex(ARTIST_ID)),
-                    yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
-                    numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS))
-                )
-            }
-        } else {
-            Log.i(TAG, "Cursor was empty")
-            Album()
+    private fun mapToAlbum(cursor: Cursor): Album =
+        cursor.run {
+            Album(
+                id = getLong(getColumnIndex(_ID)),
+                albumTitle = getString(getColumnIndex(ALBUM)),
+                artistName = getString(getColumnIndex(ARTIST)),
+                artistId = getInt(getColumnIndex(ARTIST_ID)),
+                yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
+                numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS))
+            )
         }
-    }
 }
 
 private const val TAG = "AlbumDataSource"

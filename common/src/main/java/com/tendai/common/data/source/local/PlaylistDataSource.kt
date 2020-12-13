@@ -20,11 +20,13 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
 
     private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
-    private val projection = arrayOf(
-        NAME
+    //playlist_Id should automatically inserted I think. Yet to see.
+    private val newPlaylistProjection = arrayOf(
+        PLAYLIST_ID,NAME
     )
+    // the playOrder column should be already there within the MediaStore. Android or should ?
     private val playOrderProjection = arrayOf(
-        _ID, NAME
+        _ID, NAME, PLAY_ORDER
     )
 
     override suspend fun getAllPlaylists(limit: Int): List<Playlist> {
@@ -33,11 +35,11 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
                 getCursor(
                     contentResolver,
                     PLAYLIST_URI,
-                    projection,
+                    newPlaylistProjection,
                     sortOrder = "LIMIT $limit"
                 )
-            cursor!!.use {
-                it.mapList(mapToPlaylist(it))
+            cursor!!.use {result ->
+                result.mapList { mapToPlaylist(it) }
             }
         }
     }
@@ -52,7 +54,7 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
                     getCursor(
                         contentResolver,
                         PLAYLIST_URI,
-                        projection,
+                        newPlaylistProjection,
                         "$NAME = ?",
                         arrayOf(name)
                     )
@@ -95,7 +97,7 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
                 if (trackIds.isNotEmpty()) {
                     val contentValues = Array(trackIds.size) { ContentValues() }
                     if (playOrder != -1) {
-                        for (i in 0..trackIds.size) {
+                        for (i in trackIds.indices) {
                             contentValues[i].put(AUDIO_ID, trackIds[i])
                             contentValues[i].put(PLAY_ORDER, playOrder++)
                         }
@@ -109,7 +111,7 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
     }
 
     override suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int =
-        contentResolver.delete(PLAYLIST_URI, "$_ID = ?", arrayOf(trackIds.toString()))
+        contentResolver.delete(PLAYLIST_URI, "$AUDIO_ID = ?", arrayOf(trackIds.toString()))
 
     // this is called inside withContext already so no need to make any further computations.
     override fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
@@ -119,7 +121,7 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
             getCursor(
                 contentResolver = contentResolver,
                 uri = uri,
-                projection = arrayOf(_ID)
+                projection = arrayOf(AUDIO_ID)
             )
         return cursor!!.count
     }
@@ -150,23 +152,19 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
         }
     }
 
-    private fun mapToPlaylist(cursor: Cursor, playlistId: Int = -1): Playlist {
-        return if (cursor.moveToFirst()) {
-            cursor.run {
-                Playlist(
-                    playlistId = getInt(getColumnIndex(PLAYLIST_ID)),
-                    playlistName = getString(getColumnIndex(NAME)),
-                    numberOfTracks = getNumberOfSongsInPlaylist(playlistId)
-                )
-            }
-        } else {
-            Log.e(TAG, "Cursor was empty")
-            Playlist()
+    private fun mapToPlaylist(cursor: Cursor): Playlist =
+        cursor.run {
+            Playlist(
+                playlistId = getInt(getColumnIndex(PLAYLIST_ID)),
+                playlistName = getString(getColumnIndex(NAME)),
+                numberOfTracks = getNumberOfSongsInPlaylist(getInt(getColumnIndex(PLAYLIST_ID)))
+            )
         }
-    }
+
 }
 
 private const val TAG = "PlaylistDataSource"
 
-//TODO: Write tests against these methods to see if they work as expected.
+
 //todo: check the ints returned when dealing with playlists. if -1 then respond appropriately
+//todo: what happens if I leave out other fields when inserting into t
