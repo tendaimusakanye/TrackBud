@@ -25,7 +25,9 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
     //getAlbums for the discover page
     // Do not use the let scope function on the cursor as it does not close the cursor in case of
     // an error or something else.
-    override suspend fun getAlbums(limit: Int): List<Album> {
+    override suspend fun getAlbums(
+        limit: Int
+    ): List<Album> {
         return withContext(ioDispatcher) {
             val cursor = getCursor(
                 contentResolver = contentResolver,
@@ -86,7 +88,7 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
     private fun mapToAlbum(cursor: Cursor): Album =
         cursor.run {
             Album(
-                id = getLong(getColumnIndex(_ID)),
+                id = getInt(getColumnIndex(_ID)),
                 albumTitle = getString(getColumnIndex(ALBUM)),
                 artistName = getString(getColumnIndex(ARTIST)),
                 artistId = getInt(getColumnIndex(ARTIST_ID)),
@@ -95,7 +97,6 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
             )
         }
 }
-
 private const val TAG = "AlbumDataSource"
 
 //TODO: check if list is empty or not in-place of error handling list.isEmpty()

@@ -1,12 +1,11 @@
 package com.tendai.common.data
 
 import com.tendai.common.data.model.Album
-import com.tendai.common.data.source.local.AlbumDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-class AlbumsRepository(private val albumDataSource: AlbumDataSource) : DataSource.Albums {
+class AlbumsRepository(private val albumDataSource: DataSource.Albums) : DataSource.Albums {
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -18,5 +17,4 @@ class AlbumsRepository(private val albumDataSource: AlbumDataSource) : DataSourc
 
     override suspend fun getAlbum(albumId: Int): Album =
         retrieveMediaItemDetails(albumId, scope) { albumDataSource.getAlbum(albumId) }
-
 }

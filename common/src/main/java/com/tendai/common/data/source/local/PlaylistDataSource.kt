@@ -20,10 +20,12 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
 
     private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
+
     //playlist_Id should automatically inserted I think. Yet to see.
     private val newPlaylistProjection = arrayOf(
-        PLAYLIST_ID,NAME
+        PLAYLIST_ID, NAME
     )
+
     // the playOrder column should be already there within the MediaStore. Android or should ?
     private val playOrderProjection = arrayOf(
         _ID, NAME, PLAY_ORDER
@@ -38,7 +40,7 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
                     newPlaylistProjection,
                     sortOrder = "LIMIT $limit"
                 )
-            cursor!!.use {result ->
+            cursor!!.use { result ->
                 result.mapList { mapToPlaylist(it) }
             }
         }
@@ -111,10 +113,13 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
     }
 
     override suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int =
-        contentResolver.delete(PLAYLIST_URI, "$AUDIO_ID = ?", arrayOf(trackIds.toString()))
+        withContext(ioDispatcher) {
+            contentResolver.delete(PLAYLIST_URI, "$AUDIO_ID = ?", arrayOf(trackIds.toString()))
+        }
+
 
     // this is called inside withContext already so no need to make any further computations.
-    override fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
+    private fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
         if (playlistId == -1) return -1
         val uri = getContentUri("external", playlistId.toLong())
         val cursor =
@@ -167,4 +172,4 @@ private const val TAG = "PlaylistDataSource"
 
 
 //todo: check the ints returned when dealing with playlists. if -1 then respond appropriately
-//todo: what happens if I leave out other fields when inserting into t
+

@@ -112,7 +112,6 @@ class TracksDataSource(private val context: Context) : DataSource.Tracks {
         }
 
 }
-
 private const val TAG = "TracksDataSource"
 
-//todo: _id or track_id or album_id which is which android ?
+

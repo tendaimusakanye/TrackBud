@@ -1,12 +1,11 @@
 package com.tendai.common.data
 
 import com.tendai.common.data.model.Track
-import com.tendai.common.data.source.local.TracksDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-class TracksRepository(private val tracksDataSource: TracksDataSource) : DataSource.Tracks {
+class TracksRepository(private val tracksDataSource: DataSource.Tracks) : DataSource.Tracks {
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -20,7 +19,7 @@ class TracksRepository(private val tracksDataSource: TracksDataSource) : DataSou
         retrieveMediaItemList(artistId, scope) { tracksDataSource.getTracksForArtist(artistId) }
 
     override suspend fun getTracksForAlbum(albumId: Int): List<Track> =
-        retrieveMediaItemList(albumId, scope) { getTracksForAlbum(albumId) }
+        retrieveMediaItemList(albumId, scope) { tracksDataSource.getTracksForAlbum(albumId) }
 
     override suspend fun getTracksForPlaylist(playlistId: Int): List<Track> =
         retrieveMediaItemList(

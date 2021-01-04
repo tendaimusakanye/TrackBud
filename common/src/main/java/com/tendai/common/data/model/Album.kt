@@ -2,7 +2,7 @@ package com.tendai.common.data.model
 
 
 data class Album(
-    var id: Long = -1,
+    var id: Int = -1,
     var albumTitle: String = "",
     var artistName: String = "",
     var artistId: Int = -1,

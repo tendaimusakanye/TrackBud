@@ -35,7 +35,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     //media
-    implementation "androidx.media:media:1.1.0"
+    implementation "androidx.media:media:1.2.1"
 
 
     //core
@@ -45,6 +45,8 @@ dependencies {
 
     // unit tests
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.2'
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
 
 
     //instrumentation tests

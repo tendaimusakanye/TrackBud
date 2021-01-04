@@ -43,7 +43,7 @@ interface DataSource {
 
     interface Playlists {
 
-        suspend fun getAllPlaylists(limit: Int): List<Playlist>?
+        suspend fun getAllPlaylists(limit: Int): List<Playlist>
 
         suspend fun createNewPlaylist(name: String): Uri?
 
@@ -53,7 +53,6 @@ interface DataSource {
 
         suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int
 
-        fun getNumberOfSongsInPlaylist(playlistId: Int): Int
     }
 }
 
@@ -95,6 +94,7 @@ internal fun <T> retrieveMediaItemList(
         mediaItemsList
     }!!
 }
+
 
 /**
  * @param selection is similar to sql's WHERE clause e.g WHERE name = "Tendai"
