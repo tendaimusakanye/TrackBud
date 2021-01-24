@@ -21,10 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.BaseActivity" />
 
         <service
-            android:name="com.tendai.common.MusicService"
+            android:name="com.tendai.common.media.MusicService"
             tools:ignore="ExportedService" >
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />

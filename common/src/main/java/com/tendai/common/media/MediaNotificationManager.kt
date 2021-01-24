@@ -1,4 +1,4 @@
-package com.tendai.common
+package com.tendai.common.media
 
 class MediaNotificationManager {
 }

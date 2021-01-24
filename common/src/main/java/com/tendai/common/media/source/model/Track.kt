@@ -1,4 +1,4 @@
-package com.tendai.common.data.model
+package com.tendai.common.media.source.model
 
 
 data class Track(
@@ -14,3 +14,4 @@ data class Track(
     var playlistId: String = ""
 
 )
+//todo: remove unused fields e.g. artistID, playlistID from both the models and the data sources.

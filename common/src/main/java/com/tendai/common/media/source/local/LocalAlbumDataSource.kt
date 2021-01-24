@@ -1,4 +1,4 @@
-package com.tendai.common.data.source.local
+package com.tendai.common.media.source.local
 
 import android.content.Context
 import android.database.Cursor
@@ -6,15 +6,14 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
-import com.tendai.common.data.DataSource
-import com.tendai.common.data.getCursor
-import com.tendai.common.data.model.Album
-import com.tendai.common.extensions.mapList
+import com.tendai.common.media.extensions.mapList
+import com.tendai.common.media.source.model.Album
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
 
-class AlbumDataSource(private val context: Context) : DataSource.Albums {
+class AlbumLocalDataSource(context: Context) : LocalDataSource,
+    LocalDataSource.Albums {
 
     private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
@@ -90,13 +89,16 @@ class AlbumDataSource(private val context: Context) : DataSource.Albums {
             Album(
                 id = getInt(getColumnIndex(_ID)),
                 albumTitle = getString(getColumnIndex(ALBUM)),
-                artistName = getString(getColumnIndex(ARTIST)),
+                albumArtist = getString(getColumnIndex(ARTIST)),
                 artistId = getInt(getColumnIndex(ARTIST_ID)),
                 yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
                 numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS))
             )
         }
 }
-private const val TAG = "AlbumDataSource"
+
+private const val TAG = "LocalAlbumDataSource"
 
 //TODO: check if list is empty or not in-place of error handling list.isEmpty()
+//TODO: Handle retrieval of the album art i.e. thumbnail
+//Todo: lifecycle of my coroutines in these data source. I want them tied to the service lifecyle

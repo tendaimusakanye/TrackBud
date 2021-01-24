@@ -1,4 +1,4 @@
-package com.tendai.common.extensions
+package com.tendai.common.media.extensions
 
 import android.database.Cursor
 
@@ -6,7 +6,7 @@ import android.database.Cursor
 // or Artist
 // Passing a lambda as it is lazily invoked like a callback/ Anonymous inner class. So passing in
 // function returns the appropriate results
-// appropriate results compared to the jvm implementation
+// appropriate results compared to passing it as a function parameter
 fun <T> Cursor.mapList(
     mapper: (cursor: Cursor) -> T
 ): List<T> {

@@ -1,18 +1,17 @@
-package com.tendai.common.data.source.local
+package com.tendai.common.media.source.local
 
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore.Audio.ArtistColumns.*
 import android.provider.MediaStore.Audio.Artists._ID
-import com.tendai.common.data.DataSource
-import com.tendai.common.data.getCursor
-import com.tendai.common.data.model.Artist
-import com.tendai.common.extensions.mapList
+import com.tendai.common.media.extensions.mapList
+import com.tendai.common.media.source.model.Artist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.provider.MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI as ARTISTS_URI
 
-class ArtistDataSource(private val context: Context) : DataSource.Artists {
+class ArtistLocalDataSource(context: Context) : LocalDataSource,
+    LocalDataSource.Artists {
 
     private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
@@ -47,7 +46,7 @@ class ArtistDataSource(private val context: Context) : DataSource.Artists {
         }
 
 }
-private const val TAG = "ArtistDataSource"
+private const val TAG = "LocalArtistDataSource"
 //TODO: Check the size of the list/ check if list is empty always before re
 // retrieving any before calling the get function on variables.
 //TODO: Singletons or not ?? why did I abandon them by the way ?

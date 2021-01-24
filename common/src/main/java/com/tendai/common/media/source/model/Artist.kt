@@ -1,9 +1,9 @@
-package com.tendai.common.data.model
+package com.tendai.common.media.source.model
 
 
 data class Artist(
     var artistId: Int = -1,
-    var artistName: String = "Empty",
+    var artistName: String = "",
     var numberOfAlbums: Int = 0,
     var numberOfTracks: Int = 0
 )

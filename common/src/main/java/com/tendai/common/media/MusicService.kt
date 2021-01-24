@@ -1,4 +1,4 @@
-package com.tendai.common
+package com.tendai.common.media
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -10,30 +10,12 @@ import androidx.media.MediaBrowserServiceCompat
 
 class MusicService : MediaBrowserServiceCompat() {
 
-    companion object {
-        val TAG: String = MusicService::class.simpleName!!
-
-        //Indicates the incoming intent has a command to be executed in
-        //(see {@link #onStartCommand})
-        const val ACTION_COMMAND: String = "ACTION_COMMAND"
-
-        // The key in the extras of the incoming Intent indicating the command that
-        //  should be executed e.g. PLAY, PAUSE
-        const val COMMAND_NAME = "COMMAND_NAME"
-
-        // A value of a CMD_NAME key in the extras of the incoming Intent that
-        // indicates that the music playback should be paused (see {@link #onStartCommand})
-        const val COMMAND_PAUSE = "COMMAND_PAUSE"
-
-    }
-
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaNotificationManager: MediaNotificationManager
 
     override fun onCreate() {
         super.onCreate()
 
-        //todo: initialize or setUp my music source. i.e. local storage
         //Pending intent to launch the Ui of the Music Player from the notification Panel
         val sessionPendingIntent =
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
@@ -54,6 +36,7 @@ class MusicService : MediaBrowserServiceCompat() {
 
         //initializing the notification manager
         //todo: initialize my notification manager
+        //todo: handle listening to external storage i.e. memory cards or waiting for permission read storage.
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -88,3 +71,5 @@ class MusicService : MediaBrowserServiceCompat() {
     }
 
 }
+
+const val TAG: String = "MusicService "

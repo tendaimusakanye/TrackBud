@@ -1,4 +1,4 @@
-package com.tendai.common.data.source.local
+package com.tendai.common.media.source.local
 
 import android.content.ContentValues
 import android.content.Context
@@ -8,15 +8,14 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore.Audio.Playlists.Members.*
 import android.provider.MediaStore.Audio.PlaylistsColumns.NAME
 import android.util.Log
-import com.tendai.common.data.DataSource
-import com.tendai.common.data.getCursor
-import com.tendai.common.data.model.Playlist
-import com.tendai.common.extensions.mapList
+import com.tendai.common.media.extensions.mapList
+import com.tendai.common.media.source.model.Playlist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.provider.MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI as PLAYLIST_URI
 
-class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
+class PlaylistLocalDataSource(context: Context) : LocalDataSource,
+    LocalDataSource.Playlists {
 
     private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
@@ -167,8 +166,7 @@ class PlaylistDataSource(private val context: Context) : DataSource.Playlists {
         }
 
 }
-
-private const val TAG = "PlaylistDataSource"
+private const val TAG = "LocalPlaylistDataSource"
 
 
 //todo: check the ints returned when dealing with playlists. if -1 then respond appropriately
