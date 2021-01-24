@@ -3,8 +3,6 @@ package com.tendai.common.media.source
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
 import com.tendai.common.media.extensions.mapFrom
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 interface Repository {
 
@@ -56,56 +54,46 @@ interface Repository {
  */
 internal inline fun <reified T> retrieveMediaItemDetails(
     int: Int,
-    scope: CoroutineScope,
-    noinline block: suspend (int: Int) -> T
+    block: (int: Int) -> T
 ): MediaMetadataCompat {
-    val mediaItem: T? = null
+    var mediaItem: T?
     var metadataCompat: MediaMetadataCompat? = null
 
     return metadataCompat ?: run {
-        scope.launch {
-            //try catch should be thrown here if this throws and exception but it doesn't
-            // when the coroutine gets here it jumps out of this method and does other things. The code below is only
-            //executed when the coroutine returns.
-            mediaItem ?: block.invoke(int)
+        //try catch should be thrown here if this throws and exception but it doesn't
+        // when the coroutine gets here it jumps out of this method and does other things. The code below is only
+        //executed when the coroutine returns.
+        mediaItem = block.invoke(int)
+        metadataCompat = MediaMetadataCompat.Builder()
+            .mapFrom(mediaItem!!)
+            .build()
 
-            val result = MediaMetadataCompat.Builder()
-                .mapFrom(mediaItem!!)
-                .build()
-
-            metadataCompat = result
-        }
         metadataCompat
-    } !!
+    }!!
 }
 
 /**
  * if mediaItemsList is null, Null is never returned only an empty list since no results matching the given criteria
  * where found. If null is returned then something drastic happened.
  */
-//PS I do not understand what the heck I am doing. I should read about inline, noinline, reified type parameters.
 internal inline fun <reified T> retrieveMediaItemList(
     int: Int = -1,
-    scope: CoroutineScope,
-    noinline block: suspend (int: Int) -> List<T>
+    block: (int: Int) -> List<T>
 ): List<MediaMetadataCompat> {
 
-    val mediaItemsList: List<T>? = null
+    var mediaItemsList: List<T>
     var metadataCompats: List<MediaMetadataCompat>? = null
 
     return metadataCompats ?: run {
-        scope.launch {
-            mediaItemsList ?: block.invoke(int)
-
-            mediaItemsList!!.let { list ->
-                if (list.isNotEmpty()) {
-                    val result = list.map { item ->
-                        MediaMetadataCompat.Builder()
-                            .mapFrom(item)
-                            .build()
-                    }
-                    metadataCompats = result
+        mediaItemsList = block.invoke(int)
+        mediaItemsList!!.let { list ->
+            if (list.isNotEmpty()) {
+                val result = list.map { item ->
+                    MediaMetadataCompat.Builder()
+                        .mapFrom(item)
+                        .build()
                 }
+                metadataCompats = result
             }
         }
         metadataCompats

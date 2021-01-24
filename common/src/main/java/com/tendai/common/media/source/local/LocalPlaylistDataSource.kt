@@ -10,114 +10,98 @@ import android.provider.MediaStore.Audio.PlaylistsColumns.NAME
 import android.util.Log
 import com.tendai.common.media.extensions.mapList
 import com.tendai.common.media.source.model.Playlist
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import android.provider.MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI as PLAYLIST_URI
 
 class PlaylistLocalDataSource(context: Context) : LocalDataSource,
     LocalDataSource.Playlists {
 
-    private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
-
     //playlist_Id should automatically inserted I think. Yet to see.
     private val newPlaylistProjection = arrayOf(
         PLAYLIST_ID, NAME
     )
-
     // the playOrder column should be already there within the MediaStore. Android or should ?
     private val playOrderProjection = arrayOf(
         _ID, NAME, PLAY_ORDER
     )
 
-    override suspend fun getAllPlaylists(limit: Int): List<Playlist> {
-        return withContext(ioDispatcher) {
+    override fun getAllPlaylists(limit: Int): List<Playlist> {
+        val cursor =
+            getCursor(
+                contentResolver,
+                PLAYLIST_URI,
+                newPlaylistProjection,
+                sortOrder = "LIMIT $limit"
+            )
+        return cursor!!.use { result ->
+            result.mapList { mapToPlaylist(it) }
+        }
+    }
+
+    // android is forcing me to return a null Uri here
+    override fun createNewPlaylist(name: String): Uri? {
+        if (name.isEmpty()) return null
+        //first query to check if there are other playlists with the same name.
+        return synchronized(this) {
             val cursor =
                 getCursor(
                     contentResolver,
                     PLAYLIST_URI,
                     newPlaylistProjection,
-                    sortOrder = "LIMIT $limit"
+                    "$NAME = ?",
+                    arrayOf(name)
                 )
-            cursor!!.use { result ->
-                result.mapList { mapToPlaylist(it) }
-            }
-        }
-    }
 
-    // android is forcing me to return a null Uri here
-    override suspend fun createNewPlaylist(name: String): Uri? {
-        if (name.isEmpty()) return null
-        return withContext(ioDispatcher) {
-            //first query to check if there are other playlists with the same name.
-            synchronized(this) {
-                val cursor =
-                    getCursor(
-                        contentResolver,
-                        PLAYLIST_URI,
-                        newPlaylistProjection,
-                        "$NAME = ?",
-                        arrayOf(name)
-                    )
-
-                cursor!!.use {
-                    //checking to see if a playlist with @param name exists or not
-                    if (!cursor.moveToFirst()) {
-                        //inserting values into the MediaStore.Audio.Playlist
-                        val playlistDetails = ContentValues().apply {
-                            put(NAME, name)
-                        }
-                        contentResolver.insert(PLAYLIST_URI, playlistDetails)
-                    } else {
-                        Log.i(TAG, "Playlist with the given name already exists")
-                        Uri.EMPTY
+            cursor!!.use {
+                //checking to see if a playlist with @param name exists or not
+                if (!cursor.moveToFirst()) {
+                    //inserting values into the MediaStore.Audio.Playlist
+                    val playlistDetails = ContentValues().apply {
+                        put(NAME, name)
                     }
-                }
-            }
-        }
-    }
-
-    override suspend fun deletePlaylist(playlistId: Int): Int =
-        withContext(ioDispatcher) {
-            contentResolver.delete(
-                PLAYLIST_URI,
-                "$_ID = ?",
-                arrayOf(playlistId.toString())
-            )
-        }
-
-    override suspend fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int {
-        return withContext(ioDispatcher) {
-            // this is done to get the correct Uri for us to insert the songs into the playlists.
-            // That is just how android is
-            // android recommends insert and update methods be thread safe. i.e. the reason for the synchronized block
-            synchronized(this) {
-                val uri = getContentUri("external", playlistId.toLong())
-                var playOrder = getHighestPlayOrder(playlistId)
-
-                if (trackIds.isNotEmpty()) {
-                    val contentValues = Array(trackIds.size) { ContentValues() }
-                    if (playOrder != -1) {
-                        for (i in trackIds.indices) {
-                            contentValues[i].put(AUDIO_ID, trackIds[i])
-                            contentValues[i].put(PLAY_ORDER, playOrder++)
-                        }
-                    }
-                    contentResolver.bulkInsert(uri, contentValues)
+                    contentResolver.insert(PLAYLIST_URI, playlistDetails)
                 } else {
-                    -1
+                    Log.i(TAG, "Playlist with the given name already exists")
+                    Uri.EMPTY
                 }
             }
         }
     }
 
-    override suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int =
-        withContext(ioDispatcher) {
-            contentResolver.delete(PLAYLIST_URI, "$AUDIO_ID = ?", arrayOf(trackIds.toString()))
+    override fun deletePlaylist(playlistId: Int): Int =
+        contentResolver.delete(
+            PLAYLIST_URI,
+            "$_ID = ?",
+            arrayOf(playlistId.toString())
+        )
+
+
+    override fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int {
+        // this is done to get the correct Uri for us to insert the songs into the playlists.
+        // That is just how android is
+        // android recommends insert and update methods be thread safe. i.e. the reason for the synchronized block
+        return synchronized(this) {
+            val uri = getContentUri("external", playlistId.toLong())
+            var playOrder = getHighestPlayOrder(playlistId)
+
+            if (trackIds.isNotEmpty()) {
+                val contentValues = Array(trackIds.size) { ContentValues() }
+                if (playOrder != -1) {
+                    for (i in trackIds.indices) {
+                        contentValues[i].put(AUDIO_ID, trackIds[i])
+                        contentValues[i].put(PLAY_ORDER, playOrder++)
+                    }
+                }
+                contentResolver.bulkInsert(uri, contentValues)
+            } else {
+                -1
+            }
         }
+    }
 
+    override fun removeTrackFromPlaylist(trackIds: LongArray): Int =
+        contentResolver.delete(PLAYLIST_URI, "$AUDIO_ID = ?", arrayOf(trackIds.toString()))
 
-    // this is called inside withContext already so no need to make any further computations.
     private fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
         if (playlistId == -1) return -1
         val uri = getContentUri("external", playlistId.toLong())
@@ -164,7 +148,6 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
                 numberOfTracks = getNumberOfSongsInPlaylist(getInt(getColumnIndex(PLAYLIST_ID)))
             )
         }
-
 }
 private const val TAG = "LocalPlaylistDataSource"
 

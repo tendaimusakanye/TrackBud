@@ -6,32 +6,25 @@ import android.provider.MediaStore.Audio.ArtistColumns.*
 import android.provider.MediaStore.Audio.Artists._ID
 import com.tendai.common.media.extensions.mapList
 import com.tendai.common.media.source.model.Artist
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import android.provider.MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI as ARTISTS_URI
 
-class ArtistLocalDataSource(context: Context) : LocalDataSource,
-    LocalDataSource.Artists {
+class ArtistLocalDataSource(context: Context) : LocalDataSource, LocalDataSource.Artists {
 
-    private val ioDispatcher = Dispatchers.IO
     private val contentResolver = context.contentResolver
     private val projection = arrayOf(
         _ID, ARTIST, NUMBER_OF_ALBUMS, NUMBER_OF_TRACKS
     )
 
-    override suspend fun getAllArtists(): List<Artist> {
-        //this is where execution is moved to a different thread
-        return withContext(ioDispatcher) {
-            val cursor =
-                getCursor(
-                    contentResolver,
-                    ARTISTS_URI,
-                    projection,
-                    sortOrder = "$ARTIST  ASC"
-                )
-            cursor!!.use { result ->
-                result.mapList { mapToArtist(it) }
-            }
+    override fun getAllArtists(): List<Artist> {
+        val cursor =
+            getCursor(
+                contentResolver,
+                ARTISTS_URI,
+                projection,
+                sortOrder = "$ARTIST  ASC"
+            )
+        return cursor!!.use { result ->
+            result.mapList { mapToArtist(it) }
         }
     }
 
@@ -46,6 +39,7 @@ class ArtistLocalDataSource(context: Context) : LocalDataSource,
         }
 
 }
+
 private const val TAG = "LocalArtistDataSource"
 //TODO: Check the size of the list/ check if list is empty always before
 // retrieving any before calling the get function on variables.

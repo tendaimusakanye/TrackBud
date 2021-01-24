@@ -15,42 +15,42 @@ import com.tendai.common.media.source.model.Track
 interface LocalDataSource {
     interface Tracks {
 
-        suspend fun getTrackDetails(trackId: Int): Track
+        fun getTrackDetails(trackId: Int): Track
 
-        suspend fun getTracks(): List<Track>
+        fun getTracks(): List<Track>
 
-        suspend fun getTracksForArtist(artistId: Int): List<Track>
+        fun getTracksForArtist(artistId: Int): List<Track>
 
-        suspend fun getTracksInAlbum(albumId: Int): List<Track>
+        fun getTracksInAlbum(albumId: Int): List<Track>
 
-        suspend fun getTracksInPlaylist(playlistId: Int): List<Track>
+        fun getTracksInPlaylist(playlistId: Int): List<Track>
 
     }
 
     interface Albums {
-        suspend fun getAlbums(limit: Int): List<Album>
+        fun getAlbums(limit: Int): List<Album>
 
-        suspend fun getAlbumsForArtist(artistId: Int): List<Album>
+        fun getAlbumsForArtist(artistId: Int): List<Album>
 
-        suspend fun getAlbum(albumId: Int): Album
+        fun getAlbum(albumId: Int): Album
 
     }
 
     interface Artists {
-        suspend fun getAllArtists(): List<Artist>
+        fun getAllArtists(): List<Artist>
     }
 
     interface Playlists {
 
-        suspend fun getAllPlaylists(limit: Int): List<Playlist>
+        fun getAllPlaylists(limit: Int): List<Playlist>
 
-        suspend fun createNewPlaylist(name: String): Uri?
+        fun createNewPlaylist(name: String): Uri?
 
-        suspend fun deletePlaylist(playlistId: Int): Int
+        fun deletePlaylist(playlistId: Int): Int
 
-        suspend fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int
+        fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int
 
-        suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int
+        fun removeTrackFromPlaylist(trackIds: LongArray): Int
 
     }
 

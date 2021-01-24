@@ -4,11 +4,10 @@ import com.tendai.common.media.source.local.LocalDataSource
 import com.tendai.common.media.source.model.Album
 
 class FakeAlbumDataSource : LocalDataSource.Albums {
-    override suspend fun getAlbums(
+    override  fun getAlbums(
         limit: Int
     ): List<Album> {
 
-//        return withContext(Dispatchers.IO) {
         val albumOne = Album(
             100,
             "Strings and Blings",
@@ -29,14 +28,14 @@ class FakeAlbumDataSource : LocalDataSource.Albums {
             null
         )
         return listOf(albumOne, albumTwo)
-//        }
+
     }
 
-    override suspend fun getAlbumsForArtist(artistId: Int): List<Album> {
+    override  fun getAlbumsForArtist(artistId: Int): List<Album> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAlbum(albumId: Int): Album {
-        TODO("Not yet implemented")
+    override  fun getAlbum(albumId: Int): Album {
+      return Album()
     }
 }
