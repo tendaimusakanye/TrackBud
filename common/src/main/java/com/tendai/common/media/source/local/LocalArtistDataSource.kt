@@ -47,6 +47,8 @@ class ArtistLocalDataSource(context: Context) : LocalDataSource,
 
 }
 private const val TAG = "LocalArtistDataSource"
-//TODO: Check the size of the list/ check if list is empty always before re
+//TODO: Check the size of the list/ check if list is empty always before
 // retrieving any before calling the get function on variables.
-//TODO: Singletons or not ?? why did I abandon them by the way ?
+
+// No Singletons only insert and update methods need to be thread safe of which I am using
+// a synchronized lock. That is why I abandoned them.

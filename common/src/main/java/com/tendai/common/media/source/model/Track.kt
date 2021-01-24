@@ -1,5 +1,7 @@
 package com.tendai.common.media.source.model
 
+import android.net.Uri
+
 
 data class Track(
     var id: Int = -1,
@@ -11,7 +13,10 @@ data class Track(
     var duration: Int = 0,
     var trackGenre: String = "",
     var trackNumber: Int = -1,
-    var playlistId: String = ""
+    var playlistId: String = "",
+    var albumArtUri: Uri? = null
 
 )
+
+//todo: also add albumArtBitmap but is it necessary or albumArtUri is enough ?
 //todo: remove unused fields e.g. artistID, playlistID from both the models and the data sources.

@@ -2,8 +2,13 @@ package com.tendai.common.media.source.local
 
 import android.content.Context
 import android.database.Cursor
+import android.provider.MediaStore
 import android.provider.MediaStore.Audio.AudioColumns.IS_MUSIC
-import android.provider.MediaStore.Audio.Playlists.Members.*
+import android.provider.MediaStore.Audio.AudioColumns.TRACK
+import android.provider.MediaStore.Audio.Media.*
+import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
+import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
+import android.provider.MediaStore.MediaColumns.DURATION
 import com.tendai.common.media.extensions.mapList
 import com.tendai.common.media.source.model.Track
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +21,14 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
     private var fromPlaylist = false
     private val contentResolver = context.contentResolver
     private val projection = arrayOf(
-        _ID, TITLE, ALBUM_ID, ALBUM, ARTIST, ARTIST_ID, TRACK, DURATION
+        _ID,
+        TITLE,
+        ALBUM_ID,
+        ALBUM,
+        ARTIST,
+        ARTIST_ID,
+        MediaStore.Audio.Media.TRACK,
+        MediaStore.Audio.Media.DURATION
     )
 
     override suspend fun getTrackDetails(trackId: Int): Track {
@@ -29,6 +41,8 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
                 selectionArgs = arrayOf(trackId.toString())
             )
             cursor!!.use {
+                fromPlaylist = false
+                if (!cursor.moveToFirst()) return@use Track()
                 mapToTrack(it)
             }
         }
@@ -106,17 +120,20 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
                     true -> getInt(getColumnIndex(AUDIO_ID))
                     else -> getInt(getColumnIndex(_ID))
                 },
-                duration = getInt(getColumnIndex(DURATION)),
                 trackName = getString(getColumnIndex(TITLE)),
                 albumId = getInt(getColumnIndex(ALBUM_ID)),
                 albumName = getString(getColumnIndex(ALBUM)),
                 artistId = getInt(getColumnIndex(ARTIST_ID)),
                 artistName = getString(getColumnIndex(ARTIST)),
-                trackNumber = getInt(getColumnIndex(TRACK))
+                duration = getInt(getColumnIndex(DURATION)),
+                trackNumber = getInt(getColumnIndex(TRACK)),
+                albumArtUri = getAlbumArtUri(getInt(getColumnIndex(ALBUM_ID)))
             )
         }
 
+
 }
+
 private const val TAG = "LocalTracksDataSource"
 
 

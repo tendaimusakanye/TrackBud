@@ -1,7 +1,7 @@
 package com.tendai.common.media.source
 
 import android.net.Uri
-import com.tendai.common.media.source.model.Playlist
+import android.support.v4.media.MediaMetadataCompat
 import com.tendai.common.media.source.local.LocalDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +13,7 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    override fun getAllPlaylists(limit: Int): List<Playlist> =
+    override fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =
         retrieveMediaItemList(limit, scope) { playlistLocalDataSource.getAllPlaylists(limit) }
 
     override suspend fun createNewPlaylist(name: String): Uri? =

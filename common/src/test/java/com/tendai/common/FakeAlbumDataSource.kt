@@ -15,7 +15,9 @@ class FakeAlbumDataSource : LocalDataSource.Albums {
             "NastyC",
             1,
             2015,
-            12
+            12,
+            null
+
         )
         val albumTwo = Album(
             102,
@@ -23,7 +25,8 @@ class FakeAlbumDataSource : LocalDataSource.Albums {
             "Post Malone",
             2,
             2016,
-            10
+            10,
+            null
         )
         return listOf(albumOne, albumTwo)
 //        }

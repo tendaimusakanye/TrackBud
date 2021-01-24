@@ -6,7 +6,7 @@ import android.support.v4.media.MediaMetadataCompat
 
 /**
  * Useful extensions for [MediaMetadataCompat.Builder].
- *  @see {https://github.com/android/uamp}
+ *  @sample {https://github.com/android/uamp}
  */
 
 
@@ -14,6 +14,7 @@ import android.support.v4.media.MediaMetadataCompat
 const val NO_GET = "Property does not have a 'get'"
 
 inline var MediaMetadataCompat.Builder.id: String
+
     get() = throw IllegalAccessException("Cannot get from MediaMetadataCompat.Builder")
     set(value) {
         putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, value)
@@ -69,12 +70,6 @@ inline var MediaMetadataCompat.Builder.genre: String?
         putString(MediaMetadataCompat.METADATA_KEY_GENRE, value)
     }
 
-inline var MediaMetadataCompat.Builder.mediaUri: String?
-    @Deprecated(NO_GET, level = DeprecationLevel.ERROR)
-    get() = throw IllegalAccessException("Cannot get from MediaMetadataCompat.Builder")
-    set(value) {
-        putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, value)
-    }
 
 inline var MediaMetadataCompat.Builder.albumArtUri: String?
     @Deprecated(NO_GET, level = DeprecationLevel.ERROR)
@@ -104,8 +99,6 @@ inline var MediaMetadataCompat.Builder.trackNumber: String?
     set(value) {
         putString(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, value)
     }
-
-
 
 inline var MediaMetadataCompat.Builder.displayTitle: String?
     @Deprecated(NO_GET, level = DeprecationLevel.ERROR)
@@ -151,5 +144,5 @@ const val METADATA_KEY_MUSICX_FLAGS =
     "com.tendai.common.source.extensions.METADATA_KEY_MUSICX_FLAGS"
 
 //todo: why are these inline vars  ?
-//todo: should I add the display Titles and subtitles ?
+
 

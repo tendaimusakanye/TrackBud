@@ -10,7 +10,7 @@ import android.database.Cursor
 fun <T> Cursor.mapList(
     mapper: (cursor: Cursor) -> T
 ): List<T> {
-    val result = arrayListOf<T>()
+    val result = mutableListOf<T>()
     return this.use {
         if (this.moveToFirst()) {
             do {

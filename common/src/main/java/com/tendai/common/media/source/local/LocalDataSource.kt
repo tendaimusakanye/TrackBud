@@ -1,6 +1,7 @@
 package com.tendai.common.media.source.local
 
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import com.tendai.common.media.source.model.Album
@@ -59,7 +60,7 @@ interface LocalDataSource {
      * content resolvers.
      * Method is for convenience of default and named arguments.
      */
-     fun getCursor(
+    fun getCursor(
         contentResolver: ContentResolver,
         uri: Uri,
         projection: Array<out String>? = null,
@@ -74,7 +75,14 @@ interface LocalDataSource {
             selectionArgs,
             sortOrder
         )
+
+    fun getAlbumArtUri(albumId: Int): Uri {
+        val uri = Uri.parse("content://media/external/audio/albumart")
+        return ContentUris.withAppendedId(uri, albumId.toLong())
+    }
 }
+
+//todo: check the path returned by content provider.ALBUM_ART
 
 
 

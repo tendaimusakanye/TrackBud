@@ -92,13 +92,13 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
                 albumArtist = getString(getColumnIndex(ARTIST)),
                 artistId = getInt(getColumnIndex(ARTIST_ID)),
                 yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
-                numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS))
+                numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS)),
+                albumArtUri = getAlbumArtUri(getInt(getColumnIndex(_ID)))
             )
         }
-}
 
+
+}
 private const val TAG = "LocalAlbumDataSource"
 
 //TODO: check if list is empty or not in-place of error handling list.isEmpty()
-//TODO: Handle retrieval of the album art i.e. thumbnail
-//Todo: lifecycle of my coroutines in these data source. I want them tied to the service lifecyle
