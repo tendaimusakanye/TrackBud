@@ -7,11 +7,11 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
     Repository.Albums {
 
     override fun getAlbums(limit: Int): List<MediaMetadataCompat> =
-        retrieveMediaItemList(limit) { albumLocalDataSource.getAlbums(limit) }
+        retrieveMediaItemMetadataList(limit) { albumLocalDataSource.getAlbums(limit) }
 
-    override fun getAlbumsForArtist(artistId: Int): List<MediaMetadataCompat> =
-        retrieveMediaItemList(artistId) { albumLocalDataSource.getAlbumsForArtist(artistId) }
+    override fun getAlbumsByArtist(artistId: Int): List<MediaMetadataCompat> =
+        retrieveMediaItemMetadataList(artistId) { albumLocalDataSource.getAlbumsForArtist(artistId) }
 
     override fun getAlbum(albumId: Int): MediaMetadataCompat =
-        retrieveMediaItemDetails(albumId) { albumLocalDataSource.getAlbum(albumId) }
+        retrieveMediaItemMetadata(albumId) { albumLocalDataSource.getAlbum(albumId) }
 }

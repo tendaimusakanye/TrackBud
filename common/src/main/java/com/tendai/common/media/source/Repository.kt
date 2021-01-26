@@ -12,18 +12,18 @@ interface Repository {
 
         fun getTracks(): List<MediaMetadataCompat>
 
-        fun getTracksForArtist(artistId: Int): List<MediaMetadataCompat>
+        fun getTracksByArtist(artistId: Int): List<MediaMetadataCompat>
 
-        fun getTracksForAlbum(albumId: Int): List<MediaMetadataCompat>
+        fun getTracksByAlbum(albumId: Int): List<MediaMetadataCompat>
 
-        fun getTracksForPlaylist(playlistId: Int): List<MediaMetadataCompat>
+        fun getTracksByPlaylist(playlistId: Int): List<MediaMetadataCompat>
 
     }
 
     interface Albums {
         fun getAlbums(limit: Int): List<MediaMetadataCompat>
 
-        fun getAlbumsForArtist(artistId: Int): List<MediaMetadataCompat>
+        fun getAlbumsByArtist(artistId: Int): List<MediaMetadataCompat>
 
         fun getAlbum(albumId: Int): MediaMetadataCompat
 
@@ -52,7 +52,7 @@ interface Repository {
 /**
  * Util methods for the repositories
  */
-internal inline fun <reified T> retrieveMediaItemDetails(
+internal inline fun <reified T> retrieveMediaItemMetadata(
     int: Int,
     block: (int: Int) -> T
 ): MediaMetadataCompat {
@@ -76,7 +76,7 @@ internal inline fun <reified T> retrieveMediaItemDetails(
  * if mediaItemsList is null, Null is never returned only an empty list since no results matching the given criteria
  * where found. If null is returned then something drastic happened.
  */
-internal inline fun <reified T> retrieveMediaItemList(
+internal inline fun <reified T> retrieveMediaItemMetadataList(
     int: Int = -1,
     block: (int: Int) -> List<T>
 ): List<MediaMetadataCompat> {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name= "albums_title">Albums</string>
+    <string name="playlists_title">Playlists</string>
+    <string name="tracks_title">Tracks</string>
+    <string name="artists_title">Artists</string>
+    <string name="discover_title">Discover</string>
+</resources>

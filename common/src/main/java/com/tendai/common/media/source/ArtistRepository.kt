@@ -7,6 +7,6 @@ class ArtistRepository(private val artistLocalDataSource: LocalDataSource.Artist
     Repository.Artists {
 
     override fun getAllArtists(): List<MediaMetadataCompat> =
-        retrieveMediaItemList() { artistLocalDataSource.getAllArtists() }
+        retrieveMediaItemMetadataList() { artistLocalDataSource.getAllArtists() }
 }
 

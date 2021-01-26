@@ -9,7 +9,7 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
     Repository.Playlists {
 
     override fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =
-        retrieveMediaItemList(limit) { playlistLocalDataSource.getAllPlaylists(limit) }
+        retrieveMediaItemMetadataList(limit) { playlistLocalDataSource.getAllPlaylists(limit) }
 
     override suspend fun createNewPlaylist(name: String): Uri? =
         playlistLocalDataSource.createNewPlaylist(name)

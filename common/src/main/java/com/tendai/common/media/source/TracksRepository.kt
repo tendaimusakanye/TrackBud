@@ -7,21 +7,21 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
     Repository.Tracks {
 
     override fun getTrackDetails(trackId: Int): MediaMetadataCompat =
-        retrieveMediaItemDetails(trackId) { tracksLocalDataSource.getTrackDetails(trackId) }
+        retrieveMediaItemMetadata(trackId) { tracksLocalDataSource.getTrackDetails(trackId) }
 
     override fun getTracks(): List<MediaMetadataCompat> =
-        retrieveMediaItemList() { tracksLocalDataSource.getTracks() }
+        retrieveMediaItemMetadataList() { tracksLocalDataSource.getTracks() }
 
-    override fun getTracksForArtist(artistId: Int): List<MediaMetadataCompat> =
-        retrieveMediaItemList(
+    override fun getTracksByArtist(artistId: Int): List<MediaMetadataCompat> =
+        retrieveMediaItemMetadataList(
             artistId
         ) { tracksLocalDataSource.getTracksForArtist(artistId) }
 
-    override fun getTracksForAlbum(albumId: Int): List<MediaMetadataCompat> =
-        retrieveMediaItemList(albumId) { tracksLocalDataSource.getTracksInAlbum(albumId) }
+    override fun getTracksByAlbum(albumId: Int): List<MediaMetadataCompat> =
+        retrieveMediaItemMetadataList(albumId) { tracksLocalDataSource.getTracksInAlbum(albumId) }
 
-    override fun getTracksForPlaylist(playlistId: Int): List<MediaMetadataCompat> =
-        retrieveMediaItemList(
+    override fun getTracksByPlaylist(playlistId: Int): List<MediaMetadataCompat> =
+        retrieveMediaItemMetadataList(
             playlistId
         ) { tracksLocalDataSource.getTracksInPlaylist(playlistId) }
 }
