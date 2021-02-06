@@ -16,11 +16,13 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
     LocalDataSource.Playlists {
 
     private val contentResolver = context.contentResolver
-    //playlist_Id should automatically inserted I think. Yet to see.
+    //playlist_Id should automatically be inserted I think. Yet to see.
     private val newPlaylistProjection = arrayOf(
         PLAYLIST_ID, NAME
     )
-    // the playOrder column should be already there within the MediaStore. Android or should ?
+
+    // is the _ID necessary in the playOrder projection ?
+    //todo: remove it if it is not necessary.
     private val playOrderProjection = arrayOf(
         _ID, NAME, PLAY_ORDER
     )
@@ -71,7 +73,7 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
     override fun deletePlaylist(playlistId: Int): Int =
         contentResolver.delete(
             PLAYLIST_URI,
-            "$_ID = ?",
+            "$PLAYLIST_ID = ?",
             arrayOf(playlistId.toString())
         )
 
@@ -150,7 +152,5 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
         }
 }
 private const val TAG = "LocalPlaylistDataSource"
-
-
 //todo: check the ints returned when dealing with playlists. if -1 then respond appropriately
 

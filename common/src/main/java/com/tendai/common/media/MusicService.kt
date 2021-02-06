@@ -3,15 +3,26 @@ package com.tendai.common.media
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.tendai.common.media.extensions.flag
+import com.tendai.common.media.source.Repository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
-
-class MusicService : MediaBrowserServiceCompat() {
+abstract class MusicService : MediaBrowserServiceCompat() {
 
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaNotificationManager: MediaNotificationManager
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    private lateinit var trackRepository: Repository.Tracks
+    private lateinit var albumRepository: Repository.Albums
+    private lateinit var playlistRepository: Repository.Playlists
+    private lateinit var artistRepository: Repository.Artists
 
     override fun onCreate() {
         super.onCreate()
@@ -44,20 +55,50 @@ class MusicService : MediaBrowserServiceCompat() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    override fun onLoadChildren(
-        parentId: String,
-        result: Result<MutableList<MediaBrowserCompat.MediaItem>>
-    ) {
-
-        TODO("Retrieve songs from localStorage")
-    }
-
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
         rootHints: Bundle?
-    ): BrowserRoot? {
-        TODO("Browsable etc etc. to build a representation of the UI etc etc.")
+    ): BrowserRoot? = BrowserRoot(TRACKS_ROOT, null)
+
+
+    override fun onLoadChildren(
+        parentId: String,
+        result: Result<MutableList<MediaItem>>,
+        options: Bundle
+    ) {
+        serviceScope.launch {
+            when (parentId) {
+                TRACKS_ROOT -> {
+                    if (!options.getBoolean(EXTRA_TRACK_ID)) {
+                        val children = trackRepository.getTracks().map {
+                            MediaItem(it.description, it.flag)
+                        }
+                        result.sendResult(children.toMutableList())
+                    }
+                }
+                DISCOVER_ROOT -> {
+                    if (!options.getBoolean(EXTRA_PLAYLIST_ID) &&
+                        !options.getBoolean(EXTRA_ALBUM_ID)
+                    ) {
+                        val children = mutableListOf<MediaItem>()
+                        val albums = albumRepository.getAlbums(5).map {
+                            MediaItem(it.description, it.flag)
+                        }
+                        val playlists = playlistRepository.getAllPlaylists(5).map {
+                            MediaItem(it.description, it.flag)
+                        }
+                        children += albums
+                        children += playlists
+                        result.sendResult(children)
+                    }
+                }
+                ARTISTS_ROOT ->{
+                    if
+                }
+
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -69,7 +110,12 @@ class MusicService : MediaBrowserServiceCompat() {
             release()
         }
     }
-
 }
 
+const val EXTRA_ALBUM_ID = "com.tendai.common.media.EXTRA_ALBUM_ID"
+const val EXTRA_PLAYLIST_ID = "com.tendai.common.media.EXTRA_PLAYLIST_ID"
+const val EXTRA_TRACK_ID = "com.tendai.common.media.EXTRA_TRACK_ID"
+const val DISCOVER_ROOT = "DISCOVER"
+const val TRACKS_ROOT = "TRACKS"
+const val ARTISTS_ROOT = "ARTISTS"
 const val TAG: String = "MusicService "

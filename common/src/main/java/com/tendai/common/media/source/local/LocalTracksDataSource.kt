@@ -51,7 +51,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource, LocalDataSource
         }
     }
 
-    override fun getTracksForArtist(artistId: Int): List<Track> {
+    override fun getTracksByArtist(artistId: Int): List<Track> {
         val cursor = getCursor(
             contentResolver,
             TRACKS_URI,

@@ -8,6 +8,13 @@ import android.support.v4.media.MediaMetadataCompat
  *  @sample {https://github.com/android/uamp}
  */
 
+/**
+ * Custom property for storing whether a [MediaMetadataCompat] item represents an
+ * item that is [MediaItem.FLAG_BROWSABLE] or [MediaItem.FLAG_PLAYABLE].
+ */
+inline val MediaMetadataCompat.flag
+    get() = this.getLong(METADATA_KEY_MUSICX_FLAG).toInt()
+
 // These do not have getters, so create a message for the error.
 const val NO_GET = "Property does not have a 'get'"
 const val ERROR_MESSAGE = "Cannot get from MediaMetadataCompat.Builder"

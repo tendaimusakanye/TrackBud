@@ -10,7 +10,7 @@ import com.tendai.common.media.source.model.Playlist
 import com.tendai.common.media.source.model.Track
 
 /**
- *  Interface to Data Layer. Concrete Repositories and DataSources implement this interface as an abstraction
+ *  Interface to Data Layer. Concrete DataSources implement this interface as an abstraction
  */
 interface LocalDataSource {
     interface Tracks {
@@ -19,7 +19,7 @@ interface LocalDataSource {
 
         fun getTracks(): List<Track>
 
-        fun getTracksForArtist(artistId: Int): List<Track>
+        fun getTracksByArtist(artistId: Int): List<Track>
 
         fun getTracksInAlbum(albumId: Int): List<Track>
 

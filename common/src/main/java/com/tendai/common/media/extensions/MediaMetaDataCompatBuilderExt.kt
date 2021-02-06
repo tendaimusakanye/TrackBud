@@ -27,15 +27,15 @@ inline fun <reified T> MediaMetadataCompat.Builder.mapFrom(media: T): MediaMetad
             displaySubtitle = album.albumArtist
             displayDescription = "${album.numberOfTracks} tracks"
             displayIconUri = album.albumArtUri.toString()
-
         }
-        Album::class.simpleName -> {
+        Artist::class.simpleName -> {
             val artist = media as Artist
 
             id = artist.artistId.toString()
             this.artist = artist.artistName
             trackCount = artist.numberOfTracks.toLong()
             flag = FLAG_BROWSABLE
+
             displayTitle = artist.artistName
             displayDescription = "${artist.numberOfAlbums} albums|${artist.numberOfTracks} tracks"
 
@@ -62,6 +62,7 @@ inline fun <reified T> MediaMetadataCompat.Builder.mapFrom(media: T): MediaMetad
             trackNumber = track.trackNumber.toString()
             albumArtUri = track.albumArtUri.toString()
             flag = FLAG_PLAYABLE
+
             displayTitle = track.trackName
             displaySubtitle = track.artistName
             displayDescription = track.albumName

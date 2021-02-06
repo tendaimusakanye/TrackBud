@@ -2,40 +2,39 @@ package com.tendai.common.media.source
 
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
-import com.tendai.common.media.extensions.mapFrom
 
 interface Repository {
 
     interface Tracks {
 
-        fun getTrackDetails(trackId: Int): MediaMetadataCompat
+        suspend fun getTrackDetails(trackId: Int): MediaMetadataCompat
 
-        fun getTracks(): List<MediaMetadataCompat>
+        suspend fun getTracks(): List<MediaMetadataCompat>
 
-        fun getTracksByArtist(artistId: Int): List<MediaMetadataCompat>
+        suspend fun getTracksByArtist(artistId: Int): List<MediaMetadataCompat>
 
-        fun getTracksByAlbum(albumId: Int): List<MediaMetadataCompat>
+        suspend fun getTracksByAlbum(albumId: Int): List<MediaMetadataCompat>
 
-        fun getTracksByPlaylist(playlistId: Int): List<MediaMetadataCompat>
+        suspend fun getTracksInPlaylist(playlistId: Int): List<MediaMetadataCompat>
 
     }
 
     interface Albums {
-        fun getAlbums(limit: Int): List<MediaMetadataCompat>
+        suspend fun getAlbums(limit: Int): List<MediaMetadataCompat>
 
-        fun getAlbumsByArtist(artistId: Int): List<MediaMetadataCompat>
+        suspend fun getAlbumsByArtist(artistId: Int): List<MediaMetadataCompat>
 
-        fun getAlbum(albumId: Int): MediaMetadataCompat
+        suspend fun getAlbum(albumId: Int): MediaMetadataCompat
 
     }
 
     interface Artists {
-        fun getAllArtists(): List<MediaMetadataCompat>
+        suspend fun getAllArtists(): List<MediaMetadataCompat>
     }
 
     interface Playlists {
 
-        fun getAllPlaylists(limit: Int): List<MediaMetadataCompat>
+        suspend fun getAllPlaylists(limit: Int): List<MediaMetadataCompat>
 
         suspend fun createNewPlaylist(name: String): Uri?
 
@@ -48,58 +47,34 @@ interface Repository {
     }
 }
 
-
-/**
- * Util methods for the repositories
- */
-internal inline fun <reified T> retrieveMediaItemMetadata(
+internal inline fun <T> retrieveMediaItem(
     int: Int,
     block: (int: Int) -> T
-): MediaMetadataCompat {
-    var mediaItem: T?
-    var metadataCompat: MediaMetadataCompat? = null
-
-    return metadataCompat ?: run {
+): T {
+    var mediaItem: T? = null
+    return mediaItem ?: run {
         //try catch should be thrown here if this throws and exception but it doesn't
         // when the coroutine gets here it jumps out of this method and does other things. The code below is only
         //executed when the coroutine returns.
         mediaItem = block.invoke(int)
-        metadataCompat = MediaMetadataCompat.Builder()
-            .mapFrom(mediaItem!!)
-            .build()
-
-        metadataCompat
+        //the mediaItem should never be null it will return fields with empty fields always.
+        mediaItem
     }!!
 }
 
-/**
- * if mediaItemsList is null, Null is never returned only an empty list since no results matching the given criteria
- * where found. If null is returned then something drastic happened.
- */
-internal inline fun <reified T> retrieveMediaItemMetadataList(
+ //if mediaItemsList is null, Null is never returned only an empty list since no results matching the given criteria
+ // where found. If null is returned then something drastic happened.
+
+internal inline fun <T> retrieveMediaItemsList(
     int: Int = -1,
     block: (int: Int) -> List<T>
-): List<MediaMetadataCompat> {
-
-    var mediaItemsList: List<T>
-    var metadataCompats: List<MediaMetadataCompat>? = null
-
-    return metadataCompats ?: run {
+): List<T> {
+    var mediaItemsList: List<T>? = null
+    return mediaItemsList ?: run {
         mediaItemsList = block.invoke(int)
-        mediaItemsList!!.let { list ->
-            if (list.isNotEmpty()) {
-                val result = list.map { item ->
-                    MediaMetadataCompat.Builder()
-                        .mapFrom(item)
-                        .build()
-                }
-                metadataCompats = result
-            }
-        }
-        metadataCompats
-    } ?: listOf()
+        mediaItemsList
+    }!!
 }
-
 //todo: check if list of media metadata is empty or not before using it.
 
 
