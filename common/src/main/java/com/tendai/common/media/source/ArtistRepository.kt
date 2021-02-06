@@ -30,6 +30,5 @@ class ArtistRepository(private val artistLocalDataSource: LocalDataSource.Artist
                     "${artist.numberOfAlbums} albums|${artist.numberOfTracks} tracks"
             }.build()
         }
-
 }
 

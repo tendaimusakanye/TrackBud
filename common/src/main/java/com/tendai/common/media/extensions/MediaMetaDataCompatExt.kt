@@ -4,16 +4,21 @@ import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaMetadataCompat
 
 /**
- * Useful extensions for [MediaMetadataCompat.Builder].
+ * Useful extensions for [MediaMetadataCompat].
  *  @sample {https://github.com/android/uamp}
  */
 
+
 /**
- * Custom property for storing whether a [MediaMetadataCompat] item represents an
+ * Custom property for retrieving the flag for a [MediaMetadataCompat]
  * item that is [MediaItem.FLAG_BROWSABLE] or [MediaItem.FLAG_PLAYABLE].
  */
 inline val MediaMetadataCompat.flag
     get() = this.getLong(METADATA_KEY_MUSICX_FLAG).toInt()
+
+/**
+ * Useful extensions for [MediaMetadataCompat.Builder].
+ */
 
 // These do not have getters, so create a message for the error.
 const val NO_GET = "Property does not have a 'get'"
@@ -128,7 +133,7 @@ inline var MediaMetadataCompat.Builder.flag: Int
     }
 
 const val METADATA_KEY_MUSICX_FLAG =
-    "com.tendai.common.source.extensions.METADATA_KEY_MUSICX_FLAGS"
+    "com.tendai.common.source.extensions.METADATA_KEY_MUSICX_FLAG"
 
 //For some reason if these properties are not inlined, you cannot set them.
 

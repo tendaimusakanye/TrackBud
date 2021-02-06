@@ -3,6 +3,7 @@ package com.tendai.common.media.source.local
 import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns._ID
+import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
