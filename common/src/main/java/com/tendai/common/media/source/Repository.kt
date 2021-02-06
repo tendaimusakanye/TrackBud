@@ -13,7 +13,7 @@ interface Repository {
 
         suspend fun getTracksByArtist(artistId: Int): List<MediaMetadataCompat>
 
-        suspend fun getTracksByAlbum(albumId: Int): List<MediaMetadataCompat>
+        suspend fun getTracksInAlbum(albumId: Int): List<MediaMetadataCompat>
 
         suspend fun getTracksInPlaylist(playlistId: Int): List<MediaMetadataCompat>
 
@@ -64,7 +64,6 @@ internal inline fun <T> retrieveMediaItem(
 
  //if mediaItemsList is null, Null is never returned only an empty list since no results matching the given criteria
  // where found. If null is returned then something drastic happened.
-
 internal inline fun <T> retrieveMediaItemsList(
     int: Int = -1,
     block: (int: Int) -> List<T>

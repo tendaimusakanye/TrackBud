@@ -61,7 +61,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         rootHints: Bundle?
     ): BrowserRoot? = BrowserRoot(TRACKS_ROOT, null)
 
-
+    // The logic in this function is based on the UI Design of my application.
     override fun onLoadChildren(
         parentId: String,
         result: Result<MutableList<MediaItem>>,
@@ -70,16 +70,14 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         serviceScope.launch {
             when (parentId) {
                 TRACKS_ROOT -> {
-                    if (!options.getBoolean(EXTRA_TRACK_ID)) {
-                        val children = trackRepository.getTracks().map {
-                            MediaItem(it.description, it.flag)
-                        }
-                        result.sendResult(children.toMutableList())
+                    val children = trackRepository.getTracks().map {
+                        MediaItem(it.description, it.flag)
                     }
+                    result.sendResult(children.toMutableList())
                 }
                 DISCOVER_ROOT -> {
-                    if (!options.getBoolean(EXTRA_PLAYLIST_ID) &&
-                        !options.getBoolean(EXTRA_ALBUM_ID)
+                    if (!options.getBoolean(IS_ALBUM) &&
+                        !options.getBoolean(IS_PLAYLIST)
                     ) {
                         val children = mutableListOf<MediaItem>()
                         val albums = albumRepository.getAlbums(5).map {
@@ -91,19 +89,54 @@ abstract class MusicService : MediaBrowserServiceCompat() {
                         children += albums
                         children += playlists
                         result.sendResult(children)
+                    } else if (options.getBoolean(IS_ALBUM)) {
+                        val children = trackRepository.getTracksInAlbum(
+                            options.getInt(EXTRA_ALBUM_ID)
+                        ).map {
+                            MediaItem(it.description, it.flag)
+                        }
+                        result.sendResult(children.toMutableList())
+                    } else if (options.getBoolean(IS_PLAYLIST)) {
+                        val children = trackRepository.getTracksInPlaylist(
+                            options.getInt(EXTRA_PLAYLIST_ID)
+                        ).map {
+                            MediaItem(it.description, it.flag)
+                        }
+                        result.sendResult(children.toMutableList())
                     }
                 }
-                ARTISTS_ROOT ->{
-                    if
+                ARTISTS_ROOT -> {
+                    when {
+                        options.getBoolean(IS_ALL_ARTISTS) -> {
+                            val children = artistRepository.getAllArtists().map {
+                                MediaItem(it.description, it.flag)
+                            }
+                            result.sendResult(children.toMutableList())
+                        }
+                        options.getBoolean(IS_ARTIST_TRACKS) -> {
+                            val children = trackRepository.getTracksByArtist(
+                                options.getInt(EXTRA_ARTIST_ID)
+                            ).map {
+                                MediaItem(it.description, it.flag)
+                            }
+                            result.sendResult(children.toMutableList())
+                        }
+                        options.getBoolean(IS_ARTIST_ALBUMS) -> {
+                            val children = albumRepository.getAlbumsByArtist(
+                                options.getInt(EXTRA_ARTIST_ID)
+                            ).map {
+                                MediaItem(it.description, it.flag)
+                            }
+                            result.sendResult(children.toMutableList())
+                        }
+                    }
                 }
-
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
         //release the media session when the music service is destroyed
         mediaSession.run {
             isActive = false
@@ -114,7 +147,12 @@ abstract class MusicService : MediaBrowserServiceCompat() {
 
 const val EXTRA_ALBUM_ID = "com.tendai.common.media.EXTRA_ALBUM_ID"
 const val EXTRA_PLAYLIST_ID = "com.tendai.common.media.EXTRA_PLAYLIST_ID"
-const val EXTRA_TRACK_ID = "com.tendai.common.media.EXTRA_TRACK_ID"
+const val EXTRA_ARTIST_ID = "com.tendai.common.media.EXTRA_ARTIST_ID"
+const val IS_ALL_ARTISTS = "com.tendai.common.media.IS_ALL_ARTISTS"
+const val IS_ARTIST_TRACKS = "com.tendai.common.media.IS_ARTIST_TRACKS"
+const val IS_ARTIST_ALBUMS = "com.tendai.common.media.IS_ARTIST_ALBUMS"
+const val IS_ALBUM = "com.tendai.common.media.IS_ALBUM"
+const val IS_PLAYLIST = "com.tendai.common.media.IS_PLAYLIST"
 const val DISCOVER_ROOT = "DISCOVER"
 const val TRACKS_ROOT = "TRACKS"
 const val ARTISTS_ROOT = "ARTISTS"
