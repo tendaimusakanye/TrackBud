@@ -1,9 +1,15 @@
 package com.tendai.common.media
 
 import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.support.v4.media.MediaBrowserCompat.MediaItem
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.tendai.common.media.extensions.flag
@@ -17,7 +23,8 @@ abstract class MusicService : MediaBrowserServiceCompat() {
 
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaNotificationManager: MediaNotificationManager
-    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val serviceJob = SupervisorJob()
+    private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private lateinit var trackRepository: Repository.Tracks
     private lateinit var albumRepository: Repository.Albums
@@ -50,16 +57,16 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         //todo: handle listening to external storage i.e. memory cards or waiting for permission read storage.
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
-        return super.onStartCommand(intent, flags, startId)
-    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int =
+        Service.START_STICKY
 
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
         rootHints: Bundle?
-    ): BrowserRoot? = BrowserRoot(TRACKS_ROOT, null)
+    ): BrowserRoot? {
+        TODO("Not yet implemented")
+    }
 
     // The logic in this function is based on the UI Design of my application.
     override fun onLoadChildren(
@@ -68,70 +75,59 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         options: Bundle
     ) {
         serviceScope.launch {
+            var metadatas = listOf<MediaMetadataCompat>()
             when (parentId) {
+                RECENT_ROOT -> {
+                    //TODO("Handle saving the most recent song")
+                }
                 TRACKS_ROOT -> {
-                    val children = trackRepository.getTracks().map {
-                        MediaItem(it.description, it.flag)
-                    }
-                    result.sendResult(children.toMutableList())
+                    metadatas = trackRepository.getTracks()
                 }
                 DISCOVER_ROOT -> {
-                    if (!options.getBoolean(IS_ALBUM) &&
-                        !options.getBoolean(IS_PLAYLIST)
-                    ) {
-                        val children = mutableListOf<MediaItem>()
-                        val albums = albumRepository.getAlbums(5).map {
-                            MediaItem(it.description, it.flag)
+                    when {
+                        (!options.getBoolean(IS_ALBUM) && !options.getBoolean(IS_PLAYLIST)) -> {
+                            val children = mutableListOf<MediaMetadataCompat>()
+                            val albums = albumRepository.getAlbums(5)
+                            val playlists = playlistRepository.getAllPlaylists(5)
+
+                            children += albums
+                            children += playlists
+                            metadatas = children
                         }
-                        val playlists = playlistRepository.getAllPlaylists(5).map {
-                            MediaItem(it.description, it.flag)
+                        options.getBoolean(IS_ALBUM) -> {
+                            metadatas = trackRepository.getTracksInAlbum(
+                                options.getInt(EXTRA_ALBUM_ID)
+                            )
                         }
-                        children += albums
-                        children += playlists
-                        result.sendResult(children)
-                    } else if (options.getBoolean(IS_ALBUM)) {
-                        val children = trackRepository.getTracksInAlbum(
-                            options.getInt(EXTRA_ALBUM_ID)
-                        ).map {
-                            MediaItem(it.description, it.flag)
+                        options.getBoolean(IS_PLAYLIST) -> {
+                            metadatas = trackRepository.getTracksInPlaylist(
+                                options.getInt(EXTRA_PLAYLIST_ID)
+                            )
                         }
-                        result.sendResult(children.toMutableList())
-                    } else if (options.getBoolean(IS_PLAYLIST)) {
-                        val children = trackRepository.getTracksInPlaylist(
-                            options.getInt(EXTRA_PLAYLIST_ID)
-                        ).map {
-                            MediaItem(it.description, it.flag)
-                        }
-                        result.sendResult(children.toMutableList())
                     }
                 }
                 ARTISTS_ROOT -> {
                     when {
                         options.getBoolean(IS_ALL_ARTISTS) -> {
-                            val children = artistRepository.getAllArtists().map {
-                                MediaItem(it.description, it.flag)
-                            }
-                            result.sendResult(children.toMutableList())
+                            metadatas = artistRepository.getAllArtists()
                         }
                         options.getBoolean(IS_ARTIST_TRACKS) -> {
-                            val children = trackRepository.getTracksByArtist(
+                            metadatas = trackRepository.getTracksByArtist(
                                 options.getInt(EXTRA_ARTIST_ID)
-                            ).map {
-                                MediaItem(it.description, it.flag)
-                            }
-                            result.sendResult(children.toMutableList())
+                            )
                         }
                         options.getBoolean(IS_ARTIST_ALBUMS) -> {
-                            val children = albumRepository.getAlbumsByArtist(
+                            metadatas = albumRepository.getAlbumsByArtist(
                                 options.getInt(EXTRA_ARTIST_ID)
-                            ).map {
-                                MediaItem(it.description, it.flag)
-                            }
-                            result.sendResult(children.toMutableList())
+                            )
                         }
                     }
                 }
             }
+            val mediaItems = metadatas.map {
+                MediaItem(it.description, it.flag)
+            }
+            result.sendResult(mediaItems.toMutableList())
         }
     }
 
@@ -142,6 +138,8 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             isActive = false
             release()
         }
+        //cancels the coroutines when going away. I guess it it to avoid memory leaks.
+        serviceJob.cancel()
     }
 }
 
@@ -155,5 +153,7 @@ const val IS_ALBUM = "com.tendai.common.media.IS_ALBUM"
 const val IS_PLAYLIST = "com.tendai.common.media.IS_PLAYLIST"
 const val DISCOVER_ROOT = "DISCOVER"
 const val TRACKS_ROOT = "TRACKS"
+const val RECENT_ROOT = "RECENT_SONG"
 const val ARTISTS_ROOT = "ARTISTS"
 const val TAG: String = "MusicService "
+

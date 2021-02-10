@@ -51,3 +51,6 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
             }.build()
         }
 }
+
+//todo: separate albums and playlists in the Ui by checking the display subtitle field.
+//todo: if it is present then know it's an album.

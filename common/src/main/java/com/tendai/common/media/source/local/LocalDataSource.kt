@@ -83,6 +83,7 @@ interface LocalDataSource {
 }
 
 //todo: check the path returned by content provider.ALBUM_ART
+//todo: implement content provider with paging
 
 
 
