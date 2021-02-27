@@ -1,4 +1,4 @@
-package com.tendai.common.media.source.local
+package com.tendai.common.source.local
 
 import android.content.ContentValues
 import android.content.Context
@@ -8,8 +8,8 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore.Audio.Playlists.Members.*
 import android.provider.MediaStore.Audio.PlaylistsColumns.NAME
 import android.util.Log
-import com.tendai.common.media.extensions.mapList
-import com.tendai.common.media.source.model.Playlist
+import com.tendai.common.extensions.mapList
+import com.tendai.common.source.model.Playlist
 import android.provider.MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI as PLAYLIST_URI
 
 class PlaylistLocalDataSource(context: Context) : LocalDataSource,

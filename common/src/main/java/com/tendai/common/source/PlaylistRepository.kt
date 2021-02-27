@@ -1,11 +1,11 @@
-package com.tendai.common.media.source
+package com.tendai.common.source
 
 import android.net.Uri
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.tendai.common.media.extensions.*
-import com.tendai.common.media.source.local.LocalDataSource
-import com.tendai.common.media.source.model.Playlist
+import com.tendai.common.extensions.*
+import com.tendai.common.source.local.LocalDataSource
+import com.tendai.common.source.model.Playlist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,7 +17,11 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
     override suspend fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val playlists =
-                retrieveMediaItemsList(limit) { playlistLocalDataSource.getAllPlaylists(limit) }
+                retrieveMediaItemsList(limit) {
+                    playlistLocalDataSource.getAllPlaylists(
+                        limit
+                    )
+                }
             return@withContext createMetadata(playlists)
         }
 
@@ -45,9 +49,13 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
                 id = playlist.playlistId.toString()
                 title = playlist.playlistName
                 trackCount = playlist.numberOfTracks.toLong()
+                albumArtUri = PLAYLIST_ICON_URI
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
+
                 displayTitle = playlist.playlistName
                 displayDescription = playlist.numberOfTracks.toString()
+                displayIconUri = PLAYLIST_ICON_URI
+
             }.build()
         }
 }

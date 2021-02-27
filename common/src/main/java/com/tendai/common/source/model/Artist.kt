@@ -1,4 +1,4 @@
-package com.tendai.common.media.source.model
+package com.tendai.common.source.model
 
 
 data class Artist(

@@ -23,7 +23,7 @@
         </activity>
 
         <service
-            android:name="com.tendai.common.media.MusicService"
+            android:name="com.tendai.common.MusicService"
             tools:ignore="ExportedService" >
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />

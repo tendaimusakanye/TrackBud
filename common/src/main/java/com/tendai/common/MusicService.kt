@@ -1,25 +1,24 @@
-package com.tendai.common.media
+package com.tendai.common
 
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
-import com.tendai.common.media.extensions.flag
-import com.tendai.common.media.source.Repository
+import com.tendai.common.extensions.flag
+import com.tendai.common.playback.PlaybackServiceCallback
+import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-abstract class MusicService : MediaBrowserServiceCompat() {
+
+abstract class MusicService : MediaBrowserServiceCompat(), PlaybackServiceCallback {
 
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaNotificationManager: MediaNotificationManager
@@ -45,8 +44,6 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             setCallback(object : MediaSessionCompat.Callback() {
                 //todo: Implement my own media session callback
             })
-            //todo: I also can set this in the onPlay method of My media session callback.
-            isActive = true
         }
 
         // Setting  the media session token
@@ -65,7 +62,17 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot? {
-        TODO("Not yet implemented")
+        // see @link [https://developer.android.com/guide/topics/media/media-controls]
+        val isRecentRequest =
+            rootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) ?: false
+        var extras: Bundle? = null
+        val rootId = if (isRecentRequest) {
+            extras = Bundle()
+            extras.putBoolean(BrowserRoot.EXTRA_RECENT, true)
+            RECENT_ROOT
+        } else TRACKS_ROOT
+
+        return BrowserRoot(rootId, extras)
     }
 
     // The logic in this function is based on the UI Design of my application.
@@ -78,7 +85,8 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             var metadatas = listOf<MediaMetadataCompat>()
             when (parentId) {
                 RECENT_ROOT -> {
-                    //TODO("Handle saving the most recent song")
+                    //TODO("Handle saving the most recent song & building a proper queue for the item
+                    // allowed browsing types in onGet Root")
                 }
                 TRACKS_ROOT -> {
                     metadatas = trackRepository.getTracks()
@@ -112,7 +120,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
                             metadatas = artistRepository.getAllArtists()
                         }
                         options.getBoolean(IS_ARTIST_TRACKS) -> {
-                            metadatas = trackRepository.getTracksByArtist(
+                            metadatas = trackRepository.getTracksForArtist(
                                 options.getInt(EXTRA_ARTIST_ID)
                             )
                         }
@@ -124,10 +132,14 @@ abstract class MusicService : MediaBrowserServiceCompat() {
                     }
                 }
             }
-            val mediaItems = metadatas.map {
-                MediaItem(it.description, it.flag)
+            if (options.getBoolean(BrowserRoot.EXTRA_RECENT)) {
+                //TODO("")
+            } else {
+                val mediaItems = metadatas.map {
+                    MediaItem(it.description, it.flag)
+                }
+                result.sendResult(mediaItems.toMutableList())
             }
-            result.sendResult(mediaItems.toMutableList())
         }
     }
 
@@ -138,22 +150,44 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             isActive = false
             release()
         }
-        //cancels the coroutines when going away. I guess it it to avoid memory leaks.
+        //cancels the coroutines when going away. I guess it iS to avoid memory leaks.
         serviceJob.cancel()
+    }
+
+    override fun onPlaybackStart() {
+        mediaSession.isActive = true
+    }
+
+    override fun onPlaybackStop() {
+        mediaSession.isActive = false
+        stopForeground(false)
+    }
+
+    override fun onNotificationRequired() {
+        startForeground(MEDIA_NOTIFICATION_ID, mediaNotificationManager.notification)
+    }
+
+    override fun onPlaybackStateUpdated(newState: PlaybackStateCompat) {
+        mediaSession.setPlaybackState(newState)
     }
 }
 
-const val EXTRA_ALBUM_ID = "com.tendai.common.media.EXTRA_ALBUM_ID"
-const val EXTRA_PLAYLIST_ID = "com.tendai.common.media.EXTRA_PLAYLIST_ID"
-const val EXTRA_ARTIST_ID = "com.tendai.common.media.EXTRA_ARTIST_ID"
-const val IS_ALL_ARTISTS = "com.tendai.common.media.IS_ALL_ARTISTS"
-const val IS_ARTIST_TRACKS = "com.tendai.common.media.IS_ARTIST_TRACKS"
-const val IS_ARTIST_ALBUMS = "com.tendai.common.media.IS_ARTIST_ALBUMS"
-const val IS_ALBUM = "com.tendai.common.media.IS_ALBUM"
-const val IS_PLAYLIST = "com.tendai.common.media.IS_PLAYLIST"
+const val EXTRA_ALBUM_ID = "com.tendai.common.EXTRA_ALBUM_ID"
+const val EMPTY_ROOT = "EMPTY_ROOT"
+const val EXTRA_PLAYLIST_ID = "com.tendai.common.EXTRA_PLAYLIST_ID"
+const val EXTRA_ARTIST_ID = "com.tendai.common.EXTRA_ARTIST_ID"
+const val IS_ALL_ARTISTS = "com.tendai.common.IS_ALL_ARTISTS"
+const val IS_ARTIST_TRACKS = "com.tendai.common.IS_ARTIST_TRACKS"
+const val IS_ARTIST_ALBUMS = "com.tendai.common.IS_ARTIST_ALBUMS"
+const val IS_ALBUM = "com.tendai.common.IS_ALBUM"
+const val IS_PLAYLIST = "com.tendai.common.IS_PLAYLIST"
 const val DISCOVER_ROOT = "DISCOVER"
 const val TRACKS_ROOT = "TRACKS"
 const val RECENT_ROOT = "RECENT_SONG"
 const val ARTISTS_ROOT = "ARTISTS"
+const val SYSTEM_UI_PACKAGE_NAME = "com.android.systemui"
 const val TAG: String = "MusicService "
 
+//TODO("Handle an empty root and add the systemUi logic for android 11")
+//TODO("Add a browsable root for android wear. I think it does have a viewpager. On Second thought
+// I think it does.")

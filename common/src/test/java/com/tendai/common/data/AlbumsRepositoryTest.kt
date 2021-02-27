@@ -1,7 +1,7 @@
 package com.tendai.common.data
 
 import com.tendai.common.FakeAlbumDataSource
-import com.tendai.common.media.source.AlbumRepository
+import com.tendai.common.source.AlbumRepository
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -11,7 +11,8 @@ class AlbumRepositoryTest {
 
     @Before
     fun setUp() {
-        albumsRepository = AlbumRepository(FakeAlbumDataSource())
+        albumsRepository =
+            AlbumRepository(FakeAlbumDataSource())
     }
 
     @Test

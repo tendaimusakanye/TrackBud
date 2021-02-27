@@ -1,10 +1,10 @@
-package com.tendai.common.media.source
+package com.tendai.common.source
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.tendai.common.media.extensions.*
-import com.tendai.common.media.source.local.LocalDataSource
-import com.tendai.common.media.source.model.Album
+import com.tendai.common.extensions.*
+import com.tendai.common.source.local.LocalDataSource
+import com.tendai.common.source.model.Album
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -15,19 +15,27 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
 
     override suspend fun getAlbums(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val albums = retrieveMediaItemsList(limit) { albumLocalDataSource.getAlbums(limit) }
+            val albums = retrieveMediaItemsList(limit) {
+                albumLocalDataSource.getAlbums(limit)
+            }
             return@withContext createMetadata(albums)
         }
 
     override suspend fun getAlbumsByArtist(artistId: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val albumsByArtist =
-                retrieveMediaItemsList(artistId) { albumLocalDataSource.getAlbumsForArtist(artistId) }
+                retrieveMediaItemsList(artistId) {
+                    albumLocalDataSource.getAlbumsForArtist(
+                        artistId
+                    )
+                }
             return@withContext createMetadata(albumsByArtist)
         }
 
     override suspend fun getAlbum(albumId: Int): MediaMetadataCompat = withContext(ioDispatcher) {
-        val albumDetails = retrieveMediaItem(albumId) { albumLocalDataSource.getAlbum(albumId) }
+        val albumDetails = retrieveMediaItem(albumId) {
+            albumLocalDataSource.getAlbum(albumId)
+        }
         return@withContext createMetadata(listOf(albumDetails))[0]
     }
 

@@ -1,7 +1,7 @@
 package com.tendai.common
 
-import com.tendai.common.media.source.local.LocalDataSource
-import com.tendai.common.media.source.model.Album
+import com.tendai.common.source.local.LocalDataSource
+import com.tendai.common.source.model.Album
 
 class FakeAlbumDataSource : LocalDataSource.Albums {
     override  fun getAlbums(

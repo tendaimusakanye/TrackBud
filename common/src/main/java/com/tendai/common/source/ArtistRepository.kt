@@ -1,10 +1,10 @@
-package com.tendai.common.media.source
+package com.tendai.common.source
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.tendai.common.media.extensions.*
-import com.tendai.common.media.source.local.LocalDataSource
-import com.tendai.common.media.source.model.Artist
+import com.tendai.common.extensions.*
+import com.tendai.common.source.local.LocalDataSource
+import com.tendai.common.source.model.Artist
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -14,7 +14,8 @@ class ArtistRepository(private val artistLocalDataSource: LocalDataSource.Artist
     private val ioDispatcher = Dispatchers.IO
 
     override suspend fun getAllArtists(): List<MediaMetadataCompat> = withContext(ioDispatcher) {
-        val artists = retrieveMediaItemsList() { artistLocalDataSource.getAllArtists() }
+        val artists =
+            retrieveMediaItemsList() { artistLocalDataSource.getAllArtists() }
         return@withContext createMetadata(artists)
     }
 
@@ -31,4 +32,4 @@ class ArtistRepository(private val artistLocalDataSource: LocalDataSource.Artist
             }.build()
         }
 }
-
+//TODO("Handle a display icon for artist i.e. random , from albums")

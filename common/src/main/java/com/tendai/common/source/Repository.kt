@@ -1,4 +1,4 @@
-package com.tendai.common.media.source
+package com.tendai.common.source
 
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
@@ -11,7 +11,7 @@ interface Repository {
 
         suspend fun getTracks(): List<MediaMetadataCompat>
 
-        suspend fun getTracksByArtist(artistId: Int): List<MediaMetadataCompat>
+        suspend fun getTracksForArtist(artistId: Int): List<MediaMetadataCompat>
 
         suspend fun getTracksInAlbum(albumId: Int): List<MediaMetadataCompat>
 
@@ -74,6 +74,8 @@ internal inline fun <T> retrieveMediaItemsList(
         mediaItemsList
     }!!
 }
+
+const val PLAYLIST_ICON_URI = "android.resource://com.tendai.common.media.source/drawable/ic_playlist"
 //todo: check if list of media metadata is empty or not before using it.
 
 

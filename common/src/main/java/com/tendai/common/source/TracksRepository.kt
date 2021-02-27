@@ -1,10 +1,10 @@
-package com.tendai.common.media.source
+package com.tendai.common.source
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.tendai.common.media.extensions.*
-import com.tendai.common.media.source.local.LocalDataSource
-import com.tendai.common.media.source.model.Track
+import com.tendai.common.extensions.*
+import com.tendai.common.source.local.LocalDataSource
+import com.tendai.common.source.model.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -17,34 +17,48 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
     override suspend fun getTrackDetails(trackId: Int): MediaMetadataCompat =
         withContext(ioDispatcher) {
             val trackMetadata =
-                retrieveMediaItem(trackId) { tracksLocalDataSource.getTrackDetails(trackId) }
+                retrieveMediaItem(trackId) {
+                    tracksLocalDataSource.getTrackDetails(
+                        trackId
+                    )
+                }
             return@withContext createMetadata(listOf(trackMetadata))[0]
         }
 
     override suspend fun getTracks(): List<MediaMetadataCompat> = withContext(ioDispatcher) {
-        val tracks = retrieveMediaItemsList { tracksLocalDataSource.getTracks() }
+        val tracks =
+            retrieveMediaItemsList { tracksLocalDataSource.getTracks() }
         return@withContext createMetadata(tracks)
     }
 
-    override suspend fun getTracksByArtist(artistId: Int): List<MediaMetadataCompat> =
+    override suspend fun getTracksForArtist(artistId: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val trackByArtist =
-                retrieveMediaItemsList(artistId) { tracksLocalDataSource.getTracksByArtist(artistId) }
+                retrieveMediaItemsList(artistId) {
+                    tracksLocalDataSource.getTracksByArtist(
+                        artistId
+                    )
+                }
             return@withContext createMetadata(trackByArtist)
         }
 
     override suspend fun getTracksInAlbum(albumId: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val tracksInAlbum =
-                retrieveMediaItemsList(albumId) { tracksLocalDataSource.getTracksInAlbum(albumId) }
+                retrieveMediaItemsList(albumId) {
+                    tracksLocalDataSource.getTracksInAlbum(
+                        albumId
+                    )
+                }
             return@withContext createMetadata(tracksInAlbum)
         }
 
     override suspend fun getTracksInPlaylist(playlistId: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val tracksInPlaylist = retrieveMediaItemsList(playlistId) {
-                tracksLocalDataSource.getTracksInPlaylist(playlistId)
-            }
+            val tracksInPlaylist =
+                retrieveMediaItemsList(playlistId) {
+                    tracksLocalDataSource.getTracksInPlaylist(playlistId)
+                }
             return@withContext createMetadata(tracksInPlaylist)
         }
 

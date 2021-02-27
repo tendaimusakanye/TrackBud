@@ -1,4 +1,4 @@
-package com.tendai.common.media.extensions
+package com.tendai.common.extensions
 
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaMetadataCompat

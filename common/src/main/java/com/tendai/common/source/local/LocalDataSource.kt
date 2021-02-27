@@ -1,13 +1,13 @@
-package com.tendai.common.media.source.local
+package com.tendai.common.source.local
 
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
-import com.tendai.common.media.source.model.Album
-import com.tendai.common.media.source.model.Artist
-import com.tendai.common.media.source.model.Playlist
-import com.tendai.common.media.source.model.Track
+import com.tendai.common.source.model.Album
+import com.tendai.common.source.model.Artist
+import com.tendai.common.source.model.Playlist
+import com.tendai.common.source.model.Track
 
 /**
  *  Interface to Data Layer. Concrete DataSources implement this interface as an abstraction

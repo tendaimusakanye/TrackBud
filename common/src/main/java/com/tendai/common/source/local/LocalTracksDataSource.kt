@@ -1,4 +1,4 @@
-package com.tendai.common.media.source.local
+package com.tendai.common.source.local
 
 import android.content.Context
 import android.database.Cursor
@@ -9,11 +9,12 @@ import android.provider.MediaStore.Audio.Media.*
 import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
-import com.tendai.common.media.extensions.mapList
-import com.tendai.common.media.source.model.Track
+import com.tendai.common.extensions.mapList
+import com.tendai.common.source.model.Track
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
-class TracksLocalDataSource(context: Context) : LocalDataSource, LocalDataSource.Tracks {
+class TracksLocalDataSource(context: Context) : LocalDataSource,
+    LocalDataSource.Tracks {
 
     private var fromPlaylist = false
     private val contentResolver = context.contentResolver

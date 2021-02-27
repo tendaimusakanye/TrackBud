@@ -1,17 +1,17 @@
-package com.tendai.common.media.source.local
+package com.tendai.common.source.local
 
 import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns._ID
-import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
-import com.tendai.common.media.extensions.mapList
-import com.tendai.common.media.source.model.Album
+import com.tendai.common.extensions.mapList
+import com.tendai.common.source.model.Album
 import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
 
-class AlbumLocalDataSource(context: Context) : LocalDataSource, LocalDataSource.Albums {
+class AlbumLocalDataSource(context: Context) : LocalDataSource,
+    LocalDataSource.Albums {
 
     private val contentResolver = context.contentResolver
     private val projection = arrayOf(
