@@ -7,23 +7,21 @@ import com.tendai.common.*
 import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+typealias MetadataChangedListener<T> = T.(metadata: MediaMetadataCompat) -> Unit
 
 class QueueManager(
     private val serviceScope: CoroutineScope,
     private val mediaSession: MediaSessionCompat,
     private val trackRepository: Repository.Tracks
 ) {
-
     @Volatile
     private var playingQueue = mutableListOf<MediaSessionCompat.QueueItem?>()
 
     @Volatile
     var currentIndex = 0
-
-    fun getCurrentQueueItem(): MediaSessionCompat.QueueItem? {
-        TODO("Not yet implemented")
-    }
-
+    private lateinit var onMetadataChanged: MetadataChangedListener<QueueManager>
 
     fun buildQueue(trackId: Long, extras: Bundle) {
         var metadatas = listOf<MediaMetadataCompat>()
@@ -43,7 +41,6 @@ class QueueManager(
                         trackRepository.getTracksInPlaylist(extras.getInt(EXTRA_PLAYLIST_ID))
                 }
             }
-
             //should I move this to a different thread ?
             playingQueue = metadatas.mapIndexed { index, mediaMetadataCompat ->
                 if (trackId == mediaMetadataCompat.description.mediaId?.toLong()) {
@@ -53,7 +50,27 @@ class QueueManager(
                     MediaSessionCompat.QueueItem(mediaMetadataCompat.description, mediaId.toLong())
                 }
             }.toMutableList()
+            updateMetadata()
         }
+    }
+
+    fun onMetadataChanged(onMetadataChanged: MetadataChangedListener<QueueManager>) {
+        this.onMetadataChanged = onMetadataChanged
+    }
+
+    private suspend fun updateMetadata() {
+        val currentTrack = playingQueue[currentIndex]
+        val trackId = currentTrack?.description?.mediaId?.toInt()
+        val trackMetadata = trackId?.let {
+            withContext(serviceScope.coroutineContext) {
+                trackRepository.getTrackDetails(trackId)
+            }
+        }
+        trackMetadata?.let { onMetadataChanged(this@QueueManager, it) }
+
+
+//        this.onMetadataChanged()
+
     }
 }
 

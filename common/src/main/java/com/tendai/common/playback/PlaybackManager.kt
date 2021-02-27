@@ -4,40 +4,41 @@ import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 
+typealias PlaybackStartCallback<T> = T.() -> Unit
+typealias PlaybackStopCallback = () -> Unit
+typealias PlaybackStateChangedCallback = (newState: PlaybackStateCompat) -> Unit
 
-abstract class PlaybackManager(
-    val serviceCallback: PlaybackServiceCallback,
-    val playback: Playback,
-    val queueManager: QueueManager
+
+class PlaybackManager(
+    private val playback: Playback,
+    private val queueManager: QueueManager
 ) {
+    private lateinit var onPlaybackStart: PlaybackStartCallback<PlaybackManager>
 
     val mediaSessionCallback: MediaSessionCallback
         get() = MediaSessionCallback()
 
-    fun play() {
-        playback.play()
-    }
 
-    fun play(trackId: Long, extras: Bundle) {
+    private fun updatePlaybackState() {
 
     }
 
-    fun onCompletion() {
+    private fun getAvailableActions() {
 
     }
 
-    fun updatePlaybackState() {
-
-    }
-
-    fun getAvailableActions() {
-
+    fun onPlaybackStart(onPlaybackStart: PlaybackStartCallback<PlaybackManager>) {
+        this.onPlaybackStart = onPlaybackStart
     }
 
     inner class MediaSessionCallback : MediaSessionCompat.Callback() {
 
         override fun onSeekTo(pos: Long) {
             playback.seekTo(pos)
+        }
+
+        override fun onCustomAction(action: String?, extras: Bundle?) {
+
         }
 
         override fun onSkipToPrevious() {
@@ -57,16 +58,10 @@ abstract class PlaybackManager(
         override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
             val trackId = mediaId!!.toLong()
             queueManager.buildQueue(trackId, extras!!)
-            serviceCallback.onPlaybackStart()
+            onPlaybackStart(this@PlaybackManager)
             playback.playFromId(trackId)
         }
     }
 
 }
 
-interface PlaybackServiceCallback {
-    fun onPlaybackStart()
-    fun onPlaybackStop()
-    fun onNotificationRequired()
-    fun onPlaybackStateUpdated(newState: PlaybackStateCompat)
-}

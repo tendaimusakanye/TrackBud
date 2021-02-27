@@ -7,28 +7,31 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.tendai.common.extensions.flag
-import com.tendai.common.playback.PlaybackServiceCallback
+import com.tendai.common.playback.PlaybackManager
+import com.tendai.common.playback.QueueManager
 import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-
-abstract class MusicService : MediaBrowserServiceCompat(), PlaybackServiceCallback {
+abstract class MusicService : MediaBrowserServiceCompat() {
 
     private lateinit var mediaSession: MediaSessionCompat
-    private lateinit var mediaNotificationManager: MediaNotificationManager
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
+
+    private lateinit var mediaNotificationManager: MediaNotificationManager
+    private lateinit var playbackManager: PlaybackManager
+    private lateinit var queueManager: QueueManager
 
     private lateinit var trackRepository: Repository.Tracks
     private lateinit var albumRepository: Repository.Albums
     private lateinit var playlistRepository: Repository.Playlists
     private lateinit var artistRepository: Repository.Artists
+
 
     override fun onCreate() {
         super.onCreate()
@@ -45,6 +48,14 @@ abstract class MusicService : MediaBrowserServiceCompat(), PlaybackServiceCallba
                 //todo: Implement my own media session callback
             })
         }
+
+        queueManager.onMetadataChanged { metadata ->
+            mediaSession.setMetadata(metadata)
+        }
+        playbackManager.onPlaybackStart {
+            mediaSession.isActive = true
+        }
+
 
         // Setting  the media session token
         sessionToken = mediaSession.sessionToken
@@ -153,39 +164,23 @@ abstract class MusicService : MediaBrowserServiceCompat(), PlaybackServiceCallba
         //cancels the coroutines when going away. I guess it iS to avoid memory leaks.
         serviceJob.cancel()
     }
-
-    override fun onPlaybackStart() {
-        mediaSession.isActive = true
-    }
-
-    override fun onPlaybackStop() {
-        mediaSession.isActive = false
-        stopForeground(false)
-    }
-
-    override fun onNotificationRequired() {
-        startForeground(MEDIA_NOTIFICATION_ID, mediaNotificationManager.notification)
-    }
-
-    override fun onPlaybackStateUpdated(newState: PlaybackStateCompat) {
-        mediaSession.setPlaybackState(newState)
-    }
 }
 
 const val EXTRA_ALBUM_ID = "com.tendai.common.EXTRA_ALBUM_ID"
-const val EMPTY_ROOT = "EMPTY_ROOT"
 const val EXTRA_PLAYLIST_ID = "com.tendai.common.EXTRA_PLAYLIST_ID"
 const val EXTRA_ARTIST_ID = "com.tendai.common.EXTRA_ARTIST_ID"
+
 const val IS_ALL_ARTISTS = "com.tendai.common.IS_ALL_ARTISTS"
 const val IS_ARTIST_TRACKS = "com.tendai.common.IS_ARTIST_TRACKS"
 const val IS_ARTIST_ALBUMS = "com.tendai.common.IS_ARTIST_ALBUMS"
 const val IS_ALBUM = "com.tendai.common.IS_ALBUM"
 const val IS_PLAYLIST = "com.tendai.common.IS_PLAYLIST"
+
 const val DISCOVER_ROOT = "DISCOVER"
 const val TRACKS_ROOT = "TRACKS"
 const val RECENT_ROOT = "RECENT_SONG"
 const val ARTISTS_ROOT = "ARTISTS"
-const val SYSTEM_UI_PACKAGE_NAME = "com.android.systemui"
+
 const val TAG: String = "MusicService "
 
 //TODO("Handle an empty root and add the systemUi logic for android 11")
