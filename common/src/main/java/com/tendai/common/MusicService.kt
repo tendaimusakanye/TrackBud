@@ -44,10 +44,9 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         // initializing media session
         mediaSession = MediaSessionCompat(this, TAG).apply {
             setSessionActivity(sessionPendingIntent)
-            setCallback(object : MediaSessionCompat.Callback() {
-                //todo: Implement my own media session callback
-            })
+//            setCallback(playbackManager.mediaSessionCallback)
         }
+        sessionToken = mediaSession.sessionToken
 
         queueManager.onMetadataChanged { metadata ->
             mediaSession.setMetadata(metadata)
@@ -55,10 +54,20 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         playbackManager.onPlaybackStart {
             mediaSession.isActive = true
         }
+        playbackManager.onPlaybackStopped {
+            mediaSession.isActive = false
+            stopForeground(true)
+        }
+        playbackManager.onNotificationRequired {
+
+        }
+        playbackManager.onPlaybackStateChanged { newState ->
+            mediaSession.setPlaybackState(newState)
+        }
 
 
         // Setting  the media session token
-        sessionToken = mediaSession.sessionToken
+
 
         //initializing the notification manager
         //todo: initialize my notification manager
@@ -73,7 +82,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot? {
-        // see @link [https://developer.android.com/guide/topics/media/media-controls]
+
         val isRecentRequest =
             rootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) ?: false
         var extras: Bundle? = null
@@ -181,7 +190,7 @@ const val TRACKS_ROOT = "TRACKS"
 const val RECENT_ROOT = "RECENT_SONG"
 const val ARTISTS_ROOT = "ARTISTS"
 
-const val TAG: String = "MusicService "
+private const val TAG: String = "MusicService "
 
 //TODO("Handle an empty root and add the systemUi logic for android 11")
 //TODO("Add a browsable root for android wear. I think it does have a viewpager. On Second thought

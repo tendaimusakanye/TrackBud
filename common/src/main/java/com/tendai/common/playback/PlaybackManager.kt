@@ -1,23 +1,21 @@
 package com.tendai.common.playback
 
-import android.os.Bundle
-import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 
-typealias PlaybackStartCallback<T> = T.() -> Unit
-typealias PlaybackStopCallback = () -> Unit
-typealias PlaybackStateChangedCallback = (newState: PlaybackStateCompat) -> Unit
+typealias PlaybackStart = () -> Unit
+typealias PlaybackStop = () -> Unit
+typealias PlaybackStateChanged = (newState: PlaybackStateCompat) -> Unit
+typealias ShowNotification = () -> Unit
 
 
-class PlaybackManager(
-    private val playback: Playback,
-    private val queueManager: QueueManager
+abstract class PlaybackManager(
+    val playback: Playback,
+    val queueManager: QueueManager
 ) {
-    private lateinit var onPlaybackStart: PlaybackStartCallback<PlaybackManager>
-
-    val mediaSessionCallback: MediaSessionCallback
-        get() = MediaSessionCallback()
-
+    lateinit var onPlaybackStart: PlaybackStart
+    private lateinit var onPlaybackStop: PlaybackStop
+    private lateinit var onPlaybackStateChanged: PlaybackStateChanged
+    private lateinit var onNotificationRequired: ShowNotification
 
     private fun updatePlaybackState() {
 
@@ -27,41 +25,22 @@ class PlaybackManager(
 
     }
 
-    fun onPlaybackStart(onPlaybackStart: PlaybackStartCallback<PlaybackManager>) {
+    fun onPlaybackStart(onPlaybackStart: PlaybackStart) {
         this.onPlaybackStart = onPlaybackStart
     }
 
-    inner class MediaSessionCallback : MediaSessionCompat.Callback() {
-
-        override fun onSeekTo(pos: Long) {
-            playback.seekTo(pos)
-        }
-
-        override fun onCustomAction(action: String?, extras: Bundle?) {
-
-        }
-
-        override fun onSkipToPrevious() {
-
-        }
-
-        override fun onStop() {
-            playback.stop()
-        }
-
-        override fun onSkipToNext() {
-        }
-
-        override fun onPause() {
-        }
-
-        override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
-            val trackId = mediaId!!.toLong()
-            queueManager.buildQueue(trackId, extras!!)
-            onPlaybackStart(this@PlaybackManager)
-            playback.playFromId(trackId)
-        }
+    fun onPlaybackStateChanged(onPlaybackStateChanged: PlaybackStateChanged) {
+        this.onPlaybackStateChanged = onPlaybackStateChanged
     }
+
+    fun onPlaybackStopped(onPlaybackStopped: PlaybackStop) {
+        this.onPlaybackStop = onPlaybackStopped
+    }
+
+    fun onNotificationRequired(onNotificationRequired: ShowNotification) {
+        this.onNotificationRequired = onNotificationRequired
+    }
+
 
 }
 

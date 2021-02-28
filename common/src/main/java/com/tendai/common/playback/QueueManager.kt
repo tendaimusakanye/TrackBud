@@ -3,13 +3,14 @@ package com.tendai.common.playback
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import com.tendai.common.*
 import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-typealias MetadataChangedListener<T> = T.(metadata: MediaMetadataCompat) -> Unit
+typealias MetadataChangedListener = (metadata: MediaMetadataCompat) -> Unit
 
 class QueueManager(
     private val serviceScope: CoroutineScope,
@@ -21,7 +22,7 @@ class QueueManager(
 
     @Volatile
     var currentIndex = 0
-    private lateinit var onMetadataChanged: MetadataChangedListener<QueueManager>
+    private lateinit var onMetadataChanged: MetadataChangedListener
 
     fun buildQueue(trackId: Long, extras: Bundle) {
         var metadatas = listOf<MediaMetadataCompat>()
@@ -54,7 +55,7 @@ class QueueManager(
         }
     }
 
-    fun onMetadataChanged(onMetadataChanged: MetadataChangedListener<QueueManager>) {
+    fun onMetadataChanged(onMetadataChanged: MetadataChangedListener) {
         this.onMetadataChanged = onMetadataChanged
     }
 
@@ -66,12 +67,16 @@ class QueueManager(
                 trackRepository.getTrackDetails(trackId)
             }
         }
-        trackMetadata?.let { onMetadataChanged(this@QueueManager, it) }
 
-
-//        this.onMetadataChanged()
-
+        trackMetadata?.let { onMetadataChanged(it) } ?: Log.e(
+            TAG,
+            "Track metadata was Null"
+        )
+        //TODO("Set album artwork")
     }
 }
 
+private const val TAG = "QueueManager"
 
+//TODO(test to see if removing the this@QueueManager parameter will still work afterwards)
+//TODO(Isn't fetching the track Metadata twice a bit redundant ?)
