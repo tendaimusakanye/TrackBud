@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-typealias MetadataChangedListener<T> = T.(metadata: MediaMetadataCompat) -> Unit
+typealias MetadataChangedListener = (metadata: MediaMetadataCompat) -> Unit
 
 class QueueManager(
     private val serviceScope: CoroutineScope,
@@ -21,11 +21,13 @@ class QueueManager(
 
     @Volatile
     var currentIndex = 0
-    private lateinit var onMetadataChanged: MetadataChangedListener<QueueManager>
+    private lateinit var onMetadataChanged: MetadataChangedListener
 
     fun buildQueue(trackId: Long, extras: Bundle) {
+
         var metadatas = listOf<MediaMetadataCompat>()
         serviceScope.launch {
+            val trackMetadata = trackRepository.getTrackDetails(trackId.toInt())
             when {
                 extras.getBoolean(TRACKS_ROOT) -> {
                     metadatas = trackRepository.getTracks()
@@ -41,20 +43,21 @@ class QueueManager(
                         trackRepository.getTracksInPlaylist(extras.getInt(EXTRA_PLAYLIST_ID))
                 }
             }
+
             //should I move this to a different thread ?
-            playingQueue = metadatas.mapIndexed { index, mediaMetadataCompat ->
-                if (trackId == mediaMetadataCompat.description.mediaId?.toLong()) {
-                    currentIndex = index
-                }
-                mediaMetadataCompat.description.mediaId?.let { mediaId ->
-                    MediaSessionCompat.QueueItem(mediaMetadataCompat.description, mediaId.toLong())
+            playingQueue = metadatas.mapIndexed { index, metadata ->
+                val mediaId = metadata.description.mediaId?.toLong()
+                if (trackId == mediaId) currentIndex = index
+
+                mediaId?.let {
+                    MediaSessionCompat.QueueItem(metadata.description, it)
                 }
             }.toMutableList()
             updateMetadata()
         }
     }
 
-    fun onMetadataChanged(onMetadataChanged: MetadataChangedListener<QueueManager>) {
+    fun onMetadataChanged(onMetadataChanged: MetadataChangedListener) {
         this.onMetadataChanged = onMetadataChanged
     }
 
@@ -66,12 +69,12 @@ class QueueManager(
                 trackRepository.getTrackDetails(trackId)
             }
         }
-        trackMetadata?.let { onMetadataChanged(this@QueueManager, it) }
-
-
+        trackMetadata?.let { onMetadataChanged(it) }
 //        this.onMetadataChanged()
-
     }
 }
 
 
+//todo: First complete all the functionalities, then optimize the code later
+//i.e. caching, paging, code structure, data structures etc. etc.
+//todo: cache the metadatas or only access coroutines when the queue has stale data.

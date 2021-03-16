@@ -44,9 +44,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         // initializing media session
         mediaSession = MediaSessionCompat(this, TAG).apply {
             setSessionActivity(sessionPendingIntent)
-            setCallback(object : MediaSessionCompat.Callback() {
-                //todo: Implement my own media session callback
-            })
+            setCallback(playbackManager.mediaSessionCallback)
         }
 
         queueManager.onMetadataChanged { metadata ->

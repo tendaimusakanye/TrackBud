@@ -22,12 +22,13 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
     // Do not use the let scope function on the cursor as it does not close the cursor in case of
     // an error or something else.
     override fun getAlbums(limit: Int): List<Album> {
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
             projection = projection,
             sortOrder = "LIMIT $limit"
         )
+
         return cursor!!.use { result ->
             result.mapList { mapToAlbum(it) }
         }
@@ -40,7 +41,7 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
     // are always returned.
     override fun getAlbumsForArtist(artistId: Int): List<Album> {
         val uri = getContentUri("external", artistId.toLong())
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver = contentResolver,
             uri = uri,
             projection = projection,
@@ -52,7 +53,7 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
     }
 
     override fun getAlbum(albumId: Int): Album {
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
             projection = projection,

@@ -25,7 +25,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
     )
 
     override fun getTrackDetails(trackId: Int): Track {
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -40,7 +40,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
     }
 
     override fun getTracks(): List<Track> {
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -53,7 +53,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
     }
 
     override fun getTracksByArtist(artistId: Int): List<Track> {
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -67,7 +67,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
     }
 
     override fun getTracksInAlbum(albumId: Int): List<Track> {
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -83,7 +83,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
     override fun getTracksInPlaylist(playlistId: Int): List<Track> {
         //this is how you properly get tracks from a given playlistId
         val uri = getContentUri("external", playlistId.toLong())
-        val cursor = getCursor(
+        val cursor = createCursor(
             contentResolver,
             uri,
             projection

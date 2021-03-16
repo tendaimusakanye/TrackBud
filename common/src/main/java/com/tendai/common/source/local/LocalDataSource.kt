@@ -60,7 +60,7 @@ interface LocalDataSource {
      * content resolvers.
      * Method is for convenience of default and named arguments.
      */
-    fun getCursor(
+    fun createCursor(
         contentResolver: ContentResolver,
         uri: Uri,
         projection: Array<out String>? = null,
