@@ -11,6 +11,8 @@ import androidx.media.MediaBrowserServiceCompat
 import com.tendai.common.extensions.flag
 import com.tendai.common.playback.PlaybackManager
 import com.tendai.common.playback.QueueManager
+import com.tendai.common.playback.REPEAT_MODE
+import com.tendai.common.playback.SHUFFLE_MODE
 import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -174,8 +176,8 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     private inner class PlaybackStateListener {
         init {
             playbackManager.onPlaybackStarted {
-               if(!mediaSession.isActive) mediaSession.isActive = true
-               // startService and startForeground notification
+                if (!mediaSession.isActive) mediaSession.isActive = true
+                // startService and startForeground notification
             }
             playbackManager.onPlaybackPaused {
                 stopForeground(false)
@@ -183,6 +185,10 @@ abstract class MusicService : MediaBrowserServiceCompat() {
 
             playbackManager.onPlaybackStateUpdated {
                 mediaSession.setPlaybackState(it)
+                it.extras?.let { bundle ->
+                    mediaSession.setRepeatMode(bundle.getInt(REPEAT_MODE))
+                    mediaSession.setShuffleMode(bundle.getInt(SHUFFLE_MODE))
+                }
             }
 
             playbackManager.onPlaybackStopped {

@@ -1,5 +1,6 @@
 package com.tendai.common.playback
 
+import android.os.Bundle
 import android.support.v4.media.session.PlaybackStateCompat
 
 class PlaybackManager(
@@ -28,21 +29,35 @@ class PlaybackManager(
         playback.playFromId(trackId)
     }
 
-    fun handlePreviousOrNextRequest(amount: Int) {
-        when (queueManager.getShuffleMode()) {
-            PlaybackStateCompat.SHUFFLE_MODE_NONE -> queueManager.skipToQueueItem(amount)
-            PlaybackStateCompat.SHUFFLE_MODE_GROUP -> {
-                if (amount == 1) {
-                    queueManager.getNextShuffleIndex()
-                } else queueManager.getPreviousShuffleIndex()
-            }
-        }
+    fun handlePreviousOrNextRequest() {
         val item = queueManager.getCurrentItemPlaying()
         val trackId = item?.description?.mediaId?.toLong()
-
         queueManager.onMetadataChanged(queueManager.getMetadata(trackId!!))
         updatePlaybackState()
         playback.playFromId(trackId)
+    }
+
+    fun repeatTrack() {
+
+    }
+
+    fun repeatQueue() {
+
+    }
+
+    fun setRepeatOrShuffleMode(shuffleOrRepeatMode: Int, isRepeatMode: Boolean) {
+        val bundle = queueManager.mediaSession.controller.extras ?: Bundle()
+        onPlaybackStateChanged(
+            PlaybackStateCompat.Builder(queueManager.mediaSession.controller.playbackState)
+                .setExtras(bundle.apply {
+                    if (isRepeatMode) putInt(REPEAT_MODE, shuffleOrRepeatMode)
+                    else putInt(SHUFFLE_MODE, shuffleOrRepeatMode)
+                }).build()
+        )
+    }
+
+    private fun getAvailableActions() {
+
     }
 
     fun onPlaybackStarted(playbackStart: () -> Unit) {
@@ -60,9 +75,6 @@ class PlaybackManager(
     fun onPlaybackStopped(playbackStop: () -> Unit) {
         this.onPlaybackStop = playbackStop
     }
-
-    private fun getAvailableActions() {
-
-    }
 }
+
 

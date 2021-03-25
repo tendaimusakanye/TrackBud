@@ -9,9 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class QueueManager(
-    private val serviceScope: CoroutineScope,
-    private val mediaSession: MediaSessionCompat,
-    private val trackRepository: Repository.Tracks
+    val serviceScope: CoroutineScope,
+    val mediaSession: MediaSessionCompat,
+    val trackRepository: Repository.Tracks
 ) {
     @Volatile
     var playingQueue = mutableListOf<MediaSessionCompat.QueueItem?>()
@@ -70,10 +70,6 @@ class QueueManager(
 
     fun getCurrentItemPlaying(): MediaSessionCompat.QueueItem? = playingQueue[currentIndex]
 
-    fun getRepeatMode(): Int = mediaSession.controller.repeatMode
-
-    fun getShuffleMode(): Int = mediaSession.controller.shuffleMode
-
     fun getMetadata(trackId: Long): MediaMetadataCompat {
         var metadata: MediaMetadataCompat? = null
         serviceScope.launch {
@@ -82,23 +78,20 @@ class QueueManager(
         return metadata!!
     }
 
-    // add more logic to this method.
-    //todo: check if index is the last index given the repeat mode and shuffleMode are none. then loop again.
-    fun skipToQueueItem(amount: Int) {
-        val index = currentIndex + amount
 
-        if (index < 0 && index > playingQueue.size) {
-            throw IndexOutOfBoundsException(" Index is not valid")
-        } else {
-            currentIndex = index
-        }
+    fun skipToNext() {
+
     }
 
-    fun getNextShuffleIndex() {
+    fun skipToPrevious() {
+
+    }
+
+    fun shuffleToNext() {
         TODO("Generate random indexes which loop through each node in the list once")
     }
 
-    fun getPreviousShuffleIndex() {
+    fun shuffleToPrevious() {
         TODO("Not yet implemented")
     }
 
