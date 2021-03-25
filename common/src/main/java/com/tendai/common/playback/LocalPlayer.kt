@@ -3,7 +3,7 @@ package com.tendai.common.playback
 import android.content.ContentUris
 import android.content.Context
 
-class LocalPlayback(private val context: Context) : Playback{
+class LocalPlayer(private val context: Context) : Playback{
 
 //    private val mediaPlayer
 //        get() {
