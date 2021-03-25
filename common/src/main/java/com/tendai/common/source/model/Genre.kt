@@ -1,6 +1,6 @@
 package com.tendai.common.source.model
 
-data class Genre (
-    var id: Int = -1,
+data class Genre(
+    var id: Long = -1,
     var name:String = ""
 )

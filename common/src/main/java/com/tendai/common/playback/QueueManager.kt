@@ -7,9 +7,6 @@ import com.tendai.common.*
 import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
-typealias MetadataChangedListener = (metadata: MediaMetadataCompat) -> Unit
 
 class QueueManager(
     private val serviceScope: CoroutineScope,
@@ -17,64 +14,108 @@ class QueueManager(
     private val trackRepository: Repository.Tracks
 ) {
     @Volatile
-    private var playingQueue = mutableListOf<MediaSessionCompat.QueueItem?>()
+    var playingQueue = mutableListOf<MediaSessionCompat.QueueItem?>()
 
     @Volatile
     var currentIndex = 0
-    private lateinit var onMetadataChanged: MetadataChangedListener
+    lateinit var onMetadataChanged: (metadata: MediaMetadataCompat) -> Unit
+    lateinit var onQueueChanged: (title: CharSequence, queueItems: List<MediaSessionCompat.QueueItem?>) -> Unit
 
     fun buildQueue(trackId: Long, extras: Bundle) {
-
         var metadatas = listOf<MediaMetadataCompat>()
         serviceScope.launch {
-            val trackMetadata = trackRepository.getTrackDetails(trackId.toInt())
+            val trackMetadata = trackRepository.getTrackDetails(trackId)
+            var queueTitle: CharSequence? = ""
+
             when {
                 extras.getBoolean(TRACKS_ROOT) -> {
                     metadatas = trackRepository.getTracks()
+                    queueTitle = "Tracks"
                 }
                 extras.getBoolean(IS_ALBUM) -> {
-                    metadatas = trackRepository.getTracksInAlbum(extras.getInt(EXTRA_ALBUM_ID))
+                    metadatas = trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
+                    queueTitle = metadatas[0].description.description
                 }
                 extras.getBoolean(IS_ARTIST_TRACKS) -> {
-                    metadatas = trackRepository.getTracksForArtist(extras.getInt(EXTRA_ARTIST_ID))
+                    metadatas = trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
+                    queueTitle = metadatas[0].description.subtitle
                 }
                 extras.getBoolean(IS_PLAYLIST) -> {
                     metadatas =
-                        trackRepository.getTracksInPlaylist(extras.getInt(EXTRA_PLAYLIST_ID))
+                        trackRepository.getTracksInPlaylist(extras.getLong(EXTRA_PLAYLIST_ID))
+                    queueTitle = metadatas[0].description.subtitle
                 }
             }
 
-            //should I move this to a different thread ?
+            if (playingQueue.isNotEmpty()) {
+                playingQueue.clear()
+            }
             playingQueue = metadatas.mapIndexed { index, metadata ->
                 val mediaId = metadata.description.mediaId?.toLong()
                 if (trackId == mediaId) currentIndex = index
 
-                mediaId?.let {
-                    MediaSessionCompat.QueueItem(metadata.description, it)
-                }
+                mediaId?.let { MediaSessionCompat.QueueItem(metadata.description, it) }
             }.toMutableList()
-            updateMetadata()
-        }
-    }
 
-    fun onMetadataChanged(onMetadataChanged: MetadataChangedListener) {
-        this.onMetadataChanged = onMetadataChanged
-    }
-
-    private suspend fun updateMetadata() {
-        val currentTrack = playingQueue[currentIndex]
-        val trackId = currentTrack?.description?.mediaId?.toInt()
-        val trackMetadata = trackId?.let {
-            withContext(serviceScope.coroutineContext) {
-                trackRepository.getTrackDetails(trackId)
+            //todo: what happens when the queue reaches position 15
+            val queueList = if (playingQueue.size < 15) {
+                playingQueue.subList(0, playingQueue.size - 1).toList()
+            } else {
+                playingQueue.subList(0, 15).toList()
             }
+//            onMetadataChanged(trackMetadata)
+            onQueueChanged(queueTitle!!, queueList)
         }
-        trackMetadata?.let { onMetadataChanged(it) }
-//        this.onMetadataChanged()
     }
+
+    fun getCurrentItemPlaying(): MediaSessionCompat.QueueItem? = playingQueue[currentIndex]
+
+    fun getRepeatMode(): Int = mediaSession.controller.repeatMode
+
+    fun getShuffleMode(): Int = mediaSession.controller.shuffleMode
+
+    fun getMetadata(trackId: Long): MediaMetadataCompat {
+        var metadata: MediaMetadataCompat? = null
+        serviceScope.launch {
+            metadata = trackRepository.getTrackDetails(trackId)
+        }
+        return metadata!!
+    }
+
+    // add more logic to this method.
+    //todo: check if index is the last index given the repeat mode and shuffleMode are none. then loop again.
+    fun skipToQueueItem(amount: Int) {
+        val index = currentIndex + amount
+
+        if (index < 0 && index > playingQueue.size) {
+            throw IndexOutOfBoundsException(" Index is not valid")
+        } else {
+            currentIndex = index
+        }
+    }
+
+    fun getNextShuffleIndex() {
+        TODO("Generate random indexes which loop through each node in the list once")
+    }
+
+    fun getPreviousShuffleIndex() {
+        TODO("Not yet implemented")
+    }
+
+    fun onMetadataChangedListener(metadataChanged: (metadata: MediaMetadataCompat) -> Unit) {
+        onMetadataChanged = metadataChanged
+    }
+
+    fun onQueueChangedListener(
+        queueUpdated: (title: CharSequence, queueItems: List<MediaSessionCompat.QueueItem?>) -> Unit
+    ) {
+        onQueueChanged = queueUpdated
+    }
+
 }
 
 
-//todo: First complete all the functionalities, then optimize the code later
+//todo: First complete all the functionality, then optimize the code later
+//todo: this class has too much logic.
 //i.e. caching, paging, code structure, data structures etc. etc.
 //todo: cache the metadatas or only access coroutines when the queue has stale data.

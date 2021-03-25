@@ -24,7 +24,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
         MediaStore.Audio.Media.DURATION
     )
 
-    override fun getTrackDetails(trackId: Int): Track {
+    override fun getTrackDetails(trackId: Long): Track {
         val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
@@ -52,7 +52,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
         }
     }
 
-    override fun getTracksByArtist(artistId: Int): List<Track> {
+    override fun getTracksByArtist(artistId: Long): List<Track> {
         val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
@@ -66,7 +66,7 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
         }
     }
 
-    override fun getTracksInAlbum(albumId: Int): List<Track> {
+    override fun getTracksInAlbum(albumId: Long): List<Track> {
         val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
@@ -80,9 +80,9 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
         }
     }
 
-    override fun getTracksInPlaylist(playlistId: Int): List<Track> {
+    override fun getTracksInPlaylist(playlistId: Long): List<Track> {
         //this is how you properly get tracks from a given playlistId
-        val uri = getContentUri("external", playlistId.toLong())
+        val uri = getContentUri("external", playlistId)
         val cursor = createCursor(
             contentResolver,
             uri,
@@ -98,13 +98,17 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
         cursor.run {
             Track(
                 id = when (fromPlaylist) {
-                    true -> getInt(getColumnIndex(AUDIO_ID))
-                    else -> getInt(getColumnIndex(_ID))
+                    true -> getLong(getColumnIndex(AUDIO_ID))
+                    else -> getLong(getColumnIndex(_ID))
+                },
+                playlistName = when (fromPlaylist) {
+                    true -> getString(getColumnIndex(MediaStore.Audio.Playlists.NAME))
+                    else -> ""
                 },
                 trackName = getString(getColumnIndex(TITLE)),
                 albumId = getInt(getColumnIndex(ALBUM_ID)),
                 albumName = getString(getColumnIndex(ALBUM)),
-                artistId = getInt(getColumnIndex(ARTIST_ID)),
+                artistId = getLong(getColumnIndex(ARTIST_ID)),
                 artistName = getString(getColumnIndex(ARTIST)),
                 duration = getInt(getColumnIndex(DURATION)),
                 trackNumber = getInt(getColumnIndex(TRACK)),

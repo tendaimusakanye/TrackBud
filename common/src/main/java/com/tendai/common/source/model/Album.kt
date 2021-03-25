@@ -5,7 +5,7 @@ import android.net.Uri
 
 
 data class Album(
-    var id: Int = -1,
+    var id: Long = -1,
     var albumTitle: String = "",
     var albumArtist: String = "",
     var artistId: Int = -1,

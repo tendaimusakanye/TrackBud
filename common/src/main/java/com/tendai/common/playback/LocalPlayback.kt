@@ -13,11 +13,6 @@ class LocalPlayback(private val context: Context) : Playback{
 //                .prepare()
 //
 //        }
-
-    override fun play() {
-        TODO("Not yet implemented")
-    }
-
     override fun playFromId(trackId: Long) {
         val uri = ContentUris.withAppendedId(
             android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -26,14 +21,6 @@ class LocalPlayback(private val context: Context) : Playback{
     }
 
     override fun pause() {
-        TODO("Not yet implemented")
-    }
-
-    override fun next() {
-        TODO("Not yet implemented")
-    }
-
-    override fun previous() {
         TODO("Not yet implemented")
     }
 
@@ -57,7 +44,7 @@ class LocalPlayback(private val context: Context) : Playback{
         TODO("Not yet implemented")
     }
 
-    override fun seekTo(pos: Long) {
+    override fun seekTo(position: Long) {
         TODO("Not yet implemented")
     }
 

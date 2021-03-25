@@ -15,24 +15,24 @@ import com.tendai.common.source.model.Track
 interface LocalDataSource {
     interface Tracks {
 
-        fun getTrackDetails(trackId: Int): Track
+        fun getTrackDetails(trackId: Long): Track
 
         fun getTracks(): List<Track>
 
-        fun getTracksByArtist(artistId: Int): List<Track>
+        fun getTracksByArtist(artistId: Long): List<Track>
 
-        fun getTracksInAlbum(albumId: Int): List<Track>
+        fun getTracksInAlbum(albumId: Long): List<Track>
 
-        fun getTracksInPlaylist(playlistId: Int): List<Track>
+        fun getTracksInPlaylist(playlistId: Long): List<Track>
 
     }
 
     interface Albums {
         fun getAlbums(limit: Int): List<Album>
 
-        fun getAlbumsForArtist(artistId: Int): List<Album>
+        fun getAlbumsForArtist(artistId: Long): List<Album>
 
-        fun getAlbum(albumId: Int): Album
+        fun getAlbum(albumId: Long): Album
 
     }
 
@@ -48,7 +48,7 @@ interface LocalDataSource {
 
         fun deletePlaylist(playlistId: Int): Int
 
-        fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int
+        fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int
 
         fun removeTrackFromPlaylist(trackIds: LongArray): Int
 

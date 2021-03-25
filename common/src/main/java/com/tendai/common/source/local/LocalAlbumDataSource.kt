@@ -39,8 +39,8 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
     // if the cursor is null then something drastic happened. Let NPE be thrown otherwise we found
     // Nothing. therefore return an empty list or empty mediaItem.
     // are always returned.
-    override fun getAlbumsForArtist(artistId: Int): List<Album> {
-        val uri = getContentUri("external", artistId.toLong())
+    override fun getAlbumsForArtist(artistId: Long): List<Album> {
+        val uri = getContentUri("external", artistId)
         val cursor = createCursor(
             contentResolver = contentResolver,
             uri = uri,
@@ -48,11 +48,11 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
             sortOrder = "$ALBUM ASC"
         )
         return cursor!!.use { result ->
-            result.mapList { mapToAlbum(it) }
+            result.mapList { mapToAlbum(it)}
         }
     }
 
-    override fun getAlbum(albumId: Int): Album {
+    override fun getAlbum(albumId: Long): Album {
         val cursor = createCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
@@ -78,7 +78,7 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
     private fun mapToAlbum(cursor: Cursor): Album =
         cursor.run {
             Album(
-                id = getInt(getColumnIndex(_ID)),
+                id = getLong(getColumnIndex(_ID)),
                 albumTitle = getString(getColumnIndex(ALBUM)),
                 albumArtist = getString(getColumnIndex(ARTIST)),
                 artistId = getInt(getColumnIndex(ARTIST_ID)),

@@ -78,13 +78,13 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
         )
 
 
-    override fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int {
+    override fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int {
         // this is done to get the correct Uri for us to insert the songs into the playlists.
         // That is just how android is
         // android recommends insert and update methods be thread safe. i.e. the reason for the synchronized block
         return synchronized(this) {
-            val uri = getContentUri("external", playlistId.toLong())
-            var playOrder = getHighestPlayOrder(playlistId)
+            val uri = getContentUri("external", playlistId)
+            var playOrder = getHighestPlayOrder(playlistId.toInt())
 
             if (trackIds.isNotEmpty()) {
                 val contentValues = Array(trackIds.size) { ContentValues() }
@@ -145,7 +145,7 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
     private fun mapToPlaylist(cursor: Cursor): Playlist =
         cursor.run {
             Playlist(
-                playlistId = getInt(getColumnIndex(PLAYLIST_ID)),
+                playlistId = getLong(getColumnIndex(PLAYLIST_ID)),
                 playlistName = getString(getColumnIndex(NAME)),
                 numberOfTracks = getNumberOfSongsInPlaylist(getInt(getColumnIndex(PLAYLIST_ID)))
             )

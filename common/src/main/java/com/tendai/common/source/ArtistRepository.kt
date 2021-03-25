@@ -15,20 +15,20 @@ class ArtistRepository(private val artistLocalDataSource: LocalDataSource.Artist
 
     override suspend fun getAllArtists(): List<MediaMetadataCompat> = withContext(ioDispatcher) {
         val artists =
-            retrieveMediaItemsList() { artistLocalDataSource.getAllArtists() }
+            retrieveMediaItemsList { artistLocalDataSource.getAllArtists() }
         return@withContext createMetadata(artists)
     }
 
     private fun createMetadata(artists: List<Artist>): List<MediaMetadataCompat> =
-        artists.map { artist ->
+        artists.map {
             MediaMetadataCompat.Builder().apply {
-                id = artist.artistId.toString()
-                this.artist = artist.artistName
-                trackCount = artist.numberOfTracks.toLong()
+                id = it.artistId.toString()
+                artist = it.artistName
+                trackCount = it.numberOfTracks.toLong()
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
-                displayTitle = artist.artistName
+                displayTitle = it.artistName
                 displayDescription =
-                    "${artist.numberOfAlbums} albums|${artist.numberOfTracks} tracks"
+                    "${it.numberOfAlbums} albums|${it.numberOfTracks} tracks"
             }.build()
         }
 }

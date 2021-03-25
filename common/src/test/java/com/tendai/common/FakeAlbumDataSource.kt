@@ -31,11 +31,11 @@ class FakeAlbumDataSource : LocalDataSource.Albums {
 
     }
 
-    override  fun getAlbumsForArtist(artistId: Int): List<Album> {
+    override  fun getAlbumsForArtist(artistId: Long): List<Album> {
         TODO("Not yet implemented")
     }
 
-    override  fun getAlbum(albumId: Int): Album {
+    override  fun getAlbum(albumId: Long): Album {
       return Album()
     }
 }

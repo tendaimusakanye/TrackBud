@@ -46,17 +46,12 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             setSessionActivity(sessionPendingIntent)
             setCallback(playbackManager.mediaSessionCallback)
         }
-
-        queueManager.onMetadataChanged { metadata ->
-            mediaSession.setMetadata(metadata)
-        }
-        playbackManager.onPlaybackStart {
-            mediaSession.isActive = true
-        }
-
-
         // Setting  the media session token
         sessionToken = mediaSession.sessionToken
+        playbackManager.updatePlaybackState()
+
+        MetadataChangedListener()
+        PlaybackStateListener()
 
         //initializing the notification manager
         //todo: initialize my notification manager
@@ -113,12 +108,12 @@ abstract class MusicService : MediaBrowserServiceCompat() {
                         }
                         options.getBoolean(IS_ALBUM) -> {
                             metadatas = trackRepository.getTracksInAlbum(
-                                options.getInt(EXTRA_ALBUM_ID)
+                                options.getLong(EXTRA_ALBUM_ID)
                             )
                         }
                         options.getBoolean(IS_PLAYLIST) -> {
                             metadatas = trackRepository.getTracksInPlaylist(
-                                options.getInt(EXTRA_PLAYLIST_ID)
+                                options.getLong(EXTRA_PLAYLIST_ID)
                             )
                         }
                     }
@@ -130,12 +125,12 @@ abstract class MusicService : MediaBrowserServiceCompat() {
                         }
                         options.getBoolean(IS_ARTIST_TRACKS) -> {
                             metadatas = trackRepository.getTracksForArtist(
-                                options.getInt(EXTRA_ARTIST_ID)
+                                options.getLong(EXTRA_ARTIST_ID)
                             )
                         }
                         options.getBoolean(IS_ARTIST_ALBUMS) -> {
                             metadatas = albumRepository.getAlbumsByArtist(
-                                options.getInt(EXTRA_ARTIST_ID)
+                                options.getLong(EXTRA_ARTIST_ID)
                             )
                         }
                     }
@@ -161,6 +156,42 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         }
         //cancels the coroutines when going away. I guess it iS to avoid memory leaks.
         serviceJob.cancel()
+    }
+
+    private inner class MetadataChangedListener {
+        init {
+            //listeners
+            queueManager.onMetadataChangedListener { metadata ->
+                mediaSession.setMetadata(metadata)
+            }
+            queueManager.onQueueChangedListener { title, queueItems ->
+                mediaSession.setQueueTitle(title)
+                mediaSession.setQueue(queueItems)
+            }
+        }
+    }
+
+    private inner class PlaybackStateListener {
+        init {
+            playbackManager.onPlaybackStarted {
+               if(!mediaSession.isActive) mediaSession.isActive = true
+               // startService and startForeground notification
+            }
+            playbackManager.onPlaybackPaused {
+                stopForeground(false)
+            }
+
+            playbackManager.onPlaybackStateUpdated {
+                mediaSession.setPlaybackState(it)
+            }
+
+            playbackManager.onPlaybackStopped {
+                stopSelf()
+                mediaSession.isActive = false
+                stopForeground(false)
+                // todo: save current playing song to storage
+            }
+        }
     }
 }
 

@@ -32,7 +32,7 @@ class ArtistLocalDataSource(context: Context) : LocalDataSource,
     private fun mapToArtist(cursor: Cursor): Artist =
         cursor.run {
             Artist(
-                artistId = getInt(getColumnIndex(_ID)),
+                artistId = getLong(getColumnIndex(_ID)),
                 artistName = getString(getColumnIndex(ARTIST)),
                 numberOfAlbums = getInt(getColumnIndex(NUMBER_OF_ALBUMS)),
                 numberOfTracks = getInt(getColumnIndex(NUMBER_OF_TRACKS))

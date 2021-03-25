@@ -15,16 +15,16 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
 
     override suspend fun getAlbums(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val albums = retrieveMediaItemsList(limit) {
+            val albums = retrieveMediaItemsList{
                 albumLocalDataSource.getAlbums(limit)
             }
             return@withContext createMetadata(albums)
         }
 
-    override suspend fun getAlbumsByArtist(artistId: Int): List<MediaMetadataCompat> =
+    override suspend fun getAlbumsByArtist(artistId: Long): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val albumsByArtist =
-                retrieveMediaItemsList(artistId) {
+                retrieveMediaItemsList {
                     albumLocalDataSource.getAlbumsForArtist(
                         artistId
                     )
@@ -32,29 +32,29 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
             return@withContext createMetadata(albumsByArtist)
         }
 
-    override suspend fun getAlbum(albumId: Int): MediaMetadataCompat = withContext(ioDispatcher) {
-        val albumDetails = retrieveMediaItem(albumId) {
+    override suspend fun getAlbum(albumId: Long): MediaMetadataCompat = withContext(ioDispatcher) {
+        val albumDetails = retrieveMediaItem() {
             albumLocalDataSource.getAlbum(albumId)
         }
         return@withContext createMetadata(listOf(albumDetails))[0]
     }
 
     private fun createMetadata(albums: List<Album>): List<MediaMetadataCompat> =
-        albums.map { album ->
+        albums.map {
             MediaMetadataCompat.Builder().apply {
-                id = album.id.toString()
-                this.album = album.albumTitle
-                this.albumArtist = album.albumArtist
-                year = album.yearReleased.toLong()
-                trackCount = album.numberOfTracks.toLong()
-                this.albumArtUri = album.albumArtUri.toString()
+                id = it.id.toString()
+                album = it.albumTitle
+                albumArtist = it.albumArtist
+                year = it.yearReleased.toLong()
+                trackCount = it.numberOfTracks.toLong()
+                albumArtUri = it.albumArtUri.toString()
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
 
                 //for ease of displaying
-                displayTitle = album.albumTitle
-                displaySubtitle = album.albumArtist
-                displayDescription = "${album.numberOfTracks} tracks"
-                displayIconUri = album.albumArtUri.toString()
+                displayTitle = it.albumTitle
+                displaySubtitle = it.albumArtist
+                displayDescription = "${it.numberOfTracks} tracks"
+                displayIconUri = it.albumArtUri.toString()
             }.build()
         }
 }

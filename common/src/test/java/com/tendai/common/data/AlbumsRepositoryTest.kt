@@ -2,6 +2,7 @@ package com.tendai.common.data
 
 import com.tendai.common.FakeAlbumDataSource
 import com.tendai.common.source.AlbumRepository
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -16,7 +17,7 @@ class AlbumRepositoryTest {
     }
 
     @Test
-    fun getAlbums() {
+    fun getAlbums() = runBlocking{
         val allAlbums = albumsRepository?.getAlbums(2)
         Assert.assertEquals(2, allAlbums?.size)
     }

@@ -17,10 +17,8 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
     override suspend fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val playlists =
-                retrieveMediaItemsList(limit) {
-                    playlistLocalDataSource.getAllPlaylists(
-                        limit
-                    )
+                retrieveMediaItemsList {
+                    playlistLocalDataSource.getAllPlaylists(limit)
                 }
             return@withContext createMetadata(playlists)
         }
@@ -33,7 +31,7 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
         return@withContext playlistLocalDataSource.deletePlaylist(playlistId)
     }
 
-    override suspend fun addTracksToPlaylist(playlistId: Int, trackIds: LongArray): Int =
+    override suspend fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int =
         withContext(ioDispatcher) {
             return@withContext playlistLocalDataSource.addTracksToPlaylist(playlistId, trackIds)
         }

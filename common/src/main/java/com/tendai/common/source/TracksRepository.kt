@@ -14,13 +14,11 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
 
     private val ioDispatcher = Dispatchers.IO
 
-    override suspend fun getTrackDetails(trackId: Int): MediaMetadataCompat =
+    override suspend fun getTrackDetails(trackId: Long): MediaMetadataCompat =
         withContext(ioDispatcher) {
             val trackMetadata =
-                retrieveMediaItem(trackId) {
-                    tracksLocalDataSource.getTrackDetails(
-                        trackId
-                    )
+                retrieveMediaItem {
+                    tracksLocalDataSource.getTrackDetails(trackId)
                 }
             return@withContext createMetadata(listOf(trackMetadata))[0]
         }
@@ -31,10 +29,10 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
         return@withContext createMetadata(tracks)
     }
 
-    override suspend fun getTracksForArtist(artistId: Int): List<MediaMetadataCompat> =
+    override suspend fun getTracksForArtist(artistId: Long): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val trackByArtist =
-                retrieveMediaItemsList(artistId) {
+                retrieveMediaItemsList {
                     tracksLocalDataSource.getTracksByArtist(
                         artistId
                     )
@@ -42,10 +40,10 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
             return@withContext createMetadata(trackByArtist)
         }
 
-    override suspend fun getTracksInAlbum(albumId: Int): List<MediaMetadataCompat> =
+    override suspend fun getTracksInAlbum(albumId: Long): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val tracksInAlbum =
-                retrieveMediaItemsList(albumId) {
+                retrieveMediaItemsList {
                     tracksLocalDataSource.getTracksInAlbum(
                         albumId
                     )
@@ -53,31 +51,39 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
             return@withContext createMetadata(tracksInAlbum)
         }
 
-    override suspend fun getTracksInPlaylist(playlistId: Int): List<MediaMetadataCompat> =
+    override suspend fun getTracksInPlaylist(playlistId: Long): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
             val tracksInPlaylist =
-                retrieveMediaItemsList(playlistId) {
+                retrieveMediaItemsList {
                     tracksLocalDataSource.getTracksInPlaylist(playlistId)
                 }
             return@withContext createMetadata(tracksInPlaylist)
         }
 
     private fun createMetadata(tracks: List<Track>): List<MediaMetadataCompat> {
-        return tracks.map { track ->
-            val durationMs = TimeUnit.SECONDS.toMillis(track.duration.toLong())
+        return tracks.map {
+            val durationMs = TimeUnit.SECONDS.toMillis(it.duration.toLong())
+
             MediaMetadataCompat.Builder().apply {
-                id = track.id.toString()
-                title = track.trackName
-                album = track.albumName
-                artist = track.artistName
+                id = it.id.toString()
+                title = it.trackName
+                album = it.albumName
+                artist = it.artistName
                 duration = durationMs
-                trackNumber = track.trackNumber.toString()
-                albumArtUri = track.albumArtUri.toString()
+                trackNumber = it.trackNumber.toString()
+                albumArtUri = it.albumArtUri.toString()
                 flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
-                displayTitle = track.trackName
-                displaySubtitle = track.artistName
-                displayDescription = track.albumName
-                displayIconUri = track.albumArtUri.toString()
+
+                displayTitle = it.trackName
+
+                // this hack is to cater for the setting the queueTitle in the queueManager class
+                displaySubtitle = if (it.artistName == "") {
+                    it.playlistName
+                } else {
+                    it.artistName
+                }
+                displayDescription = it.albumName
+                displayIconUri = it.albumArtUri.toString()
             }.build()
         }
     }
