@@ -4,38 +4,35 @@ import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Album
 
 class FakeAlbumDataSource : LocalDataSource.Albums {
-    override  fun getAlbums(
+    override fun getAlbums(
         limit: Int
     ): List<Album> {
 
-        val albumOne = Album(
-            100,
-            "Strings and Blings",
-            "NastyC",
-            1,
-            2015,
-            12,
-            null
-        )
+        val albums = mutableListOf<Album>()
 
-        val albumTwo = Album(
-            102,
-            "Beer bottles and Bongs",
-            "Post Malone",
-            2,
-            2016,
-            10,
-            null
-        )
-        return listOf(albumOne, albumTwo)
+        for (i in 0..100000) {
+            albums.add(
+                Album(
+                    i.toLong(),
+                    "Album $i",
+                    "Artist $i",
+                    i,
+                    2 + i,
+                    i,
+                    null
+                )
+            )
+        }
+
+        return albums
 
     }
 
-    override  fun getAlbumsForArtist(artistId: Long): List<Album> {
+    override fun getAlbumsByArtist(artistId: Long): List<Album> {
         TODO("Not yet implemented")
     }
 
-    override  fun getAlbum(albumId: Long): Album {
-      return Album()
+    override fun getAlbum(albumId: Long): Album {
+        return Album()
     }
 }

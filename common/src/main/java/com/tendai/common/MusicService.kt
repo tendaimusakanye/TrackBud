@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.tendai.common.extensions.flag
 import com.tendai.common.playback.PlaybackManager
@@ -21,7 +22,6 @@ import kotlinx.coroutines.launch
 
 abstract class MusicService : MediaBrowserServiceCompat() {
 
-    private lateinit var mediaSession: MediaSessionCompat
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
@@ -34,6 +34,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     private lateinit var playlistRepository: Repository.Playlists
     private lateinit var artistRepository: Repository.Artists
 
+    private lateinit var mediaSession: MediaSessionCompat
 
     override fun onCreate() {
         super.onCreate()
@@ -51,9 +52,8 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         // Setting  the media session token
         sessionToken = mediaSession.sessionToken
         playbackManager.updatePlaybackState()
-
-        MetadataChangedListener()
-        PlaybackStateListener()
+        setUpMetadataListeners()
+        setUpPlaybackListeners()
 
         //initializing the notification manager
         //todo: initialize my notification manager
@@ -71,6 +71,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         // see @link [https://developer.android.com/guide/topics/media/media-controls]
         val isRecentRequest =
             rootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) ?: false
+
         var extras: Bundle? = null
         val rootId = if (isRecentRequest) {
             extras = Bundle()
@@ -160,43 +161,47 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         serviceJob.cancel()
     }
 
-    private inner class MetadataChangedListener {
-        init {
-            //listeners
-            queueManager.onMetadataChangedListener { metadata ->
-                mediaSession.setMetadata(metadata)
+    private fun setUpPlaybackListeners() {
+        playbackManager.onNotificationRequiredListener { state ->
+            if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
+                    TODO("START MY NOTIFICATION")
             }
-            queueManager.onQueueChangedListener { title, queueItems ->
-                mediaSession.setQueueTitle(title)
-                mediaSession.setQueue(queueItems)
+        }
+
+        playbackManager.onPlaybackStartedListener {
+            if (!mediaSession.isActive) mediaSession.isActive = true
+            startService(Intent(applicationContext, MusicService::class.java))
+        }
+
+        playbackManager.onPlaybackPausedListener {
+            stopForeground(false)
+        }
+
+        playbackManager.onPlaybackStateUpdatedListener {
+            mediaSession.setPlaybackState(it)
+            it.extras?.let { bundle ->
+                mediaSession.setRepeatMode(bundle.getInt(REPEAT_MODE))
+                mediaSession.setShuffleMode(bundle.getInt(SHUFFLE_MODE))
             }
+        }
+
+        playbackManager.onPlaybackStoppedListener {
+            stopSelf()
+            mediaSession.isActive = false
+            stopForeground(true)
+            // todo: save current playing song to storage
         }
     }
 
-    private inner class PlaybackStateListener {
-        init {
-            playbackManager.onPlaybackStarted {
-                if (!mediaSession.isActive) mediaSession.isActive = true
-                // startService and startForeground notification
-            }
-            playbackManager.onPlaybackPaused {
-                stopForeground(false)
-            }
+    fun setUpMetadataListeners() {
+        //listeners
+        queueManager.onMetadataChangedListener { metadata ->
+            mediaSession.setMetadata(metadata)
+        }
 
-            playbackManager.onPlaybackStateUpdated {
-                mediaSession.setPlaybackState(it)
-                it.extras?.let { bundle ->
-                    mediaSession.setRepeatMode(bundle.getInt(REPEAT_MODE))
-                    mediaSession.setShuffleMode(bundle.getInt(SHUFFLE_MODE))
-                }
-            }
-
-            playbackManager.onPlaybackStopped {
-                stopSelf()
-                mediaSession.isActive = false
-                stopForeground(false)
-                // todo: save current playing song to storage
-            }
+        queueManager.onQueueChangedListener { title, queueItems ->
+            mediaSession.setQueueTitle(title)
+            mediaSession.setQueue(queueItems)
         }
     }
 }

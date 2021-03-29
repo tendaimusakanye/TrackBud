@@ -19,7 +19,7 @@ class AlbumRepositoryTest {
     @Test
     fun getAlbums() = runBlocking{
         val allAlbums = albumsRepository?.getAlbums(2)
-        Assert.assertEquals(2, allAlbums?.size)
+        Assert.assertEquals(100001, allAlbums?.size)
     }
 
 }

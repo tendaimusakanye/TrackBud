@@ -6,7 +6,7 @@ import android.net.Uri
 data class Track(
     var id: Long = -1,
     var trackName: String = "",
-    var albumId: Int = -1,
+    var albumId: Long = -1,
     var albumName: String = "",
     var artistId: Long = -1,
     var artistName: String = "",

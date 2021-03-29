@@ -20,15 +20,15 @@ class ArtistRepository(private val artistLocalDataSource: LocalDataSource.Artist
     }
 
     private fun createMetadata(artists: List<Artist>): List<MediaMetadataCompat> =
-        artists.map {
+        artists.map { artist ->
             MediaMetadataCompat.Builder().apply {
-                id = it.artistId.toString()
-                artist = it.artistName
-                trackCount = it.numberOfTracks.toLong()
+                id = artist.artistId.toString()
+                this.artist = artist.artistName
+                trackCount = artist.numberOfTracks.toLong()
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
-                displayTitle = it.artistName
+                displayTitle = artist.artistName
                 displayDescription =
-                    "${it.numberOfAlbums} albums|${it.numberOfTracks} tracks"
+                    "${artist.numberOfAlbums} albums|${artist.numberOfTracks} tracks"
             }.build()
         }
 }

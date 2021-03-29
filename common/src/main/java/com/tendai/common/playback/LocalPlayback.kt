@@ -2,9 +2,10 @@ package com.tendai.common.playback
 
 import android.content.ContentUris
 import android.content.Context
+import android.net.Uri
 
-class LocalPlayback(private val context: Context) : Playback{
-
+class LocalPlayback(private val context: Context) : Playback {
+    private lateinit var onCompletion: Callback
 //    private val mediaPlayer
 //        get() {
 //            MediaPlayer().apply {
@@ -13,6 +14,7 @@ class LocalPlayback(private val context: Context) : Playback{
 //                .prepare()
 //
 //        }
+
     override fun playFromId(trackId: Long) {
         val uri = ContentUris.withAppendedId(
             android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -21,30 +23,46 @@ class LocalPlayback(private val context: Context) : Playback{
     }
 
     override fun pause() {
-        TODO("Not yet implemented")
-    }
 
-    override fun repeat() {
-        TODO("Not yet implemented")
     }
 
     override fun stop() {
+
+    }
+
+    override fun getCurrentPosition() {
+
+    }
+
+    override fun isPlaying() : Boolean{
         TODO("Not yet implemented")
     }
 
-    override fun shuffle() {
+    override fun reset() {
+
+    }
+
+    override fun release() {
+
+    }
+
+    override fun prepare() {
+
+    }
+
+    override fun setSource(path: String): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun getPlaybackSate(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun setPlaybackState() {
+    override fun setSource(uri: Uri): Boolean {
         TODO("Not yet implemented")
     }
 
     override fun seekTo(position: Long) {
+
+    }
+
+    override fun getState():Int {
         TODO("Not yet implemented")
     }
 

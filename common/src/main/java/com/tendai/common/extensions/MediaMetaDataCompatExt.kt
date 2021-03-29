@@ -1,5 +1,6 @@
 package com.tendai.common.extensions
 
+import android.graphics.Bitmap
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaMetadataCompat
 
@@ -77,6 +78,13 @@ inline var MediaMetadataCompat.Builder.albumArtUri: String?
     get() = throw IllegalAccessException(ERROR_MESSAGE)
     set(value) {
         putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, value)
+    }
+
+inline var MediaMetadataCompat.Builder.albumArt: Bitmap?
+    @Deprecated(NO_GET, level = DeprecationLevel.ERROR)
+    get() = throw IllegalAccessException("Cannot get from MediaMetadataCompat.Builder")
+    set(value) {
+        putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, value)
     }
 
 inline var MediaMetadataCompat.Builder.trackCount: Long

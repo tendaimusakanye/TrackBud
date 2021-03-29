@@ -1,7 +1,14 @@
 package com.tendai.common.source
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
+import com.tendai.common.R
+import com.tendai.common.source.local.getAlbumArtUri
+import java.io.IOException
 
 interface Repository {
 
@@ -45,6 +52,7 @@ interface Repository {
         suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int
 
     }
+
 }
 
 internal inline fun <T> retrieveMediaItem(
@@ -73,8 +81,18 @@ internal inline fun <T> retrieveMediaItemsList(
     }!!
 }
 
-const val PLAYLIST_ICON_URI =
-    "android.resource://com.tendai.common.media.source/drawable/ic_playlist"
+@SuppressLint("NewApi")
+fun getAlbumArt(context: Context, albumId: Long): Bitmap {
+    return try {
+        val source = ImageDecoder.createSource(context.contentResolver, getAlbumArtUri(albumId))
+        ImageDecoder.decodeBitmap(source)
+    } catch (e: IOException) {
+        val defaultSource =
+            ImageDecoder.createSource(context.resources, R.drawable.ic_placeholder_art)
+        ImageDecoder.decodeBitmap(defaultSource)
+    }
+}
+
 //todo: check if list of media metadata is empty or not before using it.
 
 

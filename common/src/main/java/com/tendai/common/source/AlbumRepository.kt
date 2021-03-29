@@ -15,7 +15,7 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
 
     override suspend fun getAlbums(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val albums = retrieveMediaItemsList{
+            val albums = retrieveMediaItemsList {
                 albumLocalDataSource.getAlbums(limit)
             }
             return@withContext createMetadata(albums)
@@ -25,7 +25,7 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
         withContext(ioDispatcher) {
             val albumsByArtist =
                 retrieveMediaItemsList {
-                    albumLocalDataSource.getAlbumsForArtist(
+                    albumLocalDataSource.getAlbumsByArtist(
                         artistId
                     )
                 }
@@ -40,21 +40,22 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
     }
 
     private fun createMetadata(albums: List<Album>): List<MediaMetadataCompat> =
-        albums.map {
+        albums.map { album ->
             MediaMetadataCompat.Builder().apply {
-                id = it.id.toString()
-                album = it.albumTitle
-                albumArtist = it.albumArtist
-                year = it.yearReleased.toLong()
-                trackCount = it.numberOfTracks.toLong()
-                albumArtUri = it.albumArtUri.toString()
+                id = album.id.toString()
+                this.album = album.albumTitle
+                albumArtist = album.albumArtist
+                year = album.yearReleased.toLong()
+                trackCount = album.numberOfTracks.toLong()
+                albumArtUri = album.albumArtUri.toString()
+                albumArt = getAlbumArt(albumLocalDataSource.getContextHacky(), album.id)
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
 
                 //for ease of displaying
-                displayTitle = it.albumTitle
-                displaySubtitle = it.albumArtist
-                displayDescription = "${it.numberOfTracks} tracks"
-                displayIconUri = it.albumArtUri.toString()
+                displayTitle = album.albumTitle
+                displaySubtitle = album.albumArtist
+                displayDescription = "${album.numberOfTracks} tracks"
+                displayIconUri = album.albumArtUri.toString()
             }.build()
         }
 }

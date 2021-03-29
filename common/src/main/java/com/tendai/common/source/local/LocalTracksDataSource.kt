@@ -13,7 +13,7 @@ import com.tendai.common.extensions.mapList
 import com.tendai.common.source.model.Track
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
-class TracksLocalDataSource(context: Context) : LocalDataSource,
+class TracksLocalDataSource(private val context: Context) : LocalDataSource,
     LocalDataSource.Tracks {
 
     private var fromPlaylist = false
@@ -94,6 +94,8 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
         }
     }
 
+    override fun getContextHacky(): Context = context
+
     private fun mapToTrack(cursor: Cursor): Track =
         cursor.run {
             Track(
@@ -106,13 +108,13 @@ class TracksLocalDataSource(context: Context) : LocalDataSource,
                     else -> ""
                 },
                 trackName = getString(getColumnIndex(TITLE)),
-                albumId = getInt(getColumnIndex(ALBUM_ID)),
+                albumId = getLong(getColumnIndex(ALBUM_ID)),
                 albumName = getString(getColumnIndex(ALBUM)),
                 artistId = getLong(getColumnIndex(ARTIST_ID)),
                 artistName = getString(getColumnIndex(ARTIST)),
                 duration = getInt(getColumnIndex(DURATION)),
                 trackNumber = getInt(getColumnIndex(TRACK)),
-                albumArtUri = getAlbumArtUri(getInt(getColumnIndex(ALBUM_ID)))
+                albumArtUri = getAlbumArtUri(getLong(getColumnIndex(ALBUM_ID)))
             )
         }
 }

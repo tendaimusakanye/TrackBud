@@ -39,7 +39,7 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
     // if the cursor is null then something drastic happened. Let NPE be thrown otherwise we found
     // Nothing. therefore return an empty list or empty mediaItem.
     // are always returned.
-    override fun getAlbumsForArtist(artistId: Long): List<Album> {
+    override fun getAlbumsByArtist(artistId: Long): List<Album> {
         val uri = getContentUri("external", artistId)
         val cursor = createCursor(
             contentResolver = contentResolver,
@@ -84,7 +84,7 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
                 artistId = getInt(getColumnIndex(ARTIST_ID)),
                 yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
                 numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS)),
-                albumArtUri = getAlbumArtUri(getInt(getColumnIndex(_ID)))
+                albumArtUri = getAlbumArtUri(getLong(getColumnIndex(_ID)))
             )
         }
 }
