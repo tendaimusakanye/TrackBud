@@ -70,7 +70,7 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
                 artist = track.artistName
                 duration = durationMs
                 trackNumber = track.trackNumber.toString()
-                albumArt = getAlbumArt(tracksLocalDataSource.getContextHacky(), track.albumId)
+                albumArt = tracksLocalDataSource.getAlbumArt(track.albumId)
                 albumArtUri = track.albumArtUri.toString()
                 flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 
@@ -88,5 +88,3 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
     }
 }
 
-// TODO( I think getTracks Works Just confirm from the test in the previous commits)
-//TODO : Fix the hacky way of getting the trackDetailsMetadata

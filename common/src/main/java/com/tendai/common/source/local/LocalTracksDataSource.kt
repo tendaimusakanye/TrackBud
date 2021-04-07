@@ -2,6 +2,10 @@ package com.tendai.common.source.local
 
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.AudioColumns.IS_MUSIC
 import android.provider.MediaStore.Audio.AudioColumns.TRACK
@@ -9,8 +13,10 @@ import android.provider.MediaStore.Audio.Media.*
 import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
+import com.tendai.common.R
 import com.tendai.common.extensions.mapList
 import com.tendai.common.source.model.Track
+import java.io.IOException
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
 class TracksLocalDataSource(private val context: Context) : LocalDataSource,
@@ -94,7 +100,17 @@ class TracksLocalDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    override fun getContextHacky(): Context = context
+    override fun getAlbumArt(albumId: Long): Bitmap {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(contentResolver, getAlbumArtUri(albumId))
+                return ImageDecoder.decodeBitmap(source)
+            }
+            return MediaStore.Images.Media.getBitmap(contentResolver, getAlbumArtUri(albumId))
+        } catch (e: IOException) {
+            return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
+        }
+    }
 
     private fun mapToTrack(cursor: Cursor): Track =
         cursor.run {

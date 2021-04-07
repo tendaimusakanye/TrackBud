@@ -48,7 +48,7 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
                 year = album.yearReleased.toLong()
                 trackCount = album.numberOfTracks.toLong()
                 albumArtUri = album.albumArtUri.toString()
-                albumArt = getAlbumArt(albumLocalDataSource.getContextHacky(), album.id)
+                albumArt = albumLocalDataSource.getAlbumArt(album.id)
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
 
                 //for ease of displaying

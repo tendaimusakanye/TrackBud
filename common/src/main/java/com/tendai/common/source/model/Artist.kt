@@ -7,5 +7,3 @@ data class Artist(
     var numberOfAlbums: Int = 0,
     var numberOfTracks: Int = 0
 )
-
-//todo: refactor and minimize the casts

@@ -15,8 +15,7 @@ class QueueManager(
     private val trackRepository: Repository.Tracks,
     val mediaSession: MediaSessionCompat
 ) {
-    private val slidingWindow
-        get() = SlidingWindow()
+    private val slidingWindow = SlidingWindow()
 
     @Volatile
     var currentIndex = 0
@@ -72,8 +71,6 @@ class QueueManager(
             }
             slidingWindow.createWindow()
             currentQueueTitle = queueTitle
-
-            onMetadataChanged(getMetadata(trackId))
             onQueueChanged(
                 queueTitle!!, playingQueue.subList(slidingWindow.start, slidingWindow.end)
             )
@@ -101,6 +98,7 @@ class QueueManager(
     }
 
     fun skipToNext() {
+        //loop again when we have reached the end of the queue and adjust accordingly
         if (currentIndex == playingQueue.size - 1) {
             currentIndex = 0
             slidingWindow.createWindow()
@@ -109,12 +107,8 @@ class QueueManager(
             )
         } else {
             currentIndex += 1
-            val queueChanged = slidingWindow.advance()
-            if (queueChanged) onQueueChanged(
-                currentQueueTitle!!, playingQueue.subList(
-                    slidingWindow.start,
-                    slidingWindow.end
-                )
+            if (slidingWindow.advance()) onQueueChanged(
+                currentQueueTitle!!, playingQueue.subList(slidingWindow.start, slidingWindow.end)
             )
         }
     }
@@ -128,8 +122,7 @@ class QueueManager(
             )
         } else {
             currentIndex -= 1
-            val queueChanged = slidingWindow.shrink()
-            if (queueChanged) onQueueChanged(
+            if (slidingWindow.shrink()) onQueueChanged(
                 currentQueueTitle!!, playingQueue.subList(slidingWindow.start, slidingWindow.end)
             )
         }
@@ -181,12 +174,19 @@ class QueueManager(
 
         fun advance(): Boolean {
             var temp = currentIndex
-            if (currentIndex > queueWindow.last && currentIndex < playingQueue.size) {
+            if (currentIndex > queueWindow.last) {
                 var i = 0
-                while (i < WINDOW_CAPACITY) {
-                    queueWindow.pollFirst()
-                    if (temp <= playingQueue.size - 1) queueWindow.offerLast(temp++)
-                    i++
+                if (playingQueue.size % WINDOW_CAPACITY == 0) {
+                    while (i++ < WINDOW_CAPACITY) {
+                        queueWindow.pollFirst()
+                        queueWindow.offerLast(temp++)
+                    }
+                } else {
+                    val difference: Int = playingQueue.size - queueWindow.size
+                    while (i++ < difference) {
+                        queueWindow.pollFirst()
+                        queueWindow.offerLast(temp++)
+                    }
                 }
                 updateIndices()
                 return true
@@ -196,12 +196,19 @@ class QueueManager(
 
         fun shrink(): Boolean {
             var temp = currentIndex
-            if (currentIndex < queueWindow.first() && currentIndex >= 0) {
+            if (currentIndex < queueWindow.first) {
                 var i = 0
-                while (i < WINDOW_CAPACITY) {
-                    if (queueWindow.size >= WINDOW_CAPACITY) queueWindow.pollLast()
-                    if (temp >= 0) queueWindow.offerFirst(temp--)
-                    i++
+                if (playingQueue.size % WINDOW_CAPACITY == 0) {
+                    while (i++ < WINDOW_CAPACITY) {
+                        queueWindow.pollLast()
+                        queueWindow.offerFirst(temp--)
+                    }
+                } else {
+                    val difference: Int = playingQueue.size - queueWindow.size
+                    while (i++ < difference) {
+                        queueWindow.pollLast()
+                        queueWindow.offerFirst(temp--)
+                    }
                 }
                 updateIndices()
                 return true
@@ -216,25 +223,20 @@ class QueueManager(
         }
 
         fun createWindow() {
-            if (currentIndex > playingQueue.size - 1 || currentIndex < 0) return
+            if (currentIndex > playingQueue.size - 1 || currentIndex < 0) return  // if false proceed down.
+            queueWindow.clear()
             var tempIndex = currentIndex
 
             for (i in 0 until WINDOW_CAPACITY) {
                 if (currentIndex == playingQueue.size - 1) {
-                    queueWindow.offerFirst(tempIndex)
-                    tempIndex--
+                    if (tempIndex >= 0) queueWindow.offerFirst(tempIndex--)
                 } else {
-                    if (tempIndex >= playingQueue.size) {
-                        while (queueWindow.size > WINDOW_CAPACITY - 1) queueWindow.pollFirst()
-                        queueWindow.offerFirst(tempIndex - WINDOW_CAPACITY)
-                    } else {
-                        queueWindow.offerLast(tempIndex)
-                        while (queueWindow.size > WINDOW_CAPACITY) queueWindow.pollFirst()
-                        tempIndex++
+                    if (tempIndex < playingQueue.size) queueWindow.offerLast(tempIndex++) else {
+                        var currentFirst = queueWindow.first
+                        if (--currentFirst >= 0) queueWindow.offerFirst(currentFirst)
                     }
                 }
             }
-            while (queueWindow.size > WINDOW_CAPACITY) queueWindow.pollLast()
             updateIndices()
         }
     }

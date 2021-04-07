@@ -17,6 +17,3 @@ data class Track(
     var albumArtUri: Uri? = null
 
 )
-
-//todo: also add albumArtBitmap but is it necessary or albumArtUri is enough ?
-//todo: remove unused fields e.g. artistID, playlistID from both the models and the data sources.

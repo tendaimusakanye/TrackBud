@@ -2,15 +2,22 @@ package com.tendai.common.source.local
 
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.os.Build
 import android.provider.BaseColumns._ID
+import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
+import com.tendai.common.R
 import com.tendai.common.extensions.mapList
 import com.tendai.common.source.model.Album
+import java.io.IOException
 import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
 
-class AlbumLocalDataSource(context: Context) : LocalDataSource,
+class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
     LocalDataSource.Albums {
 
     private val contentResolver = context.contentResolver
@@ -48,7 +55,7 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
             sortOrder = "$ALBUM ASC"
         )
         return cursor!!.use { result ->
-            result.mapList { mapToAlbum(it)}
+            result.mapList { mapToAlbum(it) }
         }
     }
 
@@ -66,6 +73,17 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
         }
     }
 
+    override fun getAlbumArt(albumId: Long): Bitmap {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(contentResolver, getAlbumArtUri(albumId))
+                return ImageDecoder.decodeBitmap(source)
+            }
+            return MediaStore.Images.Media.getBitmap(contentResolver, getAlbumArtUri(albumId))
+        } catch (e: IOException) {
+            return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
+        }
+    }
 
     /**
      * create an album from the cursor.
@@ -91,4 +109,3 @@ class AlbumLocalDataSource(context: Context) : LocalDataSource,
 
 private const val TAG = "LocalAlbumDataSource"
 
-//TODO: check if list is empty or not in-place of error handling list.isEmpty()

@@ -2,8 +2,8 @@ package com.tendai.common.source.local
 
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.net.Uri
 import com.tendai.common.source.model.Album
 import com.tendai.common.source.model.Artist
@@ -26,9 +26,8 @@ interface LocalDataSource {
 
         fun getTracksInPlaylist(playlistId: Long): List<Track>
 
-        // hacky method to get the the contentResolver
-        //bad code smell.
-        fun getContextHacky(): Context
+        fun getAlbumArt(albumId: Long): Bitmap
+
     }
 
     interface Albums {
@@ -38,8 +37,7 @@ interface LocalDataSource {
 
         fun getAlbum(albumId: Long): Album
 
-        // hacky method to get the the contentResolver
-        fun getContextHacky(): Context
+        fun getAlbumArt(albumId: Long): Bitmap
 
     }
 
@@ -88,10 +86,10 @@ fun getAlbumArtUri(albumId: Long): Uri {
     val uri = Uri.parse(ALBUM_ART_PATH)
     return ContentUris.withAppendedId(uri, albumId)
 }
-const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
 
-//todo: check the path returned by content provider.ALBUM_ART
-//todo: implement content provider with paging
+
+
+const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
 
 
 

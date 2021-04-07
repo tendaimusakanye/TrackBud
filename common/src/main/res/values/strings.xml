@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name= "albums_title">Albums</string>
-    <string name="playlists_title">Playlists</string>
-    <string name="tracks_title">Tracks</string>
-    <string name="artists_title">Artists</string>
-    <string name="discover_title">Discover</string>
+    <string name= "title_albums">Albums</string>
+    <string name="title_playlists">Playlists</string>
+    <string name="title_tracks">Tracks</string>
+    <string name="title_artists">Artists</string>
+    <string name="title_discover">Discover</string>
+    <string name="title_next">Next</string>
+    <string name="title_previous">Previous</string>
+    <string name="title_play">Play</string>
+    <string name="title_pause">Pause</string>
+
+    <string name="notification_channel">MusicX_Channel_ID</string>
+    <string name="notification_channel_description">Channel ID for MusicX</string>
 </resources>

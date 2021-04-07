@@ -1,5 +1,6 @@
 package com.tendai.common
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
@@ -9,6 +10,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
+import androidx.media.session.MediaButtonReceiver
 import com.tendai.common.extensions.flag
 import com.tendai.common.playback.PlaybackManager
 import com.tendai.common.playback.QueueManager
@@ -26,6 +28,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private lateinit var mediaNotificationManager: MediaNotificationManager
+    private lateinit var notificationManager: NotificationManager
     private lateinit var playbackManager: PlaybackManager
     private lateinit var queueManager: QueueManager
 
@@ -52,23 +55,35 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         // Setting  the media session token
         sessionToken = mediaSession.sessionToken
         playbackManager.updatePlaybackState()
+
+        //todo: lambdas vs callbacks ?
+        //todo: can DI initialize my notification manager in OnCreate or it's done physically
+        //todo: request Storage permissions.
         setUpMetadataListeners()
         setUpPlaybackListeners()
-
-        //initializing the notification manager
-        //todo: initialize my notification manager
-        //todo: handle listening to external storage i.e. memory cards or waiting for permission read storage.
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int =
-        Service.START_STICKY
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            ACTION_PLAY_PAUSE -> {
+                when (mediaSession.controller.playbackState.state) {
+                    PlaybackStateCompat.STATE_PLAYING -> mediaSession.controller.transportControls.pause()
+                    PlaybackStateCompat.STATE_PAUSED -> mediaSession.controller.transportControls.play()
+                }
+            }
+            ACTION_NEXT -> mediaSession.controller.transportControls.skipToNext()
+            ACTION_PREVIOUS -> mediaSession.controller.transportControls.skipToPrevious()
+            else -> MediaButtonReceiver.handleIntent(mediaSession, intent)
+        }
+        return Service.START_STICKY
+    }
 
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot? {
-        // see @link [https://developer.android.com/guide/topics/media/media-controls]
+
         val isRecentRequest =
             rootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) ?: false
 
@@ -151,33 +166,35 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        //release the media session when the music service is destroyed
         mediaSession.run {
             isActive = false
             release()
         }
+        //todo: saveRecentTrack
+        playbackManager.cleanUp()
+        mediaNotificationManager.stopNotification()
         //cancels the coroutines when going away. I guess it iS to avoid memory leaks.
         serviceJob.cancel()
+        super.onDestroy()
     }
 
     private fun setUpPlaybackListeners() {
         playbackManager.onNotificationRequiredListener { state ->
             if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
-                    TODO("START MY NOTIFICATION")
+                mediaNotificationManager.startNotification()
             }
         }
 
-        playbackManager.onPlaybackStartedListener {
-            if (!mediaSession.isActive) mediaSession.isActive = true
+        playbackManager.onPlaybackStarted {
             startService(Intent(applicationContext, MusicService::class.java))
+            if (!mediaSession.isActive) mediaSession.isActive = true
         }
 
-        playbackManager.onPlaybackPausedListener {
+        playbackManager.onPlaybackPaused {
             stopForeground(false)
         }
 
-        playbackManager.onPlaybackStateUpdatedListener {
+        playbackManager.onPlaybackStateUpdated {
             mediaSession.setPlaybackState(it)
             it.extras?.let { bundle ->
                 mediaSession.setRepeatMode(bundle.getInt(REPEAT_MODE))
@@ -185,7 +202,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             }
         }
 
-        playbackManager.onPlaybackStoppedListener {
+        playbackManager.onPlaybackStopped {
             stopSelf()
             mediaSession.isActive = false
             stopForeground(true)
@@ -193,7 +210,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         }
     }
 
-    fun setUpMetadataListeners() {
+    private fun setUpMetadataListeners() {
         //listeners
         queueManager.onMetadataChangedListener { metadata ->
             mediaSession.setMetadata(metadata)
@@ -221,8 +238,12 @@ const val TRACKS_ROOT = "TRACKS"
 const val RECENT_ROOT = "RECENT_SONG"
 const val ARTISTS_ROOT = "ARTISTS"
 
+const val ACTION_PLAY_PAUSE = "com.tendai.common.ACTION_PLAY_PAUSE"
+const val ACTION_NEXT = "com.tendai.common.ACTION_NEXT"
+const val ACTION_PREVIOUS = "com.tendai.common.ACTION_PREVIOUS"
 const val TAG: String = "MusicService "
 
 //TODO("Handle an empty root and add the systemUi logic for android 11")
+//todo: implement DI with Dagger.
 //TODO("Add a browsable root for android wear. I think it does have a viewpager. On Second thought
 // I think it does.")

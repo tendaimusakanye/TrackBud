@@ -3,7 +3,7 @@ package com.tendai.common
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Album
 
-class FakeAlbumDataSource : LocalDataSource.Albums {
+abstract class FakeAlbumDataSource : LocalDataSource.Albums {
     override fun getAlbums(
         limit: Int
     ): List<Album> {
@@ -26,10 +26,6 @@ class FakeAlbumDataSource : LocalDataSource.Albums {
 
         return albums
 
-    }
-
-    override fun getAlbumsByArtist(artistId: Long): List<Album> {
-        TODO("Not yet implemented")
     }
 
     override fun getAlbum(albumId: Long): Album {

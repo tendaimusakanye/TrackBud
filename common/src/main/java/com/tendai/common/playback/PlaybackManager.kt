@@ -1,20 +1,27 @@
 package com.tendai.common.playback
 
+import android.media.AudioManager
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 
 class PlaybackManager(
     private val playback: Playback,
     private val queueManager: QueueManager
 ) : Callback {
+
+
     val mediaSessionCallback: MediaSessionCallback
         get() = MediaSessionCallback()
+    private val stateBuilder = PlaybackStateCompat.Builder().setActions(getAvailableActions())
+        .setState(PlaybackStateCompat.STATE_NONE, 0L, 1.0F)
 
     private lateinit var onNotificationRequired: (state: Int) -> Unit
-    private lateinit var onPlaybackStarted: () -> Unit
-    private lateinit var onPlaybackStopped: () -> Unit
-    private lateinit var onPlaybackPaused: () -> Unit
+    private lateinit var onPlaybackStart: () -> Unit
+    private lateinit var onPlaybackStop: () -> Unit
+    private lateinit var onPlaybackPause: () -> Unit
     private lateinit var onPlaybackStateChanged: (playbackState: PlaybackStateCompat) -> Unit
 
     override fun onCompletion() {
@@ -22,57 +29,77 @@ class PlaybackManager(
             PlaybackStateCompat.REPEAT_MODE_ONE -> repeatTrack()
             PlaybackStateCompat.REPEAT_MODE_NONE -> {
                 queueManager.skipToNext()
-                handlePreviousOrNextRequest()
+                handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
             }
             PlaybackStateCompat.REPEAT_MODE_GROUP -> {
                 if (queueManager.mediaSession.controller.shuffleMode
                     == PlaybackStateCompat.SHUFFLE_MODE_NONE
                 ) {
                     queueManager.skipToNext()
-                    handlePreviousOrNextRequest()
+                    handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
                 } else if (queueManager.mediaSession.controller.shuffleMode
                     == PlaybackStateCompat.SHUFFLE_MODE_GROUP
                 ) {
                     queueManager.shuffleToNext()
+                    handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
                 }
             }
         }
     }
 
-    fun updatePlaybackState() {
 
+    override fun onPrepared() {
+        updatePlaybackState()
+    }
+
+    fun updatePlaybackState() {
+        var position = PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN
+        val state = playback.getState()
+
+        if (state == PlaybackStateCompat.STATE_PLAYING
+            || state == PlaybackStateCompat.STATE_PAUSED
+            || state == PlaybackStateCompat.STATE_STOPPED
+        ) {
+            position = playback.getCurrentPosition().toLong()
+        }
+        stateBuilder.setState(state, position, 1.0F, SystemClock.elapsedRealtime())
+        queueManager.getCurrentItemPlaying()?.queueId?.let { stateBuilder.setActiveQueueItemId(it) }
+
+        onPlaybackStateChanged(stateBuilder.build())
+        onNotificationRequired(state)
+    }
+
+    fun cleanUp() {
+        playback.release()
+        updatePlaybackState()
     }
 
     private fun handlePlayRequest(trackId: Long) {
-        onPlaybackStarted()
-        if (trackId != queueManager.getCurrentItemPlaying()?.description?.mediaId?.toLong()) {
-            queueManager.onMetadataChanged(queueManager.getMetadata(trackId))
+        if (playback.requestFocus() == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            onPlaybackStart()
+            with(queueManager) {
+                onMetadataChanged(getMetadata(trackId))
+            }
+            playback.playFromId(trackId)
+        } else {
+            Log.e(TAG, "Failed to get AudioFocus")
         }
-        updatePlaybackState()
-        playback.playFromId(trackId)
-        onNotificationRequired(playback.getState())
     }
 
-    private fun handlePreviousOrNextRequest() {
+    private fun handlePreviousOrNextRequest(state: Int) {
+        val newState = stateBuilder.setState(
+            state,
+            queueManager.mediaSession.controller.playbackState.position,
+            1.0F
+        )
+        onPlaybackStateChanged(newState.build())
         val trackId = queueManager.getCurrentItemPlaying()?.description?.mediaId?.toLong()
-        queueManager.onMetadataChanged(queueManager.getMetadata(trackId!!))
-        updatePlaybackState()
-        playback.playFromId(trackId)
+        handlePlayRequest(trackId!!)
     }
 
     private fun repeatTrack() {
         val trackId = queueManager.getCurrentItemPlaying()?.description?.mediaId?.toLong()
-        updatePlaybackState()
-        playback.playFromId(trackId!!)
-    }
-
-    private fun repeatQueue() {
-        when (queueManager.mediaSession.controller.shuffleMode) {
-            PlaybackStateCompat.SHUFFLE_MODE_NONE -> queueManager.skipToNext()
-            PlaybackStateCompat.SHUFFLE_MODE_GROUP -> {
-                //todo: shuffleToNext should handle this like skipToNext ?
-            }
-        }
+        handlePlayRequest(trackId!!)
     }
 
     private fun setRepeatOrShuffleMode(shuffleOrRepeatMode: Int, isRepeatMode: Boolean) {
@@ -106,25 +133,25 @@ class PlaybackManager(
         onNotificationRequired = notificationRequired
     }
 
-    fun onPlaybackStartedListener(playbackStart: () -> Unit) {
-        onPlaybackStarted = playbackStart
+    fun onPlaybackStarted(playbackStart: () -> Unit) {
+        onPlaybackStart = playbackStart
     }
 
-    fun onPlaybackPausedListener(playbackPause: () -> Unit) {
-        onPlaybackPaused = playbackPause
+    fun onPlaybackPaused(playbackPause: () -> Unit) {
+        onPlaybackPause = playbackPause
     }
 
-    fun onPlaybackStateUpdatedListener(playbackStateUpdated: (playbackState: PlaybackStateCompat) -> Unit) {
+    fun onPlaybackStateUpdated(playbackStateUpdated: (playbackState: PlaybackStateCompat) -> Unit) {
         onPlaybackStateChanged = playbackStateUpdated
     }
 
-    fun onPlaybackStoppedListener(playbackStop: () -> Unit) {
-        onPlaybackStopped = playbackStop
+    fun onPlaybackStopped(playbackStop: () -> Unit) {
+        onPlaybackStop = playbackStop
     }
 
     inner class MediaSessionCallback : MediaSessionCompat.Callback() {
         override fun onSeekTo(pos: Long) {
-            playback.seekTo(pos)
+            playback.seekTo(pos.toInt())
             updatePlaybackState()
         }
 
@@ -134,18 +161,18 @@ class PlaybackManager(
         }
 
         override fun onSkipToQueueItem(id: Long) {
-            queueManager.run {
+            val newState = stateBuilder.setState(
+                PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM,
+                queueManager.mediaSession.controller.playbackState.position,
+                1.0F
+            )
+            onPlaybackStateChanged(newState.build())
+
+            with(queueManager) {
                 setCurrentQueueItem(id)
                 val trackId = getCurrentItemPlaying()?.description?.mediaId?.toLong()
                 onMetadataChanged(getMetadata(trackId!!))
                 this@PlaybackManager.handlePlayRequest(trackId)
-            }
-        }
-
-        override fun onCustomAction(action: String?, extras: Bundle?) {
-            when (action) {
-                ACTION_REPEAT_SONG -> repeatTrack()
-                ACTION_REPEAT_GROUP -> repeatQueue()
             }
         }
 
@@ -156,34 +183,31 @@ class PlaybackManager(
                     queueManager.shuffleToPrevious()
                 }
             }
-            handlePreviousOrNextRequest()
+            handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS)
         }
 
         override fun onStop() {
             playback.stop()
-            onPlaybackStopped()
+            onPlaybackStop()
             updatePlaybackState()
         }
 
         override fun onSkipToNext() {
             when (queueManager.mediaSession.controller.shuffleMode) {
                 PlaybackStateCompat.SHUFFLE_MODE_NONE -> queueManager.skipToNext()
-                PlaybackStateCompat.SHUFFLE_MODE_GROUP -> {
-                    queueManager.shuffleToNext()
-                }
+                PlaybackStateCompat.SHUFFLE_MODE_GROUP -> queueManager.shuffleToNext()
             }
-            handlePreviousOrNextRequest()
+            handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
         }
 
         override fun onPause() {
             if (playback.isPlaying()) {
                 playback.pause()
-                onPlaybackPaused()
+                onPlaybackPause()
                 updatePlaybackState()
             }
         }
 
-        //todo:  see if invoking super here has any effect or not ?
         override fun onSetShuffleMode(shuffleMode: Int) {
             setRepeatOrShuffleMode(shuffleMode, false)
         }
@@ -203,7 +227,7 @@ class PlaybackManager(
 
 const val REPEAT_MODE = "com.tendai.common.playback.REPEAT_MODE"
 const val SHUFFLE_MODE = "com.tendai.common.playback.SHUFFLE_MODE"
-const val ACTION_REPEAT_SONG = "com.tendai.common.playback.ACTION_REPEAT_SONG"
-const val ACTION_REPEAT_GROUP = "com.tendai.common.playback.ACTION_REPEAT_GROUP"
+private const val TAG = "PlaybackManager"
 
-
+//todo: write tests for testing errors  in logic, exceptions , null pointers and log
+// accordingly for debugging purposes. etc, etc.
