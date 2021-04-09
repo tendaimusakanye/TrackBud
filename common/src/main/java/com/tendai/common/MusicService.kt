@@ -56,7 +56,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
 
         //todo: lambdas vs callbacks ?
         //todo: can DI initialize my notification manager in OnCreate or it's done physically
-        //todo: request Storage permissions.
+        //todo: request Storage permissions...
         setUpMetadataListeners()
         setUpPlaybackListeners()
     }
