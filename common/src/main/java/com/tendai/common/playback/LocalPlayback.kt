@@ -140,6 +140,7 @@ class LocalPlayback(
         state = STATE_NONE
     }
 
+    @Suppress("DEPRECATION")
     override fun requestFocus(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager.requestAudioFocus(focusRequest)

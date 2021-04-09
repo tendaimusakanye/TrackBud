@@ -73,6 +73,7 @@ class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun getAlbumArt(albumId: Long): Bitmap {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

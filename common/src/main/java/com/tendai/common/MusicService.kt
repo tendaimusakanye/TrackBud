@@ -1,6 +1,5 @@
 package com.tendai.common
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
@@ -28,7 +27,6 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private lateinit var mediaNotificationManager: MediaNotificationManager
-    private lateinit var notificationManager: NotificationManager
     private lateinit var playbackManager: PlaybackManager
     private lateinit var queueManager: QueueManager
 
