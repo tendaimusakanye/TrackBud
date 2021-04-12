@@ -210,7 +210,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
 
     private fun setUpMetadataListeners() {
         //listeners
-        queueManager.onMetadataChangedListener { metadata ->
+        playbackManager.onMetadataChangedListener { metadata ->
             mediaSession.setMetadata(metadata)
         }
 

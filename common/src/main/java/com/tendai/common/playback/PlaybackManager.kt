@@ -3,21 +3,23 @@ package com.tendai.common.playback
 import android.media.AudioManager
 import android.os.Bundle
 import android.os.SystemClock
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 
 class PlaybackManager(
+    val mediaSession: MediaSessionCompat,
     private val playback: Playback,
     private val queueManager: QueueManager
 ) : Callback {
-
 
     val mediaSessionCallback: MediaSessionCallback
         get() = MediaSessionCallback()
     private val stateBuilder = PlaybackStateCompat.Builder().setActions(getAvailableActions())
         .setState(PlaybackStateCompat.STATE_NONE, 0L, 1.0F)
 
+    lateinit var onMetadataChanged: (metadata: MediaMetadataCompat) -> Unit
     private lateinit var onNotificationRequired: (state: Int) -> Unit
     private lateinit var onPlaybackStart: () -> Unit
     private lateinit var onPlaybackStop: () -> Unit
@@ -25,19 +27,19 @@ class PlaybackManager(
     private lateinit var onPlaybackStateChanged: (playbackState: PlaybackStateCompat) -> Unit
 
     override fun onCompletion() {
-        when (queueManager.mediaSession.controller.repeatMode) {
+        when (mediaSession.controller.repeatMode) {
             PlaybackStateCompat.REPEAT_MODE_ONE -> repeatTrack()
             PlaybackStateCompat.REPEAT_MODE_NONE -> {
                 queueManager.skipToNext()
                 handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
             }
             PlaybackStateCompat.REPEAT_MODE_GROUP -> {
-                if (queueManager.mediaSession.controller.shuffleMode
+                if (mediaSession.controller.shuffleMode
                     == PlaybackStateCompat.SHUFFLE_MODE_NONE
                 ) {
                     queueManager.skipToNext()
                     handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
-                } else if (queueManager.mediaSession.controller.shuffleMode
+                } else if (mediaSession.controller.shuffleMode
                     == PlaybackStateCompat.SHUFFLE_MODE_GROUP
                 ) {
                     queueManager.shuffleToNext()
@@ -89,7 +91,7 @@ class PlaybackManager(
     private fun handlePreviousOrNextRequest(state: Int) {
         val newState = stateBuilder.setState(
             state,
-            queueManager.mediaSession.controller.playbackState.position,
+            mediaSession.controller.playbackState.position,
             1.0F
         )
         onPlaybackStateChanged(newState.build())
@@ -103,9 +105,9 @@ class PlaybackManager(
     }
 
     private fun setRepeatOrShuffleMode(shuffleOrRepeatMode: Int, isRepeatMode: Boolean) {
-        val bundle = queueManager.mediaSession.controller.extras ?: Bundle()
+        val bundle = mediaSession.controller.extras ?: Bundle()
         onPlaybackStateChanged(
-            PlaybackStateCompat.Builder(queueManager.mediaSession.controller.playbackState)
+            PlaybackStateCompat.Builder(mediaSession.controller.playbackState)
                 .setExtras(bundle.apply {
                     if (isRepeatMode) putInt(REPEAT_MODE, shuffleOrRepeatMode)
                     else putInt(SHUFFLE_MODE, shuffleOrRepeatMode)
@@ -129,6 +131,7 @@ class PlaybackManager(
         return actions
     }
 
+    //callbacks.
     fun onNotificationRequiredListener(notificationRequired: (state: Int) -> Unit) {
         onNotificationRequired = notificationRequired
     }
@@ -139,6 +142,10 @@ class PlaybackManager(
 
     fun onPlaybackPaused(playbackPause: () -> Unit) {
         onPlaybackPause = playbackPause
+    }
+
+    fun onMetadataChangedListener(metadataChanged: (metadata: MediaMetadataCompat) -> Unit) {
+        onMetadataChanged = metadataChanged
     }
 
     fun onPlaybackStateUpdated(playbackStateUpdated: (playbackState: PlaybackStateCompat) -> Unit) {
@@ -163,7 +170,7 @@ class PlaybackManager(
         override fun onSkipToQueueItem(id: Long) {
             val newState = stateBuilder.setState(
                 PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM,
-                queueManager.mediaSession.controller.playbackState.position,
+                mediaSession.controller.playbackState.position,
                 1.0F
             )
             onPlaybackStateChanged(newState.build())
@@ -171,13 +178,12 @@ class PlaybackManager(
             with(queueManager) {
                 setCurrentQueueItem(id)
                 val trackId = getCurrentItemPlaying()?.description?.mediaId?.toLong()
-                onMetadataChanged(getMetadata(trackId!!))
-                this@PlaybackManager.handlePlayRequest(trackId)
+                this@PlaybackManager.handlePlayRequest(trackId!!)
             }
         }
 
         override fun onSkipToPrevious() {
-            when (queueManager.mediaSession.controller.shuffleMode) {
+            when (mediaSession.controller.shuffleMode) {
                 PlaybackStateCompat.SHUFFLE_MODE_NONE -> queueManager.skipToPrevious()
                 PlaybackStateCompat.SHUFFLE_MODE_GROUP -> {
                     queueManager.shuffleToPrevious()
@@ -193,7 +199,7 @@ class PlaybackManager(
         }
 
         override fun onSkipToNext() {
-            when (queueManager.mediaSession.controller.shuffleMode) {
+            when (mediaSession.controller.shuffleMode) {
                 PlaybackStateCompat.SHUFFLE_MODE_NONE -> queueManager.skipToNext()
                 PlaybackStateCompat.SHUFFLE_MODE_GROUP -> queueManager.shuffleToNext()
             }

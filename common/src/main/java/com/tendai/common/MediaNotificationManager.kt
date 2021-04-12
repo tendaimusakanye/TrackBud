@@ -41,8 +41,11 @@ class MediaNotificationManager(
                 ) {
                     stopNotification()
                 } else {
-                    val notification = createNotification()
-                    notificationManager.notify(NOTIFICATION_ID, notification)
+                    serviceScope.launch {
+                        val notification = createNotification()
+                        notificationManager.notify(NOTIFICATION_ID, notification)
+                    }
+
                 }
             }
         }
@@ -50,8 +53,11 @@ class MediaNotificationManager(
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             metadata?.let { newMetadata ->
                 this@MediaNotificationManager.metadata = newMetadata
-                val notification = createNotification()
-                notificationManager.notify(NOTIFICATION_ID, notification)
+                serviceScope.launch {
+                    val notification = createNotification()
+                    notificationManager.notify(NOTIFICATION_ID, notification)
+                }
+
             }
         }
 
@@ -79,9 +85,11 @@ class MediaNotificationManager(
             metadata = controller.metadata
             playbackState = controller.playbackState
 
-            val notification = createNotification()
-            controller.registerCallback(controllerCallback)
-            service.startForeground(NOTIFICATION_ID, notification)
+            serviceScope.launch {
+                val notification = createNotification()
+                controller.registerCallback(controllerCallback)
+                service.startForeground(NOTIFICATION_ID, notification)
+            }
             started = true
         }
     }
@@ -95,7 +103,7 @@ class MediaNotificationManager(
         }
     }
 
-    private fun createNotification(): Notification {
+    private suspend fun createNotification(): Notification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
@@ -129,7 +137,7 @@ class MediaNotificationManager(
             addAction(setPreviousAction())
             addAction(setPlayPauseAction(playbackState.state, playButtonResId))
             addAction(setNextAction())
-            color = getColorFromArt()
+            color = getColorFromArt() ?: Color.parseColor("#cfd8dc")
             setDeleteIntent(
                 MediaButtonReceiver.buildMediaButtonPendingIntent(
                     context,
@@ -148,7 +156,6 @@ class MediaNotificationManager(
                 context.getString(R.string.notification_channel),
                 NotificationManager.IMPORTANCE_LOW
             )
-
             notificationChannel.description =
                 context.getString(R.string.notification_channel_description)
             notificationManager.createNotificationChannel(notificationChannel)
@@ -156,18 +163,21 @@ class MediaNotificationManager(
     }
 
 
-    private fun getColorFromArt(): Int {
-        var color = -1
-        serviceScope.launch {
-            withContext(IO) {
-                metadata.description?.iconBitmap?.let {
-                    color = Palette.from(it)
-                        .generate()
-                        .getVibrantColor(Color.parseColor("#403f4d"))
-                }
+    private suspend fun getColorFromArt(): Int? = withContext(IO) {
+        metadata.description?.iconBitmap?.let { bitmap ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val width = bitmap.width / 2
+                val height = bitmap.height / 2
+
+                return@withContext Palette.from(bitmap)
+                    .generate()
+                    .getVibrantColor(bitmap.getColor(width, height).toArgb())
+            } else {
+                return@withContext Palette.from(bitmap)
+                    .generate()
+                    .getVibrantColor(Color.parseColor("#880e4f"))
             }
         }
-        return color
     }
 
     private fun setPreviousAction(): NotificationCompat.Action {
