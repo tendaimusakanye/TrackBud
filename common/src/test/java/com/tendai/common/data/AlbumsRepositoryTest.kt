@@ -12,6 +12,7 @@ class AlbumRepositoryTest {
 
     @Before
     fun setUp() {
+
         albumsRepository =
             AlbumRepository(FakeAlbumDataSource())
     }
@@ -21,5 +22,6 @@ class AlbumRepositoryTest {
         val allAlbums = albumsRepository?.getAlbums(2)
         Assert.assertEquals(100001, allAlbums?.size)
     }
+
 
 }

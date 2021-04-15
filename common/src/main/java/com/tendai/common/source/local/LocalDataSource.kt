@@ -35,7 +35,7 @@ interface LocalDataSource {
 
         fun getAlbumsByArtist(artistId: Long): List<Album>
 
-        fun getAlbum(albumId: Long): Album
+        fun getAlbumDetails(albumId: Long): Album
 
         fun getAlbumArt(albumId: Long): Bitmap
 
@@ -56,7 +56,6 @@ interface LocalDataSource {
         fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int
 
         fun removeTrackFromPlaylist(trackIds: LongArray): Int
-
     }
 
     /**
@@ -80,15 +79,12 @@ interface LocalDataSource {
             selectionArgs,
             sortOrder
         )
+
+    fun getAlbumArtUri(albumId: Long): Uri {
+        val uri = Uri.parse(ALBUM_ART_PATH)
+        return ContentUris.withAppendedId(uri, albumId)
+    }
 }
-
-fun getAlbumArtUri(albumId: Long): Uri {
-    val uri = Uri.parse(ALBUM_ART_PATH)
-    return ContentUris.withAppendedId(uri, albumId)
-}
-
-
-
 const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
 
 

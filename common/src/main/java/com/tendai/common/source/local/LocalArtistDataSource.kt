@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore.Audio.ArtistColumns.*
 import android.provider.MediaStore.Audio.Artists._ID
-import com.tendai.common.extensions.mapList
+import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Artist
 import android.provider.MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI as ARTISTS_URI
 
@@ -25,7 +25,7 @@ class ArtistLocalDataSource(context: Context) : LocalDataSource,
                 sortOrder = "$ARTIST  ASC"
             )
         return cursor!!.use { result ->
-            result.mapList { mapToArtist(it) }
+            result.mapToList { mapToArtist(it) }
         }
     }
 

@@ -12,7 +12,7 @@ import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
 import com.tendai.common.R
-import com.tendai.common.extensions.mapList
+import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Album
 import java.io.IOException
 import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
@@ -35,9 +35,8 @@ class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
             projection = projection,
             sortOrder = "LIMIT $limit"
         )
-
         return cursor!!.use { result ->
-            result.mapList { mapToAlbum(it) }
+            result.mapToList { mapToAlbum(it) }
         }
     }
 
@@ -55,11 +54,11 @@ class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
             sortOrder = "$ALBUM ASC"
         )
         return cursor!!.use { result ->
-            result.mapList { mapToAlbum(it) }
+            result.mapToList { mapToAlbum(it) }
         }
     }
 
-    override fun getAlbum(albumId: Long): Album {
+    override fun getAlbumDetails(albumId: Long): Album {
         val cursor = createCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
@@ -90,9 +89,6 @@ class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
      * create an album from the cursor.
      * if moveToFirst is zero then no album or albums were found. return an empty list or an empty album
      * which makes sense as the cursor returns an empty list as well.
-     *
-     * run scope function is better when returning the lambda result and in the presence of object
-     * initialization See @link https://kotlinlang.org/docs/reference/scope-functions.html
      */
     private fun mapToAlbum(cursor: Cursor): Album =
         cursor.run {

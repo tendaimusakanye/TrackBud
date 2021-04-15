@@ -4,7 +4,7 @@ import android.net.Uri
 
 
 data class Track(
-    var id: Long = -1,
+    var id: Long = -1L,
     var trackName: String = "",
     var albumId: Long = -1,
     var albumName: String = "",
@@ -14,6 +14,5 @@ data class Track(
     var trackGenre: String = "",
     var trackNumber: Int = -1,
     var playlistName: String = "",
-    var albumArtUri: Uri? = null
-
+    var albumArtUri: Uri = Uri.EMPTY
 )

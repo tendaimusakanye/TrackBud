@@ -54,11 +54,9 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         sessionToken = mediaSession.sessionToken
         playbackManager.updatePlaybackState()
 
-        //todo: lambdas vs callbacks ?
-        //todo: can DI initialize my notification manager in OnCreate or it's done physically
+        //todo: can DI initialize my notification manager inSide OnCreate or it's done on the call site
         //todo: request Storage permissions...
-        setUpMetadataListeners()
-        setUpPlaybackListeners()
+        setUpListeners()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -155,7 +153,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             if (options.getBoolean(BrowserRoot.EXTRA_RECENT)) {
                 //TODO("")
             } else {
-                val mediaItems = metadatas.map {
+                val mediaItems = metadatas.distinctBy { it.description.title }.map {
                     MediaItem(it.description, it.flag)
                 }
                 result.sendResult(mediaItems.toMutableList())
@@ -164,19 +162,19 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     }
 
     override fun onDestroy() {
+        super.onDestroy()
         mediaSession.run {
             isActive = false
             release()
         }
         //todo: saveRecentTrack
-        playbackManager.cleanUp()
+        playbackManager.release()
         mediaNotificationManager.stopNotification()
         //cancels the coroutines when going away. I guess it iS to avoid memory leaks.
         serviceJob.cancel()
-        super.onDestroy()
     }
 
-    private fun setUpPlaybackListeners() {
+    private fun setUpListeners() {
         playbackManager.onNotificationRequiredListener { state ->
             if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
                 mediaNotificationManager.startNotification()
@@ -206,10 +204,6 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             stopForeground(true)
             // todo: save current playing song to storage
         }
-    }
-
-    private fun setUpMetadataListeners() {
-        //listeners
         playbackManager.onMetadataChangedListener { metadata ->
             mediaSession.setMetadata(metadata)
         }
@@ -243,5 +237,3 @@ const val TAG: String = "MusicService "
 
 //TODO("Handle an empty root and add the systemUi logic for android 11")
 //todo: implement DI with Dagger.
-//TODO("Add a browsable root for android wear. I think it does have a viewpager. On Second thought
-// I think it does.")

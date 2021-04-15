@@ -1,9 +1,11 @@
 package com.tendai.common
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Album
 
-abstract class FakeAlbumDataSource : LocalDataSource.Albums {
+ class FakeAlbumDataSource() : LocalDataSource.Albums {
     override fun getAlbums(
         limit: Int
     ): List<Album> {
@@ -28,7 +30,15 @@ abstract class FakeAlbumDataSource : LocalDataSource.Albums {
 
     }
 
-    override fun getAlbum(albumId: Long): Album {
+     override fun getAlbumsByArtist(artistId: Long): List<Album> {
+         TODO("Not yet implemented")
+     }
+
+     override fun getAlbumDetails(albumId: Long): Album {
         return Album()
     }
-}
+
+     override fun getAlbumArt(albumId: Long): Bitmap {
+         return BitmapFactory.decodeFile("")
+     }
+ }

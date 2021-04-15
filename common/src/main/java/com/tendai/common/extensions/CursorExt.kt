@@ -7,7 +7,7 @@ import android.database.Cursor
 // Passing a lambda as it is lazily invoked like a callback/ Anonymous inner class. So passing in
 // function returns the appropriate results
 // appropriate results compared to passing it as a function parameter
-inline fun  <T> Cursor.mapList(
+inline fun  <T> Cursor.mapToList(
     mapper: (cursor: Cursor) -> T
 ): List<T> {
     val result = mutableListOf<T>()

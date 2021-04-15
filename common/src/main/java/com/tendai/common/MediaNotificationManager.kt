@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -26,7 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MediaNotificationManager(
-    private val context: Context,
     private val service: MusicService,
     private val serviceScope: CoroutineScope,
     private val notificationManager: NotificationManager
@@ -77,7 +75,11 @@ class MediaNotificationManager(
     private lateinit var playbackState: PlaybackStateCompat
 
     init {
-        updateSessionToken()
+        try {
+            updateSessionToken()
+        }catch (e: RemoteException){
+            Log.e(TAG,"Could not create Media Controller")
+        }
     }
 
     fun startNotification() {
@@ -113,7 +115,7 @@ class MediaNotificationManager(
             .setShowActionsInCompactView(1)
             .setCancelButtonIntent(
                 MediaButtonReceiver.buildMediaButtonPendingIntent(
-                    context,
+                    service,
                     PlaybackStateCompat.ACTION_STOP
                 )
             )
@@ -125,7 +127,7 @@ class MediaNotificationManager(
         }
 
         val description = metadata.description
-        val builder = NotificationCompat.Builder(context, MUSIC_X_CHANNEL_ID).apply {
+        val builder = NotificationCompat.Builder(service, MUSIC_X_CHANNEL_ID).apply {
             setStyle(style)
             setContentIntent(controller.sessionActivity)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -140,7 +142,7 @@ class MediaNotificationManager(
             color = getColorFromArt() ?: Color.parseColor("#cfd8dc")
             setDeleteIntent(
                 MediaButtonReceiver.buildMediaButtonPendingIntent(
-                    context,
+                    service,
                     PlaybackStateCompat.ACTION_STOP
                 )
             )
@@ -153,11 +155,11 @@ class MediaNotificationManager(
         if (notificationManager.getNotificationChannel(MUSIC_X_CHANNEL_ID) == null) {
             val notificationChannel = NotificationChannel(
                 MUSIC_X_CHANNEL_ID,
-                context.getString(R.string.notification_channel),
+                service.getString(R.string.notification_channel),
                 NotificationManager.IMPORTANCE_LOW
             )
             notificationChannel.description =
-                context.getString(R.string.notification_channel_description)
+                service.getString(R.string.notification_channel_description)
             notificationManager.createNotificationChannel(notificationChannel)
         }
     }
@@ -181,25 +183,25 @@ class MediaNotificationManager(
     }
 
     private fun setPreviousAction(): NotificationCompat.Action {
-        val actionIntent = Intent(context, MusicService::class.java).apply {
+        val actionIntent = Intent(service, MusicService::class.java).apply {
             action = ACTION_PREVIOUS
         }
-        val pendingIntent = PendingIntent.getService(context, 0, actionIntent, 0)
+        val pendingIntent = PendingIntent.getService(service, 0, actionIntent, 0)
         return NotificationCompat.Action(
             R.drawable.ic_previous,
-            context.getString(R.string.title_previous),
+            service.getString(R.string.title_previous),
             pendingIntent
         )
     }
 
     private fun setNextAction(): NotificationCompat.Action {
-        val actionIntent = Intent(context, MusicService::class.java).apply {
+        val actionIntent = Intent(service, MusicService::class.java).apply {
             action = ACTION_NEXT
         }
-        val pendingIntent = PendingIntent.getService(context, 0, actionIntent, 0)
+        val pendingIntent = PendingIntent.getService(service, 0, actionIntent, 0)
         return NotificationCompat.Action(
             R.drawable.ic_next,
-            context.getString(R.string.title_next),
+            service.getString(R.string.title_next),
             pendingIntent
         )
     }
@@ -208,13 +210,13 @@ class MediaNotificationManager(
         state: Int,
         @IdRes playPauseResId: Int
     ): NotificationCompat.Action {
-        val actionIntent = Intent(context, MusicService::class.java).apply {
+        val actionIntent = Intent(service, MusicService::class.java).apply {
             action = ACTION_PLAY_PAUSE
         }
-        val pendingIntent = PendingIntent.getService(context, 0, actionIntent, 0)
+        val pendingIntent = PendingIntent.getService(service, 0, actionIntent, 0)
         val label =
-            if (state == PlaybackStateCompat.STATE_PLAYING) context.getString(R.string.title_play)
-            else context.getString(R.string.title_pause)
+            if (state == PlaybackStateCompat.STATE_PLAYING) service.getString(R.string.title_play)
+            else service.getString(R.string.title_pause)
         return NotificationCompat.Action(playPauseResId, label, pendingIntent)
     }
 
@@ -225,8 +227,10 @@ class MediaNotificationManager(
         if (sessionToken != freshToken
         ) {
             controller.unregisterCallback(controllerCallback)
-            freshToken?.let { sessionToken = it }
-            controller = MediaControllerCompat(service, sessionToken)
+            freshToken?.let {
+                sessionToken = it
+                controller = MediaControllerCompat(service, sessionToken)
+            }
             if (started) {
                 controller.registerCallback(controllerCallback)
             }

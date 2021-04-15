@@ -8,7 +8,7 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore.Audio.Playlists.Members.*
 import android.provider.MediaStore.Audio.PlaylistsColumns.NAME
 import android.util.Log
-import com.tendai.common.extensions.mapList
+import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Playlist
 import android.provider.MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI as PLAYLIST_URI
 
@@ -36,7 +36,7 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
                 sortOrder = "LIMIT $limit"
             )
         return cursor!!.use { result ->
-            result.mapList { mapToPlaylist(it) }
+            result.mapToList { mapToPlaylist(it) }
         }
     }
 

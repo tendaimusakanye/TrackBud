@@ -25,16 +25,14 @@ class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) 
         withContext(ioDispatcher) {
             val albumsByArtist =
                 retrieveMediaItemsList {
-                    albumLocalDataSource.getAlbumsByArtist(
-                        artistId
-                    )
+                    albumLocalDataSource.getAlbumsByArtist(artistId)
                 }
             return@withContext createMetadata(albumsByArtist)
         }
 
     override suspend fun getAlbum(albumId: Long): MediaMetadataCompat = withContext(ioDispatcher) {
-        val albumDetails = retrieveMediaItem() {
-            albumLocalDataSource.getAlbum(albumId)
+        val albumDetails = retrieveMediaItem {
+            albumLocalDataSource.getAlbumDetails(albumId)
         }
         return@withContext createMetadata(listOf(albumDetails))[0]
     }

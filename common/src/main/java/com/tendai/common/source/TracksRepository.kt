@@ -21,6 +21,7 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
                     tracksLocalDataSource.getTrackDetails(trackId)
                 }
             return@withContext createMetadata(listOf(trackMetadata))[0]
+
         }
 
     override suspend fun getTracks(): List<MediaMetadataCompat> = withContext(ioDispatcher) {
@@ -75,14 +76,14 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
                 flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 
                 displayTitle = track.trackName
-                // this hack is to cater for the setting the queueTitle in the queueManager class
+                displayDescription = track.albumName
+                displayIconUri = track.albumArtUri.toString()
+                // hack is to cater for the setting the queueTitle in the queueManager class
                 displaySubtitle = if (track.artistName == "") {
                     track.playlistName
                 } else {
                     track.artistName
                 }
-                displayDescription = track.albumName
-                displayIconUri = track.albumArtUri.toString()
             }.build()
         }
     }

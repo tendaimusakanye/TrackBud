@@ -14,7 +14,7 @@ import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
 import com.tendai.common.R
-import com.tendai.common.extensions.mapList
+import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Track
 import java.io.IOException
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
@@ -54,7 +54,7 @@ class TracksLocalDataSource(private val context: Context) : LocalDataSource,
         )
         return cursor!!.use { result ->
             fromPlaylist = false
-            result.mapList { mapToTrack(it) }
+            result.mapToList { mapToTrack(it) }
         }
     }
 
@@ -68,7 +68,7 @@ class TracksLocalDataSource(private val context: Context) : LocalDataSource,
         )
         return cursor!!.use { result ->
             fromPlaylist = false
-            result.mapList { mapToTrack(it) }
+            result.mapToList { mapToTrack(it) }
         }
     }
 
@@ -82,7 +82,7 @@ class TracksLocalDataSource(private val context: Context) : LocalDataSource,
         )
         return cursor!!.use { result ->
             fromPlaylist = false
-            result.mapList { mapToTrack(it) }
+            result.mapToList { mapToTrack(it) }
         }
     }
 
@@ -96,7 +96,7 @@ class TracksLocalDataSource(private val context: Context) : LocalDataSource,
         )
         return cursor!!.use { result ->
             fromPlaylist = true
-            result.mapList { mapToTrack(it) }
+            result.mapToList { mapToTrack(it) }
         }
     }
 

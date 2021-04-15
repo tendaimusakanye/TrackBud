@@ -16,10 +16,11 @@ class PlaybackManager(
 
     val mediaSessionCallback: MediaSessionCallback
         get() = MediaSessionCallback()
+
     private val stateBuilder = PlaybackStateCompat.Builder().setActions(getAvailableActions())
         .setState(PlaybackStateCompat.STATE_NONE, 0L, 1.0F)
 
-    lateinit var onMetadataChanged: (metadata: MediaMetadataCompat) -> Unit
+    private lateinit var onMetadataChanged: (metadata: MediaMetadataCompat) -> Unit
     private lateinit var onNotificationRequired: (state: Int) -> Unit
     private lateinit var onPlaybackStart: () -> Unit
     private lateinit var onPlaybackStop: () -> Unit
@@ -49,7 +50,6 @@ class PlaybackManager(
         }
     }
 
-
     override fun onPrepared() {
         updatePlaybackState()
     }
@@ -71,7 +71,7 @@ class PlaybackManager(
         onNotificationRequired(state)
     }
 
-    fun cleanUp() {
+    fun release() {
         playback.release()
         updatePlaybackState()
     }
@@ -80,7 +80,7 @@ class PlaybackManager(
         if (playback.requestFocus() == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             onPlaybackStart()
             with(queueManager) {
-                onMetadataChanged(getMetadata(trackId))
+                if (trackId != cachedTrackId) onMetadataChanged(getMetadata(trackId))
             }
             playback.playFromId(trackId)
         } else {
@@ -235,5 +235,5 @@ const val REPEAT_MODE = "com.tendai.common.playback.REPEAT_MODE"
 const val SHUFFLE_MODE = "com.tendai.common.playback.SHUFFLE_MODE"
 private const val TAG = "PlaybackManager"
 
-//todo: write tests for testing errors  in logic, exceptions , null pointers and log
+//todo: write tests for the queueManager and Playback Manager testing errors  in logic, exceptions , null pointers and log
 // accordingly for debugging purposes. etc, etc.

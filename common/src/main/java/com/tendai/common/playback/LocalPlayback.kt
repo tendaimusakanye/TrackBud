@@ -51,7 +51,7 @@ class LocalPlayback(
         }
 
     @State
-    private var state: Int = STATE_NONE
+    private var state = STATE_NONE
     private var isRegistered = false
     private var audioManager: AudioManager =
         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager

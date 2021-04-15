@@ -14,6 +14,5 @@ interface Playback {
 
 interface Callback {
     fun onCompletion()
-
     fun onPrepared()
 }

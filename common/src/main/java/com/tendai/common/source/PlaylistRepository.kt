@@ -53,7 +53,6 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
                 displayTitle = playlist.playlistName
                 displayDescription = playlist.numberOfTracks.toString()
                 displayIconUri = PLAYLIST_ICON_URI
-
             }.build()
         }
 }
