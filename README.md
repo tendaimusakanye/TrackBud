@@ -53,8 +53,9 @@ Anyone can contribute
 If you have any recommendations, suggestions, improvements or if you identify any bug 
 1. File an issue describing the change
 2. If your change accepted, fork the repo, develop and test your code changes
-3. Unit test your code if this is applicable
-4. Submit a pull request. 
+3. Ensure that your code style adheres to the [kotlin code style guide](https://developer.android.com/kotlin/style-guide)
+4. Unit test your code if this is applicable
+5. Submit a pull request. 
 
 ## Credits
 [UAMP](https://github.com/android/uamp)
