@@ -10,7 +10,7 @@ data class Album(
     var artistId: Int = -1,
     var yearReleased: Int = -1,
     var numberOfTracks: Int = -1,
-    var albumArtUri: Uri = Uri.EMPTY
+    var albumArtUri: Uri? = null
 )
 
 

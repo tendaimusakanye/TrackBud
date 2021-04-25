@@ -16,7 +16,9 @@ import android.provider.MediaStore.MediaColumns.DURATION
 import com.tendai.common.R
 import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Track
+import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.InputStream
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
 class TracksLocalDataSource(private val context: Context) : LocalDataSource,
@@ -100,16 +102,24 @@ class TracksLocalDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    @Suppress("DEPRECATION")
+
     override fun getAlbumArt(albumId: Long): Bitmap {
+        var inputStream: InputStream? = null
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 val source = ImageDecoder.createSource(contentResolver, getAlbumArtUri(albumId))
                 return ImageDecoder.decodeBitmap(source)
             }
-            return MediaStore.Images.Media.getBitmap(contentResolver, getAlbumArtUri(albumId))
+            inputStream = contentResolver.openInputStream(getAlbumArtUri(albumId))
+            return BitmapFactory.decodeStream(inputStream)
         } catch (e: IOException) {
+            e.printStackTrace()
             return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
+        } finally {
+            inputStream?.close()
         }
     }
 

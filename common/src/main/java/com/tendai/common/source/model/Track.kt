@@ -14,5 +14,5 @@ data class Track(
     var trackGenre: String = "",
     var trackNumber: Int = -1,
     var playlistName: String = "",
-    var albumArtUri: Uri = Uri.EMPTY
+    var albumArtUri: Uri? = null
 )

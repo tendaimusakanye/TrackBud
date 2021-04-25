@@ -7,14 +7,15 @@ import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.BaseColumns._ID
-import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
 import com.tendai.common.R
 import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Album
+import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.InputStream
 import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
 
 class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
@@ -72,16 +73,24 @@ class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    @Suppress("DEPRECATION")
+//todo: deal with repetition of this method in Albums and Tracks data sources.
     override fun getAlbumArt(albumId: Long): Bitmap {
+        var inputStream: InputStream? = null
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 val source = ImageDecoder.createSource(contentResolver, getAlbumArtUri(albumId))
                 return ImageDecoder.decodeBitmap(source)
             }
-            return MediaStore.Images.Media.getBitmap(contentResolver, getAlbumArtUri(albumId))
+            inputStream = contentResolver.openInputStream(getAlbumArtUri(albumId))
+            return BitmapFactory.decodeStream(inputStream)
         } catch (e: IOException) {
+            e.printStackTrace()
             return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
+        } finally {
+            inputStream?.close()
         }
     }
 

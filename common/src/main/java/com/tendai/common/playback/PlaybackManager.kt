@@ -228,7 +228,6 @@ class PlaybackManager(
             handlePlayRequest(trackId)
         }
     }
-
 }
 
 const val REPEAT_MODE = "com.tendai.common.playback.REPEAT_MODE"
