@@ -3,8 +3,8 @@ TrackBud is a full-fledged music player for Android (Mobile ,TV, Wear) and is cu
 
 P.S. I am still working of finding a better name 🤣
 
-The server side is almost complete though 😎
-The client side ( UI for TV, Wear, Mobile ) is still at 0%
+Server side logic is almost complete.
+Client side logic ( UI for TV, Wear, Mobile ) is still at 0%.
 ## Features
 * Local Audio Playback
 * Eleagant UI 🤣
