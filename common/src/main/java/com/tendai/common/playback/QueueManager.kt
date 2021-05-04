@@ -10,6 +10,7 @@ abstract class QueueManager {
     lateinit var onQueueChanged: (title: CharSequence, queueItems: List<MediaSessionCompat.QueueItem?>) -> Unit
 
     abstract fun buildQueue(trackId: Long, extras: Bundle)
+    abstract fun createShuffleWindow()
     abstract fun getMetadata(trackId: Long): MediaMetadataCompat
     abstract fun getCurrentItemPlaying(): MediaSessionCompat.QueueItem?
     abstract fun setCurrentQueueItem(id: Long)

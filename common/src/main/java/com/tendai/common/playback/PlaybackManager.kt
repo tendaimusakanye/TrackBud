@@ -113,6 +113,7 @@ class PlaybackManager(
                     else putInt(SHUFFLE_MODE, shuffleOrRepeatMode)
                 }).build()
         )
+        queueManager.createShuffleWindow()
     }
 
     private fun getAvailableActions(): Long {
