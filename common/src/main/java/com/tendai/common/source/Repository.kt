@@ -49,17 +49,5 @@ interface Repository {
 }
 
 
-//if mediaItemsList is null, Null is never returned only an empty list since no results matching the given criteria
-// where found. If null is returned then something drastic happened.
-internal inline fun <T> retrieveMediaItemsList(
-    block: () -> List<T>
-): List<T> {
-    var mediaItemsList: List<T>? = null
-    return mediaItemsList ?: run {
-        mediaItemsList = block.invoke()
-        mediaItemsList
-    }!!
-}
-
 
 
