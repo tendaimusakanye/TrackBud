@@ -22,39 +22,29 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
         }
 
     override suspend fun getTracks(): List<MediaMetadataCompat> = withContext(ioDispatcher) {
-        val tracks =
-            retrieveMediaItemsList { tracksLocalDataSource.getTracks() }
+        val tracks = tracksLocalDataSource.getTracks()
+
         return@withContext createMetadata(tracks)
     }
 
     override suspend fun getTracksForArtist(artistId: Long): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val trackByArtist =
-                retrieveMediaItemsList {
-                    tracksLocalDataSource.getTracksByArtist(
-                        artistId
-                    )
-                }
+            val trackByArtist = tracksLocalDataSource.getTracksByArtist(artistId)
+
             return@withContext createMetadata(trackByArtist)
         }
 
     override suspend fun getTracksInAlbum(albumId: Long): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val tracksInAlbum =
-                retrieveMediaItemsList {
-                    tracksLocalDataSource.getTracksInAlbum(
-                        albumId
-                    )
-                }
+            val tracksInAlbum = tracksLocalDataSource.getTracksInAlbum(albumId)
+
             return@withContext createMetadata(tracksInAlbum)
         }
 
     override suspend fun getTracksInPlaylist(playlistId: Long): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val tracksInPlaylist =
-                retrieveMediaItemsList {
-                    tracksLocalDataSource.getTracksInPlaylist(playlistId)
-                }
+            val tracksInPlaylist = tracksLocalDataSource.getTracksInPlaylist(playlistId)
+
             return@withContext createMetadata(tracksInPlaylist)
         }
 

@@ -16,10 +16,8 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
 
     override suspend fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
-            val playlists =
-                retrieveMediaItemsList {
-                    playlistLocalDataSource.getAllPlaylists(limit)
-                }
+            val playlists = playlistLocalDataSource.getAllPlaylists(limit)
+
             return@withContext createMetadata(playlists)
         }
 
@@ -56,5 +54,6 @@ class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Pl
             }.build()
         }
 }
+
 const val PLAYLIST_ICON_URI =
     "android.resource://com.tendai.common.media.source/drawable/ic_playlist"
