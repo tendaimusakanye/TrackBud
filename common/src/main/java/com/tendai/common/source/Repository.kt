@@ -48,19 +48,6 @@ interface Repository {
 
 }
 
-internal inline fun <T> retrieveMediaItem(
-    block: () -> T
-): T {
-    var mediaItem: T? = null
-    return mediaItem ?: run {
-        //try catch should be thrown here if this throws and exception but it doesn't
-        // when the coroutine gets here it jumps out of this method and does other things. The code below is only
-        //executed when the coroutine returns.
-        mediaItem = block.invoke()
-        //the mediaItem should never be null it will return fields with empty fields always.
-        mediaItem
-    }!!
-}
 
 //if mediaItemsList is null, Null is never returned only an empty list since no results matching the given criteria
 // where found. If null is returned then something drastic happened.
