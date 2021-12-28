@@ -15,8 +15,8 @@ class ArtistRepository(
 ) : Repository.Artists {
 
     override suspend fun getAllArtists(): List<MediaMetadataCompat> = withContext(ioDispatcher) {
-        val artists =
-            retrieveMediaItemsList { artistLocalDataSource.getAllArtists() }
+        val artists = artistLocalDataSource.getAllArtists()
+
         return@withContext createMetadata(artists)
     }
 
