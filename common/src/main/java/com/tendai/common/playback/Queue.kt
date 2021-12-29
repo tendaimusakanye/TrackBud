@@ -325,28 +325,6 @@ class Queue(
             shuffledList = tempWindow.toList().shuffled()
         }
 
-        private fun handleShrinkOrAdvance(//could return to duplicated code with less lines.
-            increment: Boolean, // Hack to increment or decrement other than using stackTrace to get the calling method name
-            currentIndex: Int,
-            remove: () -> Int?,
-            insert: (index: Int) -> Boolean
-        ) {
-            var tempIndex = currentIndex
-            var i = 0
-            if (playingQueue.size % WINDOW_CAPACITY == 0) {
-                while (i++ < WINDOW_CAPACITY) {
-                    remove()
-                    if (increment) insert(tempIndex++) else insert(tempIndex--)
-                }
-            } else {
-                val difference = playingQueue.size - queueWindow.size
-                while (i++ < difference) {
-                    remove()
-                    if (increment) insert(tempIndex++) else insert(tempIndex--)
-                }
-            }
-        }
-
         private fun updateIndices() {
             start = queueWindow.first
             end = queueWindow.last + 1 //the subList end index is exclusive hence the plus one
