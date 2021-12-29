@@ -3,9 +3,6 @@ package com.tendai.common.source.local
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
-import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.AudioColumns.IS_MUSIC
 import android.provider.MediaStore.Audio.AudioColumns.TRACK
@@ -13,12 +10,9 @@ import android.provider.MediaStore.Audio.Media.*
 import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
-import com.tendai.common.R
 import com.tendai.common.extensions.mapToList
+import com.tendai.common.extensions.getAlbumArt
 import com.tendai.common.source.model.Track
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
 class TracksLocalDataSource(private val context: Context) : LocalDataSource,
@@ -103,25 +97,7 @@ class TracksLocalDataSource(private val context: Context) : LocalDataSource,
     }
 
 
-    override fun getAlbumArt(albumId: Long): Bitmap {
-        var inputStream: InputStream? = null
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val source = ImageDecoder.createSource(contentResolver, getAlbumArtUri(albumId))
-                return ImageDecoder.decodeBitmap(source)
-            }
-            inputStream = contentResolver.openInputStream(getAlbumArtUri(albumId))
-            return BitmapFactory.decodeStream(inputStream)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            return BitmapFactory.decodeResource(context.resources, R.drawable.ic_placeholder_art)
-        } finally {
-            inputStream?.close()
-        }
-    }
+    override fun getAlbumArt(albumId: Long): Bitmap = context.getAlbumArt(albumId)
 
     private fun mapToTrack(cursor: Cursor): Track =
         cursor.run {

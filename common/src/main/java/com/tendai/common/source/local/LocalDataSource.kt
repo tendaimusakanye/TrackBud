@@ -79,13 +79,13 @@ interface LocalDataSource {
             selectionArgs,
             sortOrder
         )
-
-    fun getAlbumArtUri(albumId: Long): Uri {
-        val uri = Uri.parse(ALBUM_ART_PATH)
-        return ContentUris.withAppendedId(uri, albumId)
-    }
 }
-const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
+
+fun getAlbumArtUri(albumId: Long): Uri {
+    val uri = Uri.parse(ALBUM_ART_PATH)
+    return ContentUris.withAppendedId(uri, albumId)
+}
+private const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
 
 
 
