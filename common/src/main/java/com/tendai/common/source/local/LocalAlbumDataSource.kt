@@ -6,12 +6,9 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
-import com.tendai.common.R
 import com.tendai.common.extensions.mapToList
+import com.tendai.common.extensions.getAlbumArt
 import com.tendai.common.source.model.Album
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
 
 class AlbumLocalDataSource(private val context: Context) : LocalDataSource,

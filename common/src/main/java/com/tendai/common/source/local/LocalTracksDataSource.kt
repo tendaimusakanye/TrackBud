@@ -9,12 +9,8 @@ import android.provider.MediaStore.Audio.Media.*
 import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
-import com.tendai.common.R
 import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Track
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
 class TracksLocalDataSource(private val context: Context) : LocalDataSource,
