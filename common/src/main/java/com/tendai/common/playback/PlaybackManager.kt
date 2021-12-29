@@ -104,17 +104,27 @@ class PlaybackManager(
         handlePlayRequest(trackId!!)
     }
 
-    private fun setRepeatOrShuffleMode(shuffleOrRepeatMode: Int, isRepeatMode: Boolean) {
+    private fun setRepeatMode(repeatMode: Int) {
         val bundle = mediaSession.controller.extras ?: Bundle()
         onPlaybackStateChanged(
             PlaybackStateCompat.Builder(mediaSession.controller.playbackState)
                 .setExtras(bundle.apply {
-                    if (isRepeatMode) putInt(REPEAT_MODE, shuffleOrRepeatMode)
-                    else putInt(SHUFFLE_MODE, shuffleOrRepeatMode)
+                    putInt(REPEAT_MODE, repeatMode)
+                }).build()
+        )
+    }
+
+    private fun setShuffleMode(shuffleMode: Int) {
+        val bundle = mediaSession.controller.extras ?: Bundle()
+        onPlaybackStateChanged(
+            PlaybackStateCompat.Builder(mediaSession.controller.playbackState)
+                .setExtras(bundle.apply {
+                    putInt(SHUFFLE_MODE, shuffleMode)
                 }).build()
         )
         queueManager.createShuffleWindow()
     }
+
 
     private fun getAvailableActions(): Long {
         var actions = PlaybackStateCompat.ACTION_PLAY_PAUSE or
@@ -216,11 +226,11 @@ class PlaybackManager(
         }
 
         override fun onSetShuffleMode(shuffleMode: Int) {
-            setRepeatOrShuffleMode(shuffleMode, false)
+            setShuffleMode(shuffleMode)
         }
 
         override fun onSetRepeatMode(repeatMode: Int) {
-            setRepeatOrShuffleMode(repeatMode, true)
+            setRepeatMode(repeatMode)
         }
 
         override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
