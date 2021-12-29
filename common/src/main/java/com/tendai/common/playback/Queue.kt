@@ -30,31 +30,31 @@ class Queue(
         if (isTrackAlreadyInQueue(trackId)) return
 
         serviceScope.launch {
-            var metadatas = listOf<MediaMetadataCompat>()
+            var tracksMetadata = listOf<MediaMetadataCompat>()
             var queueTitle: CharSequence? = ""
             when {
                 extras.getBoolean(TRACKS_ROOT) -> {
-                    metadatas = trackRepository.getTracks()
+                    tracksMetadata = trackRepository.getTracks()
                     queueTitle = "Tracks"
                 }
                 extras.getBoolean(IS_ALBUM) -> {
-                    metadatas = trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
-                    queueTitle = metadatas[0].description.description
+                    tracksMetadata = trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
+                    queueTitle = tracksMetadata[0].description.description
                 }
                 extras.getBoolean(IS_ARTIST_TRACKS) -> {
-                    metadatas = trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
-                    queueTitle = metadatas[0].description.subtitle
+                    tracksMetadata = trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
+                    queueTitle = tracksMetadata[0].description.subtitle
                 }
                 extras.getBoolean(IS_PLAYLIST) -> {
-                    metadatas =
+                    tracksMetadata =
                         trackRepository.getTracksInPlaylist(extras.getLong(EXTRA_PLAYLIST_ID))
-                    queueTitle = metadatas[0].description.subtitle
+                    queueTitle = tracksMetadata[0].description.subtitle
                 }
             }
             if (playingQueue.isNotEmpty()) {
                 playingQueue.clear()
             }
-            metadatas.distinctBy { it.description.title }.forEachIndexed { index, metadata ->
+            tracksMetadata.distinctBy { it.description.title }.forEachIndexed { index, metadata ->
                 val mediaId = metadata.description.mediaId?.toLong()
                 if (trackId == mediaId) currentIndex = index
 
@@ -234,17 +234,27 @@ class Queue(
     private inner class SlidingWindow {
         var start: Int = 0
         var end: Int = 0
-        var queueWindow = ArrayDeque<Int>(WINDOW_CAPACITY)
+        
         lateinit var shuffleList: List<Int>
+        
+        private var queueWindow = ArrayDeque<Int>(WINDOW_CAPACITY)
 
         fun advance(): Boolean {
+            var temp = currentIndex
             if (currentIndex > queueWindow.last) {
-                handleShrinkOrAdvance(
-                    true,
-                    currentIndex,
-                    { queueWindow.pollFirst() },
-                    { index -> queueWindow.offerLast(index) })
-
+                var i = 0
+                if (playingQueue.size % WINDOW_CAPACITY == 0) {
+                    while (i++ < WINDOW_CAPACITY) {
+                        queueWindow.pollFirst()
+                        queueWindow.offerLast(temp++)
+                    }
+                } else {
+                    val difference = playingQueue.size - queueWindow.size
+                    while (i++ < difference) {
+                        queueWindow.pollFirst()
+                        queueWindow.offerLast(temp++)
+                    }
+                }
                 updateIndices()
                 return true
             }
@@ -252,13 +262,21 @@ class Queue(
         }
 
         fun shrink(): Boolean {
+            var temp = currentIndex
             if (currentIndex < queueWindow.first) {
-                handleShrinkOrAdvance(
-                    false,
-                    currentIndex,
-                    { queueWindow.pollLast() },
-                    { index -> queueWindow.offerFirst(index) })
-
+                var i = 0
+                if (playingQueue.size % WINDOW_CAPACITY == 0) {
+                    while (i++ < WINDOW_CAPACITY) {
+                        queueWindow.pollLast()
+                        queueWindow.offerFirst(temp--)
+                    }
+                } else {
+                    val difference = playingQueue.size - queueWindow.size
+                    while (i++ < difference) {
+                        queueWindow.pollLast()
+                        queueWindow.offerFirst(temp--)
+                    }
+                }
                 updateIndices()
                 return true
             }
@@ -288,28 +306,6 @@ class Queue(
 
         fun createShuffleList() {
             shuffleList = queueWindow.toList().shuffled()
-        }
-
-        private fun handleShrinkOrAdvance(//could return to duplicated code with less lines.
-            increment: Boolean, // Hack to increment or decrement other than using stackTrace to get the calling method name
-            currentIndex: Int,
-            remove: () -> Int?,
-            insert: (index: Int) -> Boolean
-        ) {
-            var tempIndex = currentIndex
-            var i = 0
-            if (playingQueue.size % WINDOW_CAPACITY == 0) {
-                while (i++ < WINDOW_CAPACITY) {
-                    remove()
-                    if (increment) insert(tempIndex++) else insert(tempIndex--)
-                }
-            } else {
-                val difference = playingQueue.size - queueWindow.size
-                while (i++ < difference) {
-                    remove()
-                    if (increment) insert(tempIndex++) else insert(tempIndex--)
-                }
-            }
         }
 
         private fun updateIndices() {
