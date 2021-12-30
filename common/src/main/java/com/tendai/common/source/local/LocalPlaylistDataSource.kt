@@ -12,7 +12,7 @@ import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Playlist
 import android.provider.MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI as PLAYLIST_URI
 
-class PlaylistLocalDataSource(context: Context) : LocalDataSource,
+class LocalPlaylistDataSource(context: Context) : LocalDataSource,
     LocalDataSource.Playlists {
 
     private val contentResolver = context.contentResolver

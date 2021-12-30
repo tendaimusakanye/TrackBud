@@ -12,7 +12,7 @@ import com.tendai.common.extensions.getAlbumArt
 import com.tendai.common.source.model.Album
 import android.provider.MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI as ALBUMS_URI
 
-class AlbumLocalDataSource(private val context: Context) : LocalDataSource,
+class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
     LocalDataSource.Albums {
 
     private val contentResolver = context.contentResolver
