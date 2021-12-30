@@ -13,7 +13,7 @@ import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Track
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
-class TracksLocalDataSource(private val context: Context) : LocalDataSource,
+class LocalTracksDataSource(private val context: Context) : LocalDataSource,
     LocalDataSource.Tracks {
 
     private var fromPlaylist = false
