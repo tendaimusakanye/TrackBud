@@ -5,13 +5,16 @@ import android.support.v4.media.MediaMetadataCompat
 import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Album
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
-class AlbumRepository(private val albumLocalDataSource: LocalDataSource.Albums) :
+class AlbumRepository(
+    private val albumLocalDataSource: LocalDataSource.Albums,
+    private val ioDispatcher: CoroutineDispatcher
+) :
     Repository.Albums {
-
-    private val ioDispatcher = Dispatchers.IO
 
     override suspend fun getAlbums(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {

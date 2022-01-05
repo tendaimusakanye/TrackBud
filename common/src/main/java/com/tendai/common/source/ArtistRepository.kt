@@ -5,13 +5,15 @@ import android.support.v4.media.MediaMetadataCompat
 import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Artist
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ArtistRepository(private val artistLocalDataSource: LocalDataSource.Artists) :
+class ArtistRepository(
+    private val artistLocalDataSource: LocalDataSource.Artists,
+    private val ioDispatcher: CoroutineDispatcher
+) :
     Repository.Artists {
-
-    private val ioDispatcher = Dispatchers.IO
 
     override suspend fun getAllArtists(): List<MediaMetadataCompat> = withContext(ioDispatcher) {
         val artists = artistLocalDataSource.getAllArtists()

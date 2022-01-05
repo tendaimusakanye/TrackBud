@@ -6,13 +6,15 @@ import android.support.v4.media.MediaMetadataCompat
 import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Playlist
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class PlaylistRepository(private val playlistLocalDataSource: LocalDataSource.Playlists) :
+class PlaylistRepository(
+    private val playlistLocalDataSource: LocalDataSource.Playlists,
+    private val ioDispatcher: CoroutineDispatcher
+) :
     Repository.Playlists {
-
-    private val ioDispatcher = Dispatchers.IO
 
     override suspend fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {
