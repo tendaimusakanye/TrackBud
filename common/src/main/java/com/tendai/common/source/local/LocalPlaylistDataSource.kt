@@ -27,7 +27,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
         _ID, NAME, PLAY_ORDER
     )
 
-    override fun getAllPlaylists(limit: Int): List<Playlist> {
+    override  suspend  fun getAllPlaylists(limit: Int): List<Playlist> {
         val cursor =
             createCursor(
                 contentResolver,
@@ -41,7 +41,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
     }
 
     // android is forcing me to return a null Uri here
-    override fun createNewPlaylist(name: String): Uri? {
+    override  suspend  fun createNewPlaylist(name: String): Uri? {
         if (name.isEmpty()) return null
         //first query to check if there are other playlists with the same name.
         return synchronized(this) {
@@ -70,7 +70,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
         }
     }
 
-    override fun deletePlaylist(playlistId: Int): Int =
+    override  suspend  fun deletePlaylist(playlistId: Int): Int =
         contentResolver.delete(
             PLAYLIST_URI,
             "$PLAYLIST_ID = ?",
@@ -78,7 +78,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
         )
 
 
-    override fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int {
+    override  suspend  fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int {
         // this is done to get the correct Uri for us to insert the songs into the playlists.
         // That is just how android is
         // android recommends insert and update methods be thread safe. i.e. the reason for the synchronized block
@@ -101,7 +101,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
         }
     }
 
-    override fun removeTrackFromPlaylist(trackIds: LongArray): Int =
+    override suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int =
         contentResolver.delete(PLAYLIST_URI, "$AUDIO_ID = ?", arrayOf(trackIds.toString()))
 
     private fun getNumberOfSongsInPlaylist(playlistId: Int): Int {

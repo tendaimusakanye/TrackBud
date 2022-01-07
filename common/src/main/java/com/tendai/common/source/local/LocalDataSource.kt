@@ -15,47 +15,46 @@ import com.tendai.common.source.model.Track
  */
 interface LocalDataSource {
     interface Tracks {
+        suspend fun getTrackDetails(trackId: Long): Track
 
-        fun getTrackDetails(trackId: Long): Track
+        suspend fun getTracks(): List<Track>
 
-        fun getTracks(): List<Track>
+        suspend fun getTracksByArtist(artistId: Long): List<Track>
 
-        fun getTracksByArtist(artistId: Long): List<Track>
+        suspend fun getTracksInAlbum(albumId: Long): List<Track>
 
-        fun getTracksInAlbum(albumId: Long): List<Track>
+        suspend fun getTracksInPlaylist(playlistId: Long): List<Track>
 
-        fun getTracksInPlaylist(playlistId: Long): List<Track>
-
-        fun getAlbumArt(albumId: Long): Bitmap
+        suspend fun getAlbumArt(albumId: Long): Bitmap
 
     }
 
     interface Albums {
-        fun getAlbums(limit: Int): List<Album>
+        suspend fun getAlbums(limit: Int): List<Album>
 
-        fun getAlbumsByArtist(artistId: Long): List<Album>
+        suspend fun getAlbumsByArtist(artistId: Long): List<Album>
 
-        fun getAlbumDetails(albumId: Long): Album
+        suspend fun getAlbumDetails(albumId: Long): Album
 
-        fun getAlbumArt(albumId: Long): Bitmap
+        suspend fun getAlbumArt(albumId: Long): Bitmap
 
     }
 
     interface Artists {
-        fun getAllArtists(): List<Artist>
+        suspend fun getAllArtists(): List<Artist>
     }
 
     interface Playlists {
 
-        fun getAllPlaylists(limit: Int): List<Playlist>
+        suspend fun getAllPlaylists(limit: Int): List<Playlist>
 
-        fun createNewPlaylist(name: String): Uri?
+        suspend fun createNewPlaylist(name: String): Uri?
 
-        fun deletePlaylist(playlistId: Int): Int
+        suspend fun deletePlaylist(playlistId: Int): Int
 
-        fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int
+        suspend fun addTracksToPlaylist(playlistId: Long, trackIds: LongArray): Int
 
-        fun removeTrackFromPlaylist(trackIds: LongArray): Int
+        suspend fun removeTrackFromPlaylist(trackIds: LongArray): Int
     }
 
     /**

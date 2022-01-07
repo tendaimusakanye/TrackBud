@@ -23,7 +23,7 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
     //getAlbums for the discover page
     // Do not use the let scope function on the cursor as it does not close the cursor in case of
     // an error or something else.
-    override fun getAlbums(limit: Int): List<Album> {
+    override suspend fun getAlbums(limit: Int): List<Album> {
         val cursor = createCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
@@ -40,7 +40,7 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
     // if the cursor is null then something drastic happened. Let NPE be thrown otherwise we found
     // Nothing. therefore return an empty list or empty mediaItem.
     // are always returned.
-    override fun getAlbumsByArtist(artistId: Long): List<Album> {
+    override suspend fun getAlbumsByArtist(artistId: Long): List<Album> {
         val uri = getContentUri("external", artistId)
         val cursor = createCursor(
             contentResolver = contentResolver,
@@ -53,7 +53,7 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    override fun getAlbumDetails(albumId: Long): Album {
+    override suspend fun getAlbumDetails(albumId: Long): Album {
         val cursor = createCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
@@ -68,7 +68,7 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
     }
 
 
-    override fun getAlbumArt(albumId: Long): Bitmap = context.getAlbumArt(albumId)
+    override suspend fun getAlbumArt(albumId: Long): Bitmap = context.getAlbumArt(albumId)
 
     /**
      * create an album from the cursor.

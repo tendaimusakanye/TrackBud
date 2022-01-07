@@ -26,7 +26,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
         MediaStore.Audio.Media.DURATION
     )
 
-    override fun getTrackDetails(trackId: Long): Track {
+    override  suspend  fun getTrackDetails(trackId: Long): Track {
         val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
@@ -41,7 +41,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    override fun getTracks(): List<Track> {
+    override  suspend  fun getTracks(): List<Track> {
         val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
@@ -54,7 +54,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    override fun getTracksByArtist(artistId: Long): List<Track> {
+    override  suspend  fun getTracksByArtist(artistId: Long): List<Track> {
         val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
@@ -68,7 +68,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    override fun getTracksInAlbum(albumId: Long): List<Track> {
+    override  suspend  fun getTracksInAlbum(albumId: Long): List<Track> {
         val cursor = createCursor(
             contentResolver,
             TRACKS_URI,
@@ -82,7 +82,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    override fun getTracksInPlaylist(playlistId: Long): List<Track> {
+    override  suspend  fun getTracksInPlaylist(playlistId: Long): List<Track> {
         //this is how you properly get tracks from a given playlistId
         val uri = getContentUri("external", playlistId)
         val cursor = createCursor(
@@ -97,7 +97,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
     }
 
 
-    override fun getAlbumArt(albumId: Long): Bitmap = context.getAlbumArt(albumId)
+    override  suspend  fun getAlbumArt(albumId: Long): Bitmap = context.getAlbumArt(albumId)
 
     private fun mapToTrack(cursor: Cursor): Track =
         cursor.run {
