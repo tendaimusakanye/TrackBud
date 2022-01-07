@@ -16,7 +16,7 @@ class LocalArtistDataSource(context: Context) : LocalDataSource,
         _ID, ARTIST, NUMBER_OF_ALBUMS, NUMBER_OF_TRACKS
     )
 
-    override fun getAllArtists(): List<Artist> {
+    override  suspend fun getAllArtists(): List<Artist> {
         val cursor =
             createCursor(
                 contentResolver,
