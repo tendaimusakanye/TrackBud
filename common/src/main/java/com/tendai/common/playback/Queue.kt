@@ -14,17 +14,15 @@ class Queue(
     private val trackRepository: Repository.Tracks
 ) : QueueManager() {
 
-    private val slidingWindow = SlidingWindow()
+    val slidingWindow = SlidingWindow()
+    val playingQueue = mutableListOf<MediaSessionCompat.QueueItem?>()
 
     private var currentQueueTitle: CharSequence? = ""
     private var nextShuffleIndexCount = 0
     private var previousShuffleIndexCount = 0
 
-    @Volatile
-    private var currentIndex = 0
-
-    @Volatile
-    private var playingQueue = mutableListOf<MediaSessionCompat.QueueItem?>()
+    var currentIndex: Int = -1
+        private set
 
     override fun buildQueue(trackId: Long, extras: Bundle) {
         if (isTrackAlreadyInQueue(trackId)) return
@@ -103,7 +101,7 @@ class Queue(
 
     override fun skipToNext() {
         //loop again when we have reached the end of the queue and adjust accordingly
-        if (currentIndex >= playingQueue.size - 1) {
+        if (currentIndex >= playingQueue.lastIndex) {
             currentIndex = 0
             if (slidingWindow.createWindow()) {
                 onQueueChanged(
@@ -124,7 +122,7 @@ class Queue(
 
     override fun skipToPrevious() {
         if (currentIndex <= 0) {
-            currentIndex = playingQueue.size - 1
+            currentIndex = playingQueue.lastIndex
             if (slidingWindow.createWindow()) {
                 onQueueChanged(
                     currentQueueTitle!!,
@@ -143,23 +141,23 @@ class Queue(
     }
 
     override fun shuffleToNext() {
-        val tempShuffleList = slidingWindow.shuffleList
-        var index = tempShuffleList.indexOf(currentIndex)
+        val shuffledList = slidingWindow.shuffledList
+        var index = shuffledList.indexOf(currentIndex)
 
-        if (nextShuffleIndexCount < WINDOW_CAPACITY) {
-            if (index == tempShuffleList.lastIndex) {
+        if (nextShuffleIndexCount < WINDOW_CAPACITY && !slidingWindow.refreshWindow(FLAG_NEXT)) {
+            if (index == shuffledList.lastIndex) {
                 index = 0
-                currentIndex = tempShuffleList[index]
+                currentIndex = shuffledList[index]
             } else {
-                currentIndex = tempShuffleList[++index]
+                currentIndex = shuffledList[++index]
             }
             nextShuffleIndexCount++
             if (previousShuffleIndexCount != 0) previousShuffleIndexCount--
         } else {
             nextShuffleIndexCount = 0
 
-            with(tempShuffleList) {
-                currentIndex = maxOrNull() ?: 0
+            with(shuffledList) {
+                currentIndex = maxOrNull()!!
                 currentIndex++
             }
 
@@ -173,16 +171,17 @@ class Queue(
         }
     }
 
+    // Add comments.//javadoc for these methods.
     override fun shuffleToPrevious() {
-        val tempShuffleList = slidingWindow.shuffleList
-        var index = tempShuffleList.indexOf(currentIndex)
+        val shuffledList = slidingWindow.shuffledList
+        var index = shuffledList.indexOf(currentIndex)
 
-        if (previousShuffleIndexCount < WINDOW_CAPACITY) {
+        if (previousShuffleIndexCount < WINDOW_CAPACITY && !slidingWindow.refreshWindow(FLAG_PREVIOUS)) {
             if (index == 0) {
-                index = tempShuffleList.lastIndex
-                currentIndex = tempShuffleList[index]
+                index = shuffledList.lastIndex
+                currentIndex = shuffledList[index]
             } else {
-                currentIndex = tempShuffleList[--index]
+                currentIndex = shuffledList[--index]
             }
 
             previousShuffleIndexCount++
@@ -190,10 +189,12 @@ class Queue(
         } else {
             previousShuffleIndexCount = 0
 
-            with(tempShuffleList) {
-                currentIndex = minOrNull() ?: 0
-                currentIndex--
-            }
+            var min = shuffledList.minOrNull()!!
+            currentIndex = if (min != 0)
+                min - WINDOW_CAPACITY
+            else
+                playingQueue.lastIndex
+
 
             slidingWindow.createWindow()
             slidingWindow.createShuffleList()
@@ -205,7 +206,7 @@ class Queue(
         }
     }
 
-    private fun isTrackAlreadyInQueue(trackId: Long): Boolean {
+    fun isTrackAlreadyInQueue(trackId: Long): Boolean {
         if (cachedTrackId == trackId) return true
 
         if (playingQueue.isNotEmpty()) {
@@ -231,12 +232,13 @@ class Queue(
      * Add Java-doc for this class
      *
      */
-    private inner class SlidingWindow {
+    inner class SlidingWindow {
         var start: Int = 0
         var end: Int = 0
-        
-        lateinit var shuffleList: List<Int>
-        
+
+        internal lateinit var shuffledList: List<Int>
+            private set
+
         private var queueWindow = ArrayDeque<Int>(WINDOW_CAPACITY)
 
         fun advance(): Boolean {
@@ -249,8 +251,9 @@ class Queue(
                         queueWindow.offerLast(temp++)
                     }
                 } else {
-                    val difference = playingQueue.size - queueWindow.size
+                    val difference = playingQueue.size % WINDOW_CAPACITY
                     while (i++ < difference) {
+                        if (temp > playingQueue.lastIndex) temp = 0
                         queueWindow.pollFirst()
                         queueWindow.offerLast(temp++)
                     }
@@ -271,8 +274,9 @@ class Queue(
                         queueWindow.offerFirst(temp--)
                     }
                 } else {
-                    val difference = playingQueue.size - queueWindow.size
+                    val difference = playingQueue.size % WINDOW_CAPACITY
                     while (i++ < difference) {
+                        if (temp < 0) temp = playingQueue.lastIndex
                         queueWindow.pollLast()
                         queueWindow.offerFirst(temp--)
                     }
@@ -283,8 +287,9 @@ class Queue(
             return false
         }
 
+        // create the window only if the currentIndex is greater than the last index or if it is <= -1
         fun createWindow(): Boolean {
-            if (currentIndex > playingQueue.lastIndex || currentIndex < 0) return false// if false proceed down.
+            if (currentIndex > playingQueue.lastIndex || currentIndex <= -1) return false
             queueWindow.clear()
             var tempIndex = currentIndex
 
@@ -304,8 +309,17 @@ class Queue(
             return true
         }
 
+        fun refreshWindow(flag: CharSequence): Boolean {
+            return if (flag == FLAG_NEXT) {
+                currentIndex == queueWindow.last && nextShuffleIndexCount == 0
+            } else {
+                currentIndex == queueWindow.first && previousShuffleIndexCount == 16
+            }
+        }
+
         fun createShuffleList() {
-            shuffleList = queueWindow.toList().shuffled()
+            val tempWindow = queueWindow
+            shuffledList = tempWindow.toList().shuffled()
         }
 
         private fun updateIndices() {
@@ -316,13 +330,10 @@ class Queue(
 }
 
 private const val WINDOW_CAPACITY = 16
+private const val FLAG_NEXT = "FLAG_NEXT"
+private const val FLAG_PREVIOUS = "FLAG_PREVIOUS"
 
-//todo: or the Kotlin windowed function for my sliding window ?
-//todo: write tests for the shuffling logic.
-//todo: handle the case when the use is at the end of the queue after linear traversal and enables shuffling.
-// A new window should be created instead
 
-//todo: handle case when I shuffle to another queue and then press previous again.
-// I am loosing the consistency. Quick fix is expanding the queue title for now.
-//
+//TODO: 12/29/21 Add comments and java-doc for this class
+
 
