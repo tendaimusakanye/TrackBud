@@ -85,7 +85,9 @@ interface LocalDataSource {
         return ContentUris.withAppendedId(uri, albumId)
     }
 }
-const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
+
+private const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
+
 
 
 

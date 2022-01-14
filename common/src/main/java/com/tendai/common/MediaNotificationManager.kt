@@ -55,7 +55,6 @@ class MediaNotificationManager(
                     val notification = createNotification()
                     notificationManager.notify(NOTIFICATION_ID, notification)
                 }
-
             }
         }
 
@@ -77,8 +76,8 @@ class MediaNotificationManager(
     init {
         try {
             updateSessionToken()
-        }catch (e: RemoteException){
-            Log.e(TAG,"Could not create Media Controller")
+        } catch (e: RemoteException) {
+            Log.e(TAG, "Could not create Media Controller")
         }
     }
 

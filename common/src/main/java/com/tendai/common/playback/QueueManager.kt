@@ -2,7 +2,6 @@ package com.tendai.common.playback
 
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
-
 import android.support.v4.media.session.MediaSessionCompat
 
 abstract class QueueManager {

@@ -66,7 +66,6 @@ class PlaybackManager(
         }
         stateBuilder.setState(state, position, 1.0F, SystemClock.elapsedRealtime())
         queueManager.getCurrentItemPlaying()?.queueId?.let { stateBuilder.setActiveQueueItemId(it) }
-
         onPlaybackStateChanged(stateBuilder.build())
         onNotificationRequired(state)
     }
@@ -235,5 +234,5 @@ const val REPEAT_MODE = "com.tendai.common.playback.REPEAT_MODE"
 const val SHUFFLE_MODE = "com.tendai.common.playback.SHUFFLE_MODE"
 private const val TAG = "PlaybackManager"
 
-//todo: write tests for the queueManager and Playback Manager testing errors  in logic, exceptions , null pointers and log
-// accordingly for debugging purposes. etc, etc.
+
+// TODO: 1/14/22 Are shuffleMode and repeatMode persisted ?
