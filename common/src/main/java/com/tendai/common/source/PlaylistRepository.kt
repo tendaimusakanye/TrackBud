@@ -7,14 +7,12 @@ import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Playlist
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class PlaylistRepository(
     private val playlistLocalDataSource: LocalDataSource.Playlists,
     private val ioDispatcher: CoroutineDispatcher
-) :
-    Repository.Playlists {
+) : Repository.Playlists {
 
     override suspend fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {

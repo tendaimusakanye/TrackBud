@@ -13,8 +13,7 @@ import kotlin.coroutines.CoroutineContext
 class AlbumRepository(
     private val albumLocalDataSource: LocalDataSource.Albums,
     private val ioDispatcher: CoroutineDispatcher
-) :
-    Repository.Albums {
+) : Repository.Albums {
 
     override suspend fun getAlbums(limit: Int): List<MediaMetadataCompat> =
         withContext(ioDispatcher) {

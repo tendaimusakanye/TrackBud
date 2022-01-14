@@ -35,7 +35,7 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    // I am using the getCursor method for the flexibility of named arguments.
+    // I am using the createCursor method for the flexibility of named arguments.
     // The content resolver's query method does not offer the flexibility named arguments.
     // if the cursor is null then something drastic happened. Let NPE be thrown otherwise we found
     // Nothing. therefore return an empty list or empty mediaItem.
