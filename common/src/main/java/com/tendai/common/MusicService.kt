@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlin.IllegalStateException
 
 abstract class MusicService : MediaBrowserServiceCompat() {
 
@@ -65,6 +66,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
                 when (mediaSession.controller.playbackState.state) {
                     PlaybackStateCompat.STATE_PLAYING -> mediaSession.controller.transportControls.pause()
                     PlaybackStateCompat.STATE_PAUSED -> mediaSession.controller.transportControls.play()
+                    else -> throw IllegalStateException("Illegal action. Only play or pause are allowed.")
                 }
             }
             ACTION_NEXT -> mediaSession.controller.transportControls.skipToNext()

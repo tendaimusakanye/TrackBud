@@ -5,14 +5,15 @@ import android.support.v4.media.MediaMetadataCompat
 import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Track
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks) :
-    Repository.Tracks {
-
-    private val ioDispatcher = Dispatchers.IO
+class TracksRepository(
+    private val tracksLocalDataSource: LocalDataSource.Tracks,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : Repository.Tracks {
 
     override suspend fun getTrackDetails(trackId: Long): MediaMetadataCompat =
         withContext(ioDispatcher) {
