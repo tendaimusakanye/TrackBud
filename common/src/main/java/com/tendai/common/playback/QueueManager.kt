@@ -6,8 +6,10 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 
 abstract class QueueManager {
-    var cachedTrackId = 0L
-    lateinit var onQueueChanged: (title: CharSequence, queueItems: List<MediaSessionCompat.QueueItem?>) -> Unit
+    var cachedTrackId = -1L
+
+    protected lateinit var onQueueChanged: (title: CharSequence, queueItems: List<MediaSessionCompat.QueueItem?>) -> Unit
+        private set
 
     abstract fun buildQueue(trackId: Long, extras: Bundle)
     abstract fun createShuffleWindow()

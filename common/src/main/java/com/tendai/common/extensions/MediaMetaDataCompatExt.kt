@@ -94,11 +94,11 @@ inline var MediaMetadataCompat.Builder.trackCount: Long
         putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, value)
     }
 
-inline var MediaMetadataCompat.Builder.trackNumber: String?
+inline var MediaMetadataCompat.Builder.trackNumber: Long
     @Deprecated(NO_GET, level = DeprecationLevel.ERROR)
     get() = throw IllegalAccessException(ERROR_MESSAGE)
     set(value) {
-        putString(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, value)
+        putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, value)
     }
 
 inline var MediaMetadataCompat.Builder.displayTitle: String?

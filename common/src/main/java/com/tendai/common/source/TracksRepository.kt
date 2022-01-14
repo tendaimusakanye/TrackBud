@@ -70,8 +70,8 @@ class TracksRepository(private val tracksLocalDataSource: LocalDataSource.Tracks
                 album = track.albumName
                 artist = track.artistName
                 duration = durationMs
-                trackNumber = track.trackNumber.toString()
-                albumArt = tracksLocalDataSource.getAlbumArt(track.albumId)
+                trackNumber = track.trackNumber.toLong()
+                //albumArt = tracksLocalDataSource.getAlbumArt(track.albumId)
                 albumArtUri = track.albumArtUri.toString()
                 flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 
