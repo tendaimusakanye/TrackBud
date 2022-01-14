@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 class TracksRepository(
     private val tracksLocalDataSource: LocalDataSource.Tracks,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : Repository.Tracks {
 
     override suspend fun getTrackDetails(trackId: Long): MediaMetadataCompat =

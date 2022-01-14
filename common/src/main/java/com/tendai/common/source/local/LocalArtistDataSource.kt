@@ -22,7 +22,7 @@ class LocalArtistDataSource(context: Context) : LocalDataSource,
                 contentResolver,
                 ARTISTS_URI,
                 projection,
-                sortOrder = "$ARTIST  ASC"
+                sortOrder = "$ARTIST ASC"
             )
         return cursor!!.use { result ->
             result.mapToList { mapToArtist(it) }

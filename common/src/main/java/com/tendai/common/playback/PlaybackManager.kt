@@ -41,7 +41,7 @@ class PlaybackManager(
                     queueManager.skipToNext()
                     handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
                 } else if (mediaSession.controller.shuffleMode
-                    == PlaybackStateCompat.SHUFFLE_MODE_GROUP
+                    == PlaybackStateCompat.SHUFFLE_MODE_ALL || mediaSession.controller.shuffleMode == PlaybackStateCompat.SHUFFLE_MODE_GROUP
                 ) {
                     queueManager.shuffleToNext()
                     handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
@@ -77,10 +77,10 @@ class PlaybackManager(
 
     private fun handlePlayRequest(trackId: Long) {
         if (playback.requestFocus() == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            onPlaybackStart()
             with(queueManager) {
                 if (trackId != cachedTrackId) onMetadataChanged(getMetadata(trackId))
             }
+            onPlaybackStart()
             playback.playFromId(trackId)
         } else {
             Log.e(TAG, "Failed to get AudioFocus")
@@ -198,6 +198,7 @@ class PlaybackManager(
                 PlaybackStateCompat.SHUFFLE_MODE_GROUP -> {
                     queueManager.shuffleToPrevious()
                 }
+                PlaybackStateCompat.SHUFFLE_MODE_ALL -> queueManager.shuffleToPrevious()
             }
             handlePreviousOrNextRequest(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS)
         }
