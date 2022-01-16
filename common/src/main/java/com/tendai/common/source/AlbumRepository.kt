@@ -6,9 +6,7 @@ import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Album
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 class AlbumRepository(
     private val albumLocalDataSource: LocalDataSource.Albums,
@@ -44,7 +42,6 @@ class AlbumRepository(
                 year = album.yearReleased.toLong()
                 trackCount = album.numberOfTracks.toLong()
                 albumArtUri = album.albumArtUri.toString()
-//                albumArt = albumLocalDataSource.getAlbumArt(album.id)
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
 
                 //for ease of displaying

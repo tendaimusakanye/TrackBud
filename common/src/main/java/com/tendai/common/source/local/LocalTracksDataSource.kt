@@ -2,7 +2,6 @@ package com.tendai.common.source.local
 
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.AudioColumns.IS_MUSIC
 import android.provider.MediaStore.Audio.AudioColumns.TRACK
@@ -11,7 +10,6 @@ import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
 import com.tendai.common.extensions.mapToList
-import com.tendai.common.extensions.getAlbumArt
 import com.tendai.common.source.model.Track
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
@@ -95,9 +93,6 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
             result.mapToList { mapToTrack(it) }
         }
     }
-
-
-    override  suspend  fun getAlbumArt(albumId: Long): Bitmap = context.getAlbumArt(albumId)
 
     private fun mapToTrack(cursor: Cursor): Track =
         cursor.run {
