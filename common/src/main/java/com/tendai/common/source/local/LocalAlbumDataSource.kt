@@ -77,8 +77,8 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
                 albumTitle = getString(getColumnIndex(ALBUM)),
                 albumArtist = getString(getColumnIndex(ARTIST)),
                 artistId = getInt(getColumnIndex(ARTIST_ID)),
-                yearReleased = getInt(getColumnIndex(FIRST_YEAR)),
-                numberOfTracks = getInt(getColumnIndex(NUMBER_OF_SONGS)),
+                yearReleased = getLong(getColumnIndex(FIRST_YEAR)),
+                numberOfTracks = getLong(getColumnIndex(NUMBER_OF_SONGS)),
                 albumArtUri = getAlbumArtUri(getLong(getColumnIndex(_ID)))
             )
         }

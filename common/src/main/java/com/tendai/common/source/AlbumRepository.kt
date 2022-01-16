@@ -34,21 +34,21 @@ class AlbumRepository(
     }
 
     private fun createMetadata(albums: List<Album>): List<MediaMetadataCompat> =
-        albums.map { album ->
+        albums.map {
             MediaMetadataCompat.Builder().apply {
-                id = album.id.toString()
-                this.album = album.albumTitle
-                albumArtist = album.albumArtist
-                year = album.yearReleased.toLong()
-                trackCount = album.numberOfTracks.toLong()
-                albumArtUri = album.albumArtUri.toString()
+                id = "${it.id}"
+                album = it.albumTitle
+                albumArtist = it.albumArtist
+                year = it.yearReleased
+                trackCount = it.numberOfTracks
+                albumArtUri = "${it.albumArtUri}"
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
 
                 //for ease of displaying
-                displayTitle = album.albumTitle
-                displaySubtitle = album.albumArtist
-                displayDescription = "${album.numberOfTracks} tracks"
-                displayIconUri = album.albumArtUri.toString()
+                displayTitle = it.albumTitle
+                displaySubtitle = it.albumArtist
+                displayDescription = "${it.numberOfTracks} tracks"
+                displayIconUri = "${it.albumArtUri}"
             }.build()
         }
 }

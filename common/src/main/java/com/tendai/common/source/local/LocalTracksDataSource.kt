@@ -110,8 +110,8 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
                 albumName = getString(getColumnIndex(ALBUM)),
                 artistId = getLong(getColumnIndex(ARTIST_ID)),
                 artistName = getString(getColumnIndex(ARTIST)),
-                duration = getInt(getColumnIndex(DURATION)),
-                trackNumber = getInt(getColumnIndex(TRACK)),
+                duration = getLong(getColumnIndex(DURATION)),
+                trackNumber = getLong(getColumnIndex(TRACK)),
                 albumArtUri = getAlbumArtUri(getLong(getColumnIndex(ALBUM_ID)))
             )
         }
