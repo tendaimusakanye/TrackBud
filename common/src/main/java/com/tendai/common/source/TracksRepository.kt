@@ -72,7 +72,6 @@ class TracksRepository(
                 artist = track.artistName
                 duration = durationMs
                 trackNumber = track.trackNumber.toLong()
-                //albumArt = tracksLocalDataSource.getAlbumArt(track.albumId)
                 albumArtUri = track.albumArtUri.toString()
                 flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 

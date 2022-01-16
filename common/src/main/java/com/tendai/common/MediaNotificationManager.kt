@@ -5,7 +5,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.ImageDecoder
+import android.net.Uri
 import android.os.Build
 import android.os.RemoteException
 import android.support.v4.media.MediaMetadataCompat
@@ -19,10 +23,11 @@ import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStream
 
 class MediaNotificationManager(
     private val service: MusicService,
@@ -134,7 +139,7 @@ class MediaNotificationManager(
             setContentTitle(description.title)
             setContentText(description.subtitle)
             setSubText(description.description)
-            setLargeIcon(description.iconBitmap)
+            setLargeIcon(createBitmap(description.iconUri))
             addAction(setPreviousAction())
             addAction(setPlayPauseAction(playbackState.state, playButtonResId))
             addAction(setNextAction())
@@ -160,6 +165,30 @@ class MediaNotificationManager(
             notificationChannel.description =
                 service.getString(R.string.notification_channel_description)
             notificationManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    private fun createBitmap(uri: Uri?): Bitmap? {
+        val placeHolderBitmap = BitmapFactory.decodeResource(service.resources, R.drawable.ic_placeholder_art)
+
+        return uri?.let {
+            var inputStream: InputStream? = null
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val source = ImageDecoder.createSource(service.contentResolver, it)
+                    return ImageDecoder.decodeBitmap(source)
+                }
+                inputStream = service.contentResolver.openInputStream(it)
+                BitmapFactory.decodeStream(inputStream)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                placeHolderBitmap
+            } catch (e: FileNotFoundException) {
+                e.printStackTrace()
+                placeHolderBitmap
+            } finally {
+                inputStream?.close()
+            } ?: placeHolderBitmap
         }
     }
 

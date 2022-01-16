@@ -3,7 +3,6 @@ package com.tendai.common.source.local
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.net.Uri
 import com.tendai.common.source.model.Album
 import com.tendai.common.source.model.Artist
@@ -25,9 +24,6 @@ interface LocalDataSource {
         fun getTracksInAlbum(albumId: Long): List<Track>
 
         fun getTracksInPlaylist(playlistId: Long): List<Track>
-
-        fun getAlbumArt(albumId: Long): Bitmap
-
     }
 
     interface Albums {
@@ -36,9 +32,6 @@ interface LocalDataSource {
         fun getAlbumsByArtist(artistId: Long): List<Album>
 
         fun getAlbumDetails(albumId: Long): Album
-
-        fun getAlbumArt(albumId: Long): Bitmap
-
     }
 
     interface Artists {
