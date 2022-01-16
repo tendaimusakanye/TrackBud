@@ -8,8 +8,8 @@ data class Album(
     var albumTitle: String = "",
     var albumArtist: String = "",
     var artistId: Int = -1,
-    var yearReleased: Int = -1,
-    var numberOfTracks: Int = -1,
+    var yearReleased: Long = -1,
+    var numberOfTracks: Long = -1,
     var albumArtUri: Uri? = null
 )
 

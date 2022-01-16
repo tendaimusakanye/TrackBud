@@ -104,9 +104,9 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
     override fun removeTrackFromPlaylist(trackIds: LongArray): Int =
         contentResolver.delete(PLAYLIST_URI, "$AUDIO_ID = ?", arrayOf(trackIds.toString()))
 
-    private fun getNumberOfSongsInPlaylist(playlistId: Int): Int {
-        if (playlistId == -1) return -1
-        val uri = getContentUri("external", playlistId.toLong())
+    private fun getNumberOfSongsInPlaylist(playlistId: Long): Int {
+        if (playlistId == -1L) return -1
+        val uri = getContentUri("external", playlistId)
         val cursor =
             createCursor(
                 contentResolver = contentResolver,
@@ -147,10 +147,11 @@ class PlaylistLocalDataSource(context: Context) : LocalDataSource,
             Playlist(
                 playlistId = getLong(getColumnIndex(PLAYLIST_ID)),
                 playlistName = getString(getColumnIndex(NAME)),
-                numberOfTracks = getNumberOfSongsInPlaylist(getInt(getColumnIndex(PLAYLIST_ID)))
+                numberOfTracks = getNumberOfSongsInPlaylist(getLong(getColumnIndex(PLAYLIST_ID))).toLong()
             )
         }
 }
+
 private const val TAG = "LocalPlaylistDataSource"
 //todo: check the ints returned when dealing with playlists. if -1 then respond appropriately
 

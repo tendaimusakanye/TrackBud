@@ -63,27 +63,28 @@ class TracksRepository(
         }
 
     private fun createMetadata(tracks: List<Track>): List<MediaMetadataCompat> {
-        return tracks.map { track ->
-            val durationMs = TimeUnit.SECONDS.toMillis(track.duration.toLong())
+        return tracks.map {
+            val durationMs = TimeUnit.SECONDS.toMillis(it.duration)
+
             MediaMetadataCompat.Builder().apply {
-                id = track.id.toString()
-                title = track.trackName
-                album = track.albumName
-                artist = track.artistName
+                id = "${it.id}"
+                title = it.trackName
+                album = it.albumName
+                artist = it.artistName
                 duration = durationMs
-                trackNumber = track.trackNumber.toLong()
-                albumArtUri = track.albumArtUri.toString()
+                trackNumber = it.trackNumber
+                albumArtUri = "${it.albumArtUri}"
                 flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 
-                displayTitle = track.trackName
-                displayDescription = track.albumName
-                displayIconUri = track.albumArtUri.toString()
+                displayTitle = it.trackName
+                displayDescription = it.albumName
+                displayIconUri = "${it.albumArtUri}"
                 // hack is to cater for the setting the queueTitle in the queueManager class
-                displaySubtitle = if (track.artistName == "") {
-                    track.playlistName
-                } else {
-                    track.artistName
-                }
+                displaySubtitle = if (it.artistName == "")
+                    it.playlistName
+                else
+                    it.artistName
+
             }.build()
         }
     }

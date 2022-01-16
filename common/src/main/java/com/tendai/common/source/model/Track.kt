@@ -10,9 +10,9 @@ data class Track(
     var albumName: String = "",
     var artistId: Long = -1,
     var artistName: String = "",
-    var duration: Int = 0,
+    var duration: Long = -1,
     var trackGenre: String = "",
-    var trackNumber: Int = -1,
+    var trackNumber: Long = -1,
     var playlistName: String = "",
     var albumArtUri: Uri? = null
 )

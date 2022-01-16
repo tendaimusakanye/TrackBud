@@ -34,12 +34,13 @@ class ArtistLocalDataSource(context: Context) : LocalDataSource,
             Artist(
                 artistId = getLong(getColumnIndex(_ID)),
                 artistName = getString(getColumnIndex(ARTIST)),
-                numberOfAlbums = getInt(getColumnIndex(NUMBER_OF_ALBUMS)),
-                numberOfTracks = getInt(getColumnIndex(NUMBER_OF_TRACKS))
+                numberOfAlbums = getLong(getColumnIndex(NUMBER_OF_ALBUMS)),
+                numberOfTracks = getLong(getColumnIndex(NUMBER_OF_TRACKS))
             )
         }
 
 }
+
 private const val TAG = "LocalArtistDataSource"
 
 

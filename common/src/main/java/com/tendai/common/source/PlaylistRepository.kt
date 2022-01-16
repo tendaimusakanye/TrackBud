@@ -43,16 +43,16 @@ class PlaylistRepository(
         }
 
     private fun createMetadata(playlists: List<Playlist>): List<MediaMetadataCompat> =
-        playlists.map { playlist ->
+        playlists.map {
             MediaMetadataCompat.Builder().apply {
-                id = playlist.playlistId.toString()
-                title = playlist.playlistName
-                trackCount = playlist.numberOfTracks.toLong()
+                id = "${it.playlistId}"
+                title = it.playlistName
+                trackCount = it.numberOfTracks
                 albumArtUri = PLAYLIST_ICON_URI
                 flag = MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
 
-                displayTitle = playlist.playlistName
-                displayDescription = playlist.numberOfTracks.toString()
+                displayTitle = it.playlistName
+                displayDescription = "${it.numberOfTracks}"
                 displayIconUri = PLAYLIST_ICON_URI
             }.build()
         }
