@@ -28,31 +28,31 @@ class Queue(
         if (isTrackAlreadyInQueue(trackId)) return
 
         serviceScope.launch {
-            var metadatas = listOf<MediaMetadataCompat>()
+            var tracksMetadata = listOf<MediaMetadataCompat>()
             var queueTitle: CharSequence? = ""
             when {
                 extras.getBoolean(TRACKS_ROOT) -> {
-                    metadatas = trackRepository.getTracks()
+                    tracksMetadata = trackRepository.getTracks()
                     queueTitle = "Tracks"
                 }
                 extras.getBoolean(IS_ALBUM) -> {
-                    metadatas = trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
-                    queueTitle = metadatas[0].description.description
+                    tracksMetadata = trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
+                    queueTitle = tracksMetadata[0].description.description
                 }
                 extras.getBoolean(IS_ARTIST_TRACKS) -> {
-                    metadatas = trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
-                    queueTitle = metadatas[0].description.subtitle
+                    tracksMetadata = trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
+                    queueTitle = tracksMetadata[0].description.subtitle
                 }
                 extras.getBoolean(IS_PLAYLIST) -> {
-                    metadatas =
+                    tracksMetadata =
                         trackRepository.getTracksInPlaylist(extras.getLong(EXTRA_PLAYLIST_ID))
-                    queueTitle = metadatas[0].description.subtitle
+                    queueTitle = tracksMetadata[0].description.subtitle
                 }
             }
             if (playingQueue.isNotEmpty()) {
                 playingQueue.clear()
             }
-            metadatas.distinctBy { it.description.title }.forEachIndexed { index, metadata ->
+            tracksMetadata.distinctBy { it.description.title }.forEachIndexed { index, metadata ->
                 val mediaId = metadata.description.mediaId?.toLong()
                 if (trackId == mediaId) currentIndex = index
 
@@ -192,7 +192,7 @@ class Queue(
         } else {
             previousShuffleIndexCount = 0
 
-            var min = shuffledList.minOrNull()!!
+            val min = shuffledList.minOrNull()!!
             currentIndex = if (min != 0)
                 min - WINDOW_CAPACITY
             else
@@ -360,5 +360,6 @@ private const val FLAG_PREVIOUS = "FLAG_PREVIOUS"
 
 
 //TODO: 12/29/21 Add comments and java-doc for this class
+// TODO: 1/14/22 Clarify changes made in the SlidingWindow and Queue class methods by properly documenting the desired functionality
 
 

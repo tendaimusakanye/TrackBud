@@ -1,11 +1,12 @@
-package com.tendai.common.playback
+package com.tendai.common.playback.playback
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.tendai.common.MainCoroutineRule
 import com.tendai.common.TRACKS_ROOT
-import com.tendai.common.source.FakeTracksDataSource
+import com.tendai.common.playback.MainCoroutineRule
+import com.tendai.common.playback.Queue
 import com.tendai.common.source.Repository
 import com.tendai.common.source.TracksRepository
 import com.tendai.common.source.local.LocalDataSource
@@ -15,16 +16,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class QueueTest {
 
     private lateinit var coroutineScope: CoroutineScope
@@ -46,8 +47,9 @@ class QueueTest {
 
     @Before
     fun setUp() {
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         dispatcher = TestCoroutineDispatcher()
-        tracksDataSource = FakeTracksDataSource()
+        tracksDataSource = LocalTracksDataSource(appContext)
         tracksRepository = TracksRepository(tracksDataSource, dispatcher)
         coroutineScope = coroutineRule
         queue = Queue(coroutineScope, tracksRepository)
@@ -64,14 +66,14 @@ class QueueTest {
         }
 
         //given
-        trackId = 0
+        trackId = 18
 
         //when the queue is created for the first time
         queue.buildQueue(trackId, bundle)
 
         //then
         assertEquals(queue.currentIndex, 0)
-        assertEquals(queue.playingQueue.size, 32)
+        assertEquals(queue.playingQueue.size, 289)
     }
 
     @Test
@@ -80,7 +82,7 @@ class QueueTest {
         givenValidTrackIdAndBundle_BuildProperQueue()
 
         //given trackId which already exists in the playingQueue
-        trackId = 13L
+        trackId = 75983
 
         //when
         queue.buildQueue(trackId, bundle)
@@ -100,7 +102,7 @@ class QueueTest {
 
         //then
         assertEquals(queue.currentIndex, -1)
-        assertEquals(queue.playingQueue.size, 32)
+        assertEquals(queue.playingQueue.size, 289)
     }
 
     @Test
@@ -144,8 +146,8 @@ class QueueTest {
 
         //then
         assertEquals(queue.currentIndex, 16)
-        assertEquals(queue.slidingWindow.start, 16)
-        assertEquals(queue.slidingWindow.end, 32)
+        assertNotEquals(queue.slidingWindow.start, 0)
+
     }
 
 
@@ -155,12 +157,10 @@ class QueueTest {
         givenValidTrackIdAndBundle_BuildProperQueue()
 
         //when skipToNext is invoked indefinitely it should always loop the playing queue
-        for (i in 1..117) queue.skipToNext()
+        for (i in 1..350) queue.skipToNext()
 
         //then loop
-        assertEquals(queue.currentIndex, 21)
-        assertEquals(queue.slidingWindow.start, 16)
-        assertEquals(queue.slidingWindow.end, 32)
+        assertEquals(queue.currentIndex, 61)
     }
 
     @Test
@@ -172,9 +172,8 @@ class QueueTest {
         queue.skipToPrevious()
 
         //then
-        assertEquals(queue.currentIndex, 31)
-        assertEquals(queue.slidingWindow.start, 16)
-        assertEquals(queue.slidingWindow.end, 32)
+        assertEquals(queue.currentIndex, 288)
+        assertNotEquals(queue.slidingWindow.start, 0)
     }
 
     @Test
@@ -190,9 +189,9 @@ class QueueTest {
         for (i in 1..15) queue.skipToPrevious()
 
         //then
-        assertEquals(queue.currentIndex, 16)
-        assertEquals(queue.slidingWindow.start, 16)
-        assertEquals(queue.slidingWindow.end, 32)
+        assertEquals(queue.currentIndex, 273)
+        assertEquals(queue.slidingWindow.start, 273)
+        assertEquals(queue.slidingWindow.end, 289)
     }
 
 
@@ -202,12 +201,10 @@ class QueueTest {
         givenValidTrackIdAndBundle_BuildProperQueue()
 
         //when skipToPrevious is invoked indefinitely it should always loop the playing queue
-        for (i in 1..117) queue.skipToPrevious()
+        for (i in 1..350) queue.skipToPrevious()
 
         //then loop
-        assertEquals(queue.currentIndex, 11)
-        assertEquals(queue.slidingWindow.start, 0)
-        assertEquals(queue.slidingWindow.end, 16)
+        assertEquals(queue.currentIndex, 228)
     }
 
     @Test
@@ -226,16 +223,16 @@ class QueueTest {
     @Test
     fun shuffleToNext_createsNewWindow() = coroutineRule.runBlockingTest {
 //        //create initial queue
-//        givenValidTrackIdAndBundle_BuildProperQueue()
-//
-//        //when
-//        queue.slidingWindow.createShuffleList()
-//        for (i in 1..18) queue.shuffleToNext() //nextShuffleIndexCount starts at 1
+        givenValidTrackIdAndBundle_BuildProperQueue()
+
+        //when
+        queue.slidingWindow.createShuffleList()
+        for (i in 1..18) queue.shuffleToNext() //nextShuffleIndexCount starts at 1
 
         // user skipsToNext, then enables shuffling when he/she has reached the end of the queue. A new shuffling queue is created.
-        skipToNext_doesNotCreateNewQueueWindow()
-        queue.createShuffleWindow()
-        queue.shuffleToNext()
+//        skipToNext_doesNotCreateNewQueueWindow()
+//        queue.createShuffleWindow()
+//        queue.shuffleToNext()
 
         assertEquals(queue.slidingWindow.shuffledList.minOrNull()!!, 16)
     }
@@ -264,7 +261,7 @@ class QueueTest {
         for (i in 0..16) queue.shuffleToPrevious()
 
         //then
-        assertEquals(queue.slidingWindow.start, 16)
+        assertEquals(queue.slidingWindow.start, 273)
 
     }
 
@@ -283,7 +280,7 @@ class QueueTest {
         for (i in 1..17) queue.shuffleToPrevious()
 
         //then
-        assertEquals(queue.slidingWindow.start, 16)
+        assertEquals(queue.slidingWindow.start, 273)
     }
 
 
