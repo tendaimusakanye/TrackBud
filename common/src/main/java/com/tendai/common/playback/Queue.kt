@@ -44,8 +44,7 @@ class Queue(
                     queueTitle = tracksMetadata[0].description.subtitle
                 }
                 extras.getBoolean(IS_PLAYLIST) -> {
-                    tracksMetadata =
-                        trackRepository.getTracksInPlaylist(extras.getLong(EXTRA_PLAYLIST_ID))
+                    tracksMetadata = trackRepository.getTracksInPlaylist(extras.getLong(EXTRA_PLAYLIST_ID))
                     queueTitle = tracksMetadata[0].description.subtitle
                 }
             }
@@ -189,7 +188,7 @@ class Queue(
         } else {
             previousShuffleIndexCount = 0
 
-            var min = shuffledList.minOrNull()!!
+            val min = shuffledList.minOrNull()!!
             currentIndex = if (min != 0)
                 min - WINDOW_CAPACITY
             else
@@ -335,5 +334,6 @@ private const val FLAG_PREVIOUS = "FLAG_PREVIOUS"
 
 
 //TODO: 12/29/21 Add comments and java-doc for this class
+// TODO: 1/14/22 Clarify changes made in the SlidingWindow and Queue class methods by properly documenting the desired functionality
 
 

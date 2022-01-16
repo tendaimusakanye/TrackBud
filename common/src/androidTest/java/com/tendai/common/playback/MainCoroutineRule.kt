@@ -1,4 +1,4 @@
-package com.tendai.common
+package com.tendai.common.playback
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
