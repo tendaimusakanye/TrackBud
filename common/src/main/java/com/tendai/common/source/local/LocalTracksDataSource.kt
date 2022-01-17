@@ -10,6 +10,7 @@ import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
 import com.tendai.common.extensions.mapToList
+import com.tendai.common.extensions.getAlbumArt
 import com.tendai.common.source.model.Track
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 

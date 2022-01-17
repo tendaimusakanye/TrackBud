@@ -36,15 +36,18 @@ class Queue(
                     queueTitle = "Tracks"
                 }
                 extras.getBoolean(IS_ALBUM) -> {
-                    tracksMetadata = trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
+                    tracksMetadata =
+                        trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
                     queueTitle = tracksMetadata[0].description.description
                 }
                 extras.getBoolean(IS_ARTIST_TRACKS) -> {
-                    tracksMetadata = trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
+                    tracksMetadata =
+                        trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
                     queueTitle = tracksMetadata[0].description.subtitle
                 }
                 extras.getBoolean(IS_PLAYLIST) -> {
-                    tracksMetadata = trackRepository.getTracksInPlaylist(extras.getLong(EXTRA_PLAYLIST_ID))
+                    tracksMetadata =
+                        trackRepository.getTracksInPlaylist(extras.getLong(EXTRA_PLAYLIST_ID))
                     queueTitle = tracksMetadata[0].description.subtitle
                 }
             }
@@ -175,7 +178,10 @@ class Queue(
         val shuffledList = slidingWindow.shuffledList
         var index = shuffledList.indexOf(currentIndex)
 
-        if (previousShuffleIndexCount < WINDOW_CAPACITY && !slidingWindow.refreshWindow(FLAG_PREVIOUS)) {
+        if (previousShuffleIndexCount < WINDOW_CAPACITY && !slidingWindow.refreshWindow(
+                FLAG_PREVIOUS
+            )
+        ) {
             if (index == 0) {
                 index = shuffledList.lastIndex
                 currentIndex = shuffledList[index]
