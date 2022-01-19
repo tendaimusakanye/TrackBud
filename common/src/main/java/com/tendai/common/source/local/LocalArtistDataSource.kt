@@ -18,7 +18,7 @@ class LocalArtistDataSource(context: Context) : LocalDataSource,
 
     override fun getAllArtists(): List<Artist> {
         val cursor =
-            createCursor(
+            getCursor(
                 contentResolver,
                 ARTISTS_URI,
                 projection,

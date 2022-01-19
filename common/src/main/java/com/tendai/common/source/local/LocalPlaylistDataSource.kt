@@ -29,7 +29,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
 
     override fun getAllPlaylists(limit: Int): List<Playlist> {
         val cursor =
-            createCursor(
+            getCursor(
                 contentResolver,
                 PLAYLIST_URI,
                 newPlaylistProjection,
@@ -46,7 +46,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
         //first query to check if there are other playlists with the same name.
         return synchronized(this) {
             val cursor =
-                createCursor(
+                getCursor(
                     contentResolver,
                     PLAYLIST_URI,
                     newPlaylistProjection,
@@ -108,7 +108,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
         if (playlistId == -1L) return -1
         val uri = getContentUri("external", playlistId)
         val cursor =
-            createCursor(
+            getCursor(
                 contentResolver = contentResolver,
                 uri = uri,
                 projection = arrayOf(AUDIO_ID)
@@ -125,7 +125,7 @@ class LocalPlaylistDataSource(context: Context) : LocalDataSource,
     private fun getHighestPlayOrder(playlistId: Int): Int {
         val uri = getContentUri("external", playlistId.toLong())
         val cursor =
-            createCursor(
+            getCursor(
                 contentResolver,
                 uri,
                 playOrderProjection,
