@@ -10,7 +10,6 @@ import android.provider.MediaStore.Audio.Playlists.Members.AUDIO_ID
 import android.provider.MediaStore.Audio.Playlists.Members.getContentUri
 import android.provider.MediaStore.MediaColumns.DURATION
 import com.tendai.common.extensions.mapToList
-import com.tendai.common.extensions.getAlbumArt
 import com.tendai.common.source.model.Track
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
@@ -26,7 +25,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
     )
 
     override  suspend  fun getTrackDetails(trackId: Long): Track {
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -41,7 +40,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
     }
 
     override  suspend  fun getTracks(): List<Track> {
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -54,7 +53,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
     }
 
     override  suspend  fun getTracksByArtist(artistId: Long): List<Track> {
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -68,7 +67,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
     }
 
     override  suspend  fun getTracksInAlbum(albumId: Long): List<Track> {
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver,
             TRACKS_URI,
             projection,
@@ -84,7 +83,7 @@ class LocalTracksDataSource(private val context: Context) : LocalDataSource,
     override  suspend  fun getTracksInPlaylist(playlistId: Long): List<Track> {
         //this is how you properly get tracks from a given playlistId
         val uri = getContentUri("external", playlistId)
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver,
             uri,
             projection

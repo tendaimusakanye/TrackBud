@@ -22,7 +22,7 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
     // Do not use the let scope function on the cursor as it does not close the cursor in case of
     // an error or something else.
     override suspend fun getAlbums(limit: Int): List<Album> {
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
             projection = projection,
@@ -33,14 +33,14 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
         }
     }
 
-    // I am using the createCursor method for the flexibility of named arguments.
+    // I am using the getCursor method for the flexibility of named arguments.
     // The content resolver's query method does not offer the flexibility named arguments.
     // if the cursor is null then something drastic happened. Let NPE be thrown otherwise we found
     // Nothing. therefore return an empty list or empty mediaItem.
     // are always returned.
     override suspend fun getAlbumsByArtist(artistId: Long): List<Album> {
         val uri = getContentUri("external", artistId)
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver = contentResolver,
             uri = uri,
             projection = projection,
@@ -52,7 +52,7 @@ class LocalAlbumDataSource(private val context: Context) : LocalDataSource,
     }
 
     override suspend fun getAlbumDetails(albumId: Long): Album {
-        val cursor = createCursor(
+        val cursor = getCursor(
             contentResolver = contentResolver,
             uri = ALBUMS_URI,
             projection = projection,
