@@ -16,5 +16,3 @@ interface ServiceComponent {
 
     fun inject(musicService: MusicService)
 }
-
-// TODO: 1/19/22 The @JVMStatic Annotation ?
