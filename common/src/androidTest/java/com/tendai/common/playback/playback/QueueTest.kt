@@ -6,15 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.tendai.common.TRACKS_ROOT
 import com.tendai.common.playback.MainCoroutineRule
-import com.tendai.common.playback.Queue
-import com.tendai.common.source.Repository
-import com.tendai.common.source.TracksRepository
-import com.tendai.common.source.local.LocalDataSource
-import com.tendai.common.source.local.LocalTracksDataSource
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -22,19 +14,20 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class QueueTest {
 
-    private lateinit var coroutineScope: CoroutineScope
-    private lateinit var tracksRepository: Repository.Tracks
-    private lateinit var dispatcher: CoroutineDispatcher
-    private lateinit var tracksDataSource: LocalDataSource.Tracks
+    @Inject
+    @Rule
+    lateinit var coroutineRule: MainCoroutineRule
 
     //Using the concrete Queue class for tests.
-    private lateinit var queue: Queue
+    @Inject
+    lateinit var queue: DummyQueue
 
     private var trackId: Long = -1
 
@@ -42,17 +35,10 @@ class QueueTest {
         putBoolean(TRACKS_ROOT, true)
     }
 
-    @get: Rule
-    var coroutineRule = MainCoroutineRule()
-
     @Before
     fun setUp() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        dispatcher = TestCoroutineDispatcher()
-        tracksDataSource = LocalTracksDataSource(appContext)
-        tracksRepository = TracksRepository(tracksDataSource, dispatcher)
-        coroutineScope = coroutineRule
-        queue = Queue(coroutineScope, tracksRepository)
+        DaggerTestServiceComponent.factory().create(appContext)
     }
 
     @Test
