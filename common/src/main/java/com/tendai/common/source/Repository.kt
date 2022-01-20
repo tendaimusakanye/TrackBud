@@ -4,7 +4,6 @@ import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
 
 interface Repository {
-
     interface Tracks {
 
         suspend fun getTrackDetails(trackId: Long): MediaMetadataCompat
@@ -47,6 +46,7 @@ interface Repository {
     }
 
 }
+
 
 
 

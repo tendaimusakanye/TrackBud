@@ -73,7 +73,6 @@ class TracksRepository @Inject constructor(
                     it.playlistName
                 else
                     it.artistName
-
             }.build()
         }
     }

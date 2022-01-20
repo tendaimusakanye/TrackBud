@@ -75,6 +75,7 @@ class Queue @Inject constructor(
                 )
             }
         }
+
     }
 
     override fun createShuffleWindow() {
