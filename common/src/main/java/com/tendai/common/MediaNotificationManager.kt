@@ -37,6 +37,9 @@ class MediaNotificationManager @Inject constructor(
     private val serviceScope: CoroutineScope,
     private val notificationManager: NotificationManager
 ) {
+    private val placeHolderAlbumArt: Bitmap
+        get() = BitmapFactory.decodeResource(service.resources, R.drawable.ic_placeholder_art)
+
     private val controllerCallback = object : MediaControllerCompat.Callback() {
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             state?.let { newState ->
@@ -171,9 +174,8 @@ class MediaNotificationManager @Inject constructor(
         }
     }
 
-    private fun createBitmap(uri: Uri?): Bitmap? {
-        val placeHolderBitmap = BitmapFactory.decodeResource(service.resources, R.drawable.ic_placeholder_art)
 
+    private fun createBitmap(uri: Uri?): Bitmap? {
         return uri?.let {
             var inputStream: InputStream? = null
             try {
@@ -185,13 +187,13 @@ class MediaNotificationManager @Inject constructor(
                 BitmapFactory.decodeStream(inputStream)
             } catch (e: IOException) {
                 e.printStackTrace()
-                placeHolderBitmap
+                placeHolderAlbumArt
             } catch (e: FileNotFoundException) {
                 e.printStackTrace()
-                placeHolderBitmap
+                placeHolderAlbumArt
             } finally {
                 inputStream?.close()
-            } ?: placeHolderBitmap
+            } ?: placeHolderAlbumArt
         }
     }
 
