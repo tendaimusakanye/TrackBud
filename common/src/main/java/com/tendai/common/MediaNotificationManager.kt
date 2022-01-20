@@ -273,6 +273,7 @@ class MediaNotificationManager @Inject constructor(
 
 const val NOTIFICATION_ID = 98716
 const val MUSIC_X_CHANNEL_ID = "com.tendai.common.MusicXChannelId"
+private const val TAG = "MediaNotificationMan"
 
 //todo: add the proper contentIntent when the UI is done.
 //todo: setOngoing is it necessary ?
