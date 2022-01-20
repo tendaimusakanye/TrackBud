@@ -2,6 +2,7 @@ package com.tendai.common.source
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
+import com.tendai.common.di.ServiceModule
 import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Track
@@ -9,10 +10,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class TracksRepository(
+class TracksRepository @Inject constructor(
     private val tracksLocalDataSource: LocalDataSource.Tracks,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    @ServiceModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : Repository.Tracks {
 
     override suspend fun getTrackDetails(trackId: Long): MediaMetadataCompat =

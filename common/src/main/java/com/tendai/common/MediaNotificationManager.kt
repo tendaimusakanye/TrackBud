@@ -28,8 +28,11 @@ import kotlinx.coroutines.Dispatchers.IO
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MediaNotificationManager(
+@Singleton
+class MediaNotificationManager @Inject constructor(
     private val service: MusicService,
     private val serviceScope: CoroutineScope,
     private val notificationManager: NotificationManager

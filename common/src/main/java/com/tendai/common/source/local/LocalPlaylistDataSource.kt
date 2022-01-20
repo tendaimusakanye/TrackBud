@@ -10,9 +10,11 @@ import android.provider.MediaStore.Audio.PlaylistsColumns.NAME
 import android.util.Log
 import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Playlist
+import javax.inject.Inject
+import javax.inject.Singleton
 import android.provider.MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI as PLAYLIST_URI
 
-class LocalPlaylistDataSource(context: Context) : LocalDataSource,
+class LocalPlaylistDataSource @Inject constructor(context: Context) : LocalDataSource,
     LocalDataSource.Playlists {
 
     private val contentResolver = context.contentResolver

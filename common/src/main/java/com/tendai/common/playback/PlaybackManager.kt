@@ -7,9 +7,10 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import javax.inject.Inject
 
-class PlaybackManager(
-    val mediaSession: MediaSessionCompat,
+class PlaybackManager @Inject constructor(
+    private val mediaSession: MediaSessionCompat,
     private val playback: Playback,
     private val queueManager: QueueManager
 ) : Callback {
