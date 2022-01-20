@@ -25,7 +25,7 @@ import javax.inject.Inject
     STATE_INITIALIZED,
     STATE_ERROR
 )
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.RUNTIME)
 
 annotation class State
 
