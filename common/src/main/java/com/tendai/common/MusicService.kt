@@ -10,6 +10,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
+import com.tendai.common.di.DaggerServiceComponent
+import com.tendai.common.di.ServiceComponent
 import com.tendai.common.extensions.flag
 import com.tendai.common.playback.PlaybackManager
 import com.tendai.common.playback.QueueManager
@@ -17,28 +19,50 @@ import com.tendai.common.playback.REPEAT_MODE
 import com.tendai.common.playback.SHUFFLE_MODE
 import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlin.IllegalStateException
+import javax.inject.Inject
 
 abstract class MusicService : MediaBrowserServiceCompat() {
 
-    private val serviceJob = SupervisorJob()
-    private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
+    @Inject
+    lateinit var serviceJob: Job
 
-    private lateinit var mediaNotificationManager: MediaNotificationManager
-    private lateinit var playbackManager: PlaybackManager
-    private lateinit var queueManager: QueueManager
+    @Inject
+    lateinit var serviceScope: CoroutineScope
 
-    private lateinit var trackRepository: Repository.Tracks
-    private lateinit var albumRepository: Repository.Albums
-    private lateinit var playlistRepository: Repository.Playlists
-    private lateinit var artistRepository: Repository.Artists
+    @Inject
+    lateinit var mediaNotificationManager: MediaNotificationManager
 
-    private lateinit var mediaSession: MediaSessionCompat
+    @Inject
+    lateinit var playbackManager: PlaybackManager
+
+    @Inject
+    lateinit var queueManager: QueueManager
+
+    @Inject
+    lateinit var trackRepository: Repository.Tracks
+
+    @Inject
+    lateinit var albumRepository: Repository.Albums
+
+    @Inject
+    lateinit var playlistRepository: Repository.Playlists
+
+    @Inject
+    lateinit var artistRepository: Repository.Artists
+
+    @Inject
+    lateinit var mediaSession: MediaSessionCompat
+
+    private val serviceComponent: ServiceComponent by lazy {
+        DaggerServiceComponent.factory().create(applicationContext)
+    }
 
     override fun onCreate() {
+        //inject dependencies with dagger
+        serviceComponent.inject(this)
+
         super.onCreate()
 
         //Pending intent to launch the Ui of the Music Player from the notification Panel
@@ -46,8 +70,8 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
                 PendingIntent.getActivity(this, 0, sessionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             }
-        // initializing media session
-        mediaSession = MediaSessionCompat(this, TAG).apply {
+
+        mediaSession.apply {
             setSessionActivity(sessionPendingIntent)
             setCallback(playbackManager.mediaSessionCallback)
         }
@@ -55,7 +79,6 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         sessionToken = mediaSession.sessionToken
         playbackManager.updatePlaybackState()
 
-        //todo: can DI initialize my notification manager inSide OnCreate or it's done on the call site
         //todo: request Storage permissions...
         setUpListeners()
     }
@@ -235,7 +258,6 @@ const val ARTISTS_ROOT = "ARTISTS"
 const val ACTION_PLAY_PAUSE = "com.tendai.common.ACTION_PLAY_PAUSE"
 const val ACTION_NEXT = "com.tendai.common.ACTION_NEXT"
 const val ACTION_PREVIOUS = "com.tendai.common.ACTION_PREVIOUS"
-const val TAG: String = "MusicService "
+
 
 //TODO("Handle an empty root and add the systemUi logic for android 11")
-//todo: implement DI with Dagger.

@@ -2,16 +2,17 @@ package com.tendai.common.source
 
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
+import com.tendai.common.di.ServiceModule
 import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Artist
 import kotlinx.coroutines.CoroutineDispatcher
-
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ArtistRepository(
+class ArtistRepository @Inject constructor(
     private val artistLocalDataSource: LocalDataSource.Artists,
-    private val ioDispatcher: CoroutineDispatcher
+    @ServiceModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : Repository.Artists {
 
     override suspend fun getAllArtists(): List<MediaMetadataCompat> = withContext(ioDispatcher) {

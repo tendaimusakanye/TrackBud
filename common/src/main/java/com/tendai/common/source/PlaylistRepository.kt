@@ -3,15 +3,17 @@ package com.tendai.common.source
 import android.net.Uri
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
+import com.tendai.common.di.ServiceModule
 import com.tendai.common.extensions.*
 import com.tendai.common.source.local.LocalDataSource
 import com.tendai.common.source.model.Playlist
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class PlaylistRepository(
+class PlaylistRepository @Inject constructor(
     private val playlistLocalDataSource: LocalDataSource.Playlists,
-    private val ioDispatcher: CoroutineDispatcher
+    @ServiceModule.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : Repository.Playlists {
 
     override suspend fun getAllPlaylists(limit: Int): List<MediaMetadataCompat> =

@@ -8,8 +8,10 @@ import com.tendai.common.source.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class Queue(
+class Queue @Inject constructor(
     private val serviceScope: CoroutineScope,
     private val trackRepository: Repository.Tracks
 ) : QueueManager() {

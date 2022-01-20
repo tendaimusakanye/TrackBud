@@ -6,9 +6,11 @@ import android.provider.MediaStore.Audio.ArtistColumns.*
 import android.provider.MediaStore.Audio.Artists._ID
 import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Artist
+import javax.inject.Inject
+import javax.inject.Singleton
 import android.provider.MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI as ARTISTS_URI
 
-class LocalArtistDataSource(context: Context) : LocalDataSource,
+class LocalArtistDataSource @Inject constructor(context: Context) : LocalDataSource,
     LocalDataSource.Artists {
 
     private val contentResolver = context.contentResolver

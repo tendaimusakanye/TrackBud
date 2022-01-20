@@ -14,6 +14,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.annotation.IntDef
+import javax.inject.Inject
 
 @IntDef(
     STATE_PLAYING,
@@ -28,7 +29,7 @@ import androidx.annotation.IntDef
 
 annotation class State
 
-class LocalPlayback(
+class LocalPlayback @Inject constructor(
     private val context: Context,
     sessionToken: MediaSessionCompat.Token
 ) : Playback,
