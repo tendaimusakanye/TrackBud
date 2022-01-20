@@ -91,7 +91,7 @@ class PlaybackManager @Inject constructor(
     private fun handlePreviousOrNextRequest(state: Int) {
         val newState = stateBuilder.setState(
             state,
-            mediaSession.controller.playbackState.position,
+            mediaSession.controller.playbackState.position, // TODO: 1/20/22 Is this correct or -1 should be used
             1.0F
         )
         onPlaybackStateChanged(newState.build())

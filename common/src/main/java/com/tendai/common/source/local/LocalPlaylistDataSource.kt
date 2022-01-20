@@ -155,5 +155,5 @@ class LocalPlaylistDataSource @Inject constructor(context: Context) : LocalDataS
 }
 
 private const val TAG = "LocalPlaylistDataSource"
-//todo: check the ints returned when dealing with playlists. if -1 then respond appropriately
+// TODO: 1/20/22 Throw exceptions when appropriate
 
