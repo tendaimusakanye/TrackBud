@@ -276,3 +276,4 @@ const val MUSIC_X_CHANNEL_ID = "com.tendai.common.MusicXChannelId"
 
 //todo: add the proper contentIntent when the UI is done.
 //todo: setOngoing is it necessary ?
+// TODO: 1/19/22 Refactor visibility of constants

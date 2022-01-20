@@ -341,5 +341,6 @@ private const val FLAG_PREVIOUS = "FLAG_PREVIOUS"
 
 //TODO: 12/29/21 Add comments and java-doc for this class
 // TODO: 1/14/22 Clarify changes made in the SlidingWindow and Queue class methods by properly documenting the desired functionality
+// TODO: 1/19/22 List or HashMap for playingQueue
 
 
