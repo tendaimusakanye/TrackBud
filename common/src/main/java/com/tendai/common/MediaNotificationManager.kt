@@ -31,7 +31,6 @@ import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class MediaNotificationManager @Inject constructor(
     private val service: MusicService,
     private val serviceScope: CoroutineScope,
