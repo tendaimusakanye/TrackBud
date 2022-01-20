@@ -12,6 +12,7 @@ import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
 import com.tendai.common.di.DaggerServiceComponent
 import com.tendai.common.di.ServiceComponent
+import com.tendai.common.di.ServiceModule
 import com.tendai.common.extensions.flag
 import com.tendai.common.playback.PlaybackManager
 import com.tendai.common.playback.QueueManager
@@ -53,6 +54,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     lateinit var artistRepository: Repository.Artists
 
     @Inject
+    @ServiceModule.MediaSession
     lateinit var mediaSession: MediaSessionCompat
 
     private val serviceComponent: ServiceComponent by lazy {

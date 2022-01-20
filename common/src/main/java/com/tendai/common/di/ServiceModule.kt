@@ -70,7 +70,7 @@ object ServiceModule {
     @Provides
     @JvmStatic
     fun providePlaybackManager(
-        mediaSession: MediaSessionCompat,
+        @MediaSession mediaSession: MediaSessionCompat,
         playback: Playback,
         queueManager: QueueManager
     ): PlaybackManager = PlaybackManager(mediaSession, playback, queueManager)

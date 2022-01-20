@@ -9,9 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-class Queue @Inject constructor(
+open class Queue @Inject constructor(
     private val serviceScope: CoroutineScope,
     private val trackRepository: Repository.Tracks
 ) : QueueManager() {
@@ -242,7 +241,10 @@ class Queue @Inject constructor(
      */
     inner class SlidingWindow {
         var start: Int = 0
+            private set
         var end: Int = 0
+            private set
+
 
         internal lateinit var shuffledList: List<Int>
             private set
