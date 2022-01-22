@@ -2,6 +2,7 @@ package com.tendai.common.playback.di
 
 import android.content.Context
 import com.tendai.common.di.*
+import com.tendai.common.playback.playback.QueueTest
 import dagger.BindsInstance
 import dagger.Component
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,4 +20,6 @@ interface TestServiceComponent {
     interface Factory {
         fun create(@BindsInstance context: Context): TestServiceComponent
     }
+
+    fun inject(queue: QueueTest)
 }

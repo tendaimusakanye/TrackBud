@@ -3,6 +3,7 @@ package com.tendai.common.playback.di
 import com.tendai.common.playback.MainCoroutineRule
 import com.tendai.common.playback.playback.DummyQueue
 import com.tendai.common.source.Repository
+import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +13,7 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @ExperimentalCoroutinesApi
+@Module
 object TestServiceModule {
     @Qualifier
     @Retention(AnnotationRetention.RUNTIME)

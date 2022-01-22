@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.tendai.common.TRACKS_ROOT
 import com.tendai.common.playback.MainCoroutineRule
+import com.tendai.common.playback.di.DaggerTestServiceComponent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
@@ -38,7 +39,7 @@ class QueueTest {
     @Before
     fun setUp() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        DaggerTestServiceComponent.factory().create(appContext)
+        DaggerTestServiceComponent.factory().create(appContext).inject(this)
     }
 
     @Test

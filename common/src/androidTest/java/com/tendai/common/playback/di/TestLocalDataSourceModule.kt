@@ -2,6 +2,7 @@ package com.tendai.common.playback.di
 
 import com.tendai.common.playback.source.local.DummyLocalTracksDataSource
 import com.tendai.common.source.local.LocalDataSource
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import javax.inject.Qualifier
@@ -14,7 +15,7 @@ abstract class TestLocalDataSourceModule {
     @Retention(AnnotationRetention.RUNTIME)
     annotation class TestLocalTracksDataSource
 
-    @Provides
+    @Binds
     @Singleton
     @TestLocalTracksDataSource
     abstract fun bindTracksDataSource(tracksDataSource: DummyLocalTracksDataSource): LocalDataSource.Tracks
