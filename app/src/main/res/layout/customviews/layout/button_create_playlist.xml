@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tendai.musicx.ui.customviews.CreatePlaylistButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/textview_create_playlist"
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:clickable="false"
+        android:text="@string/description_create_playlist" />
+
+    <ImageView
+        android:id="@+id/icon_create_playlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_8dp"
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:layout_marginBottom="@dimen/margin_8dp"
+        android:contentDescription="@string/description_create_new_playlist"
+        android:src="@drawable/ic_add" />
+
+</com.tendai.musicx.ui.customviews.CreatePlaylistButton>

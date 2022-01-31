@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Music X</string>
+    <string name="description_search_for_songs">Tap to search for songs</string>
+    <string name="description_open_album">Tap to see the songs in the album</string>
+    <string name="title_placeholder_text">Placeholder Text</string>
+    <string name="description_create_playlist">Create Playlist</string>
+    <string name="description_create_new_playlist">Create New Playlist</string>
+    <string name="description_open_playlist">Tap to see the songs in the playlists</string>
+    <string name="description_play_track">Play track</string>
+    <string name="description_open_artist_tracks_and_albums">Tap to see artist\'s tracks and albums</string>
+    <string name="description_album_art">Album Art</string>
+    <string name="description_minimize_fragment">Minimize Fragment</string>
+    <string name="description_reorder_queue_item">Press and drag to reorder tracks</string>
+    <string name="empty_text" />
+    <string name="description_show_queue">Tap to show the playing queue</string>
+    <string name="description_shuffle_tracks">Shuffle tracks</string>
+    <string name="description_previous_track">Previous Track</string>
+    <string name="description_play_pause">Play or Pause Track</string>
+    <string name="description_next_track">Next Track</string>
+    <string name="description_repeat">Repeat Track</string>
 </resources>

@@ -2,6 +2,5 @@ package com.tendai.musicx.ui
 
 import androidx.fragment.app.Fragment
 
-class NowPlayingFragment : Fragment() {
-
+abstract class BaseFragment : Fragment() {
 }
