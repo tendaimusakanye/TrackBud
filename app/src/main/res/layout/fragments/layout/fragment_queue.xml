@@ -9,12 +9,148 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_queue"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/card_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0"
         tools:listitem="@layout/item_queue" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/margin_8dp"
+        android:translationZ="@dimen/margin_8dp"
+        app:cardCornerRadius="@dimen/margin_8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recycler_view_queue"
+        app:layout_constraintVertical_bias="1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textview_position"
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_16dp"
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:text="@string/title_placeholder_text"
+                app:layout_constraintBottom_toTopOf="@id/seek_bar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textview_duration"
+                style="@style/TextAppearance.MaterialComponents.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_16dp"
+                android:text="@string/title_placeholder_text"
+                app:layout_constraintBottom_toBottomOf="@id/textview_position"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toEndOf="@id/textview_position"
+                app:layout_constraintTop_toTopOf="@id/textview_position" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seek_bar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/icon_queue"
+                app:layout_constraintEnd_toEndOf="@id/textview_duration"
+                app:layout_constraintStart_toStartOf="@id/textview_position"
+                app:layout_constraintTop_toBottomOf="@id/textview_position"
+                app:layout_constraintVertical_bias="0" />
+
+            <ImageView
+                android:id="@+id/icon_queue"
+                android:layout_width="@dimen/album_art_small_width"
+                android:layout_height="@dimen/album_art_small_height"
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:layout_marginBottom="@dimen/margin_16dp"
+                android:contentDescription="@string/description_show_queue"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_queue"
+                app:layout_constraintBottom_toTopOf="@id/icon_shuffle"
+                app:layout_constraintEnd_toEndOf="@id/seek_bar"
+                app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+
+            <ImageView
+                android:id="@+id/icon_shuffle"
+                android:layout_width="@dimen/album_art_small_width"
+                android:layout_height="@dimen/album_art_small_height"
+                android:layout_marginBottom="@dimen/margin_64dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_shuffle"
+                app:layout_constraintEnd_toStartOf="@id/icon_previous"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/seek_bar"
+                app:layout_constraintTop_toBottomOf="@id/icon_queue"
+                android:contentDescription="@string/description_shuffle_tracks" />
+
+            <ImageView
+                android:id="@+id/icon_previous"
+                android:layout_width="@dimen/album_art_small_width"
+                android:layout_height="@dimen/album_art_small_height"
+                android:src="@drawable/ic_previous"
+                android:scaleType="centerInside"
+                android:layout_marginStart="@dimen/margin_8dp"
+                android:layout_marginEnd="@dimen/margin_8dp"
+                app:layout_constraintEnd_toStartOf="@id/icon_play_pause"
+                android:contentDescription="@string/description_previous_track"
+                app:layout_constraintBottom_toBottomOf="@id/icon_shuffle"
+                app:layout_constraintStart_toEndOf="@+id/icon_shuffle"
+                app:layout_constraintTop_toTopOf="@id/icon_shuffle" />
+
+
+            <ImageView
+                android:id="@+id/icon_play_pause"
+                android:layout_width="@dimen/album_art_small_width"
+                android:layout_height="@dimen/album_art_small_height"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_play"
+                android:contentDescription="@string/description_play_pause"
+                android:layout_marginStart="@dimen/margin_8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/icon_previous"
+                app:layout_constraintEnd_toStartOf="@id/icon_next"
+                app:layout_constraintStart_toEndOf="@+id/icon_previous"
+                app:layout_constraintTop_toTopOf="@+id/icon_previous" />
+
+            <ImageView
+                android:id="@+id/icon_next"
+                android:layout_width="@dimen/album_art_small_width"
+                android:layout_height="@dimen/album_art_small_height"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_next"
+                android:layout_marginStart="@dimen/margin_8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/icon_play_pause"
+                app:layout_constraintStart_toEndOf="@+id/icon_play_pause"
+                app:layout_constraintTop_toTopOf="@+id/icon_play_pause"
+                app:layout_constraintEnd_toStartOf="@id/icon_repeat"
+                android:contentDescription="@string/description_next_track" />
+
+            <ImageView
+                android:id="@+id/icon_repeat"
+                android:layout_width="@dimen/album_art_small_width"
+                android:layout_height="@dimen/album_art_small_height"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_repeat"
+                android:contentDescription="@string/description_repeat"
+                app:layout_constraintBottom_toBottomOf="@+id/icon_next"
+                app:layout_constraintEnd_toEndOf="@+id/seek_bar"
+                app:layout_constraintStart_toEndOf="@+id/icon_next"
+                app:layout_constraintTop_toTopOf="@+id/icon_next" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
