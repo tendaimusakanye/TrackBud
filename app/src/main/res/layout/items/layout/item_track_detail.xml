@@ -32,11 +32,11 @@
         android:clickable="false"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="@string/title_placeholder_text"
         app:layout_constraintBottom_toTopOf="@id/textview_subtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/icon_album_art_small"
-        app:layout_constraintTop_toTopOf="@+id/icon_album_art_small" />
+        app:layout_constraintTop_toTopOf="@+id/icon_album_art_small"
+        tools:text="@string/title_placeholder_text" />
 
     <TextView
         android:id="@+id/textview_subtitle"
@@ -46,11 +46,11 @@
         android:clickable="false"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="@string/title_placeholder_text"
         app:layout_constraintBottom_toBottomOf="@+id/icon_album_art_small"
         app:layout_constraintEnd_toEndOf="@id/textview_title"
         app:layout_constraintStart_toStartOf="@+id/textview_title"
-        app:layout_constraintTop_toBottomOf="@+id/textview_title" />
+        app:layout_constraintTop_toBottomOf="@+id/textview_title"
+        tools:text="@string/title_placeholder_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

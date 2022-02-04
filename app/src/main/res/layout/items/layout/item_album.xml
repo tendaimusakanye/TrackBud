@@ -46,10 +46,10 @@
         android:gravity="center"
         android:maxLines="1"
         android:padding="@dimen/margin_4dp"
-        android:text="@string/title_placeholder_text"
         android:textColor="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/card_view"
         app:layout_constraintStart_toStartOf="@id/card_view"
-        app:layout_constraintTop_toBottomOf="@id/card_view" />
+        app:layout_constraintTop_toBottomOf="@id/card_view"
+        tools:text="@string/title_placeholder_text" />
 </androidx.constraintlayout.widget.ConstraintLayout>

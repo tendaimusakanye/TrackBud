@@ -16,8 +16,7 @@
         android:contentDescription="@string/description_play_track"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textview_title"
@@ -28,11 +27,11 @@
         android:layout_marginEnd="@dimen/margin_8dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="@string/title_placeholder_text"
         app:layout_constraintBottom_toTopOf="@id/textview_subtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/icon_reorder_queue_item"
-        app:layout_constraintTop_toTopOf="@+id/icon_reorder_queue_item" />
+        app:layout_constraintTop_toTopOf="@+id/icon_reorder_queue_item"
+        tools:text="@string/title_placeholder_text" />
 
     <TextView
         android:id="@+id/textview_subtitle"
@@ -41,11 +40,11 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="@string/title_placeholder_text"
         app:layout_constraintBottom_toBottomOf="@+id/icon_reorder_queue_item"
         app:layout_constraintEnd_toEndOf="@id/textview_title"
         app:layout_constraintStart_toStartOf="@+id/textview_title"
-        app:layout_constraintTop_toBottomOf="@+id/textview_title" />
+        app:layout_constraintTop_toBottomOf="@+id/textview_title"
+        tools:text="@string/title_placeholder_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
