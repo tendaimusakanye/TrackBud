@@ -8,8 +8,7 @@
     android:clickable="true"
     android:focusable="true">
 
-    <!--look into Shape-able imageview-->
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/icon_album_art_small"
         android:layout_width="@dimen/album_art_small_width"
         android:layout_height="@dimen/album_art_small_height"

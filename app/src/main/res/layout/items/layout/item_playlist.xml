@@ -6,8 +6,7 @@
     android:layout_height="wrap_content"
     android:clickable="false">
 
-    <!--look into Shape-able imageview-->
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/icon_reorder_queue_item"
         android:layout_width="@dimen/album_art_small_width"
         android:layout_height="@dimen/album_art_small_height"
