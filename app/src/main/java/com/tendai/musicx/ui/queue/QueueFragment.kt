@@ -14,11 +14,4 @@ class QueueFragment : BaseFragment<FragmentQueueBinding>() {
         attachToRoot: Boolean
     ): ViewBinding = FragmentQueueBinding.inflate(inflater, container, attachToRoot)
 
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
 }

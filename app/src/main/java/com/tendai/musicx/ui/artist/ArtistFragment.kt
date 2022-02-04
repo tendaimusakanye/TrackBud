@@ -18,11 +18,4 @@ class ArtistFragment : BaseFragment<FragmentArtistBinding>() {
         attachToRoot: Boolean
     ): ViewBinding = FragmentArtistBinding.inflate(inflater, container, attachToRoot)
 
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
 }

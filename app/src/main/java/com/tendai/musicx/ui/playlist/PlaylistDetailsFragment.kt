@@ -15,11 +15,4 @@ class PlaylistDetailsFragment : BaseFragment<FragmentPlaylistDetailsBinding>() {
     ): ViewBinding =
         FragmentPlaylistDetailsBinding.inflate(inflater, container, attachToRoot)
 
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
 }

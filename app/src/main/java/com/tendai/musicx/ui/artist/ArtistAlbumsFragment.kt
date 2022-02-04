@@ -14,13 +14,4 @@ class ArtistAlbumsFragment : BaseFragment<FragmentArtistAlbumsBinding>() {
         attachToRoot: Boolean
     ): ViewBinding =
         FragmentArtistAlbumsBinding.inflate(inflater, container, attachToRoot)
-
-    override fun setUp() {
-        TODO("Not yet implemented")
-
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
 }

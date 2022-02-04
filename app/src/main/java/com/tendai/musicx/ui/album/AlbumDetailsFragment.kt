@@ -14,12 +14,4 @@ class AlbumDetailsFragment : BaseFragment<FragmentAlbumDetailsBinding>() {
         attachToRoot: Boolean
     ): ViewBinding = FragmentAlbumDetailsBinding.inflate(inflater, container, attachToRoot)
 
-
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
 }

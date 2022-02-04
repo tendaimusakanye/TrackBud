@@ -18,11 +18,4 @@ class DiscoverFragment : BaseFragment<FragmentDiscoverBinding>() {
         attachToRoot: Boolean
     ): ViewBinding = FragmentDiscoverBinding.inflate(inflater, container, attachToRoot)
 
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
 }

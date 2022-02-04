@@ -18,13 +18,5 @@ class TracksFragment : BaseFragment<FragmentTracksBinding>() {
         attachToRoot: Boolean
     ): ViewBinding = FragmentTracksBinding.inflate(inflater, container, attachToRoot)
 
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
-
 }
 

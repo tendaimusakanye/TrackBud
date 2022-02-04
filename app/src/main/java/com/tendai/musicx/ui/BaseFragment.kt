@@ -24,11 +24,6 @@ abstract class BaseFragment<V : ViewBinding> : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setUp()
-        setUpObservers()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -39,8 +34,4 @@ abstract class BaseFragment<V : ViewBinding> : Fragment() {
         container: ViewGroup?,
         attachToRoot: Boolean
     ): ViewBinding
-
-    abstract fun setUp()
-
-    abstract fun setUpObservers()
 }

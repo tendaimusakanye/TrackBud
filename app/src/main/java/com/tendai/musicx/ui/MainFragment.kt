@@ -31,14 +31,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             TabLayoutMediator(tabLayout, viewPager) { _, _ -> }.attach()
         }
     }
-
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
 }
 
 private class MainAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {

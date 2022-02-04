@@ -14,12 +14,4 @@ class NowPlayingFragment : BaseFragment<FragmentNowPlayingBinding>() {
         attachToRoot: Boolean
     ): ViewBinding = FragmentNowPlayingBinding.inflate(inflater, container, false)
 
-    override fun setUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun setUpObservers() {
-        TODO("Not yet implemented")
-    }
-
 }
