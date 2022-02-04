@@ -1,4 +1,4 @@
-package com.tendai.musicx.ui.queue
+package com.tendai.musicx.ui.nowplaying
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
