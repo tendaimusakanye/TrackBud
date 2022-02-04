@@ -6,68 +6,26 @@
     android:layout_height="match_parent"
     tools:context="ui.nowplaying.NowPlayingFragment">
 
-    <ImageView
-        android:id="@+id/imageview_minimize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_8dp"
-        android:contentDescription="@string/description_minimize_fragment"
-        android:src="@drawable/ic_minimize"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageview_album_art_big"
-        android:layout_width="@dimen/album_art_big_width"
-        android:layout_height="@dimen/album_art_big_height"
-        android:layout_margin="@dimen/margin_64dp"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toTopOf="@id/textview_track_title"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/card_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageview_minimize"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/textview_track_title"
-        style="@style/TextAppearance.MaterialComponents.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_16dp"
-        android:maxLines="3"
-        android:text="@string/title_placeholder_text"
-        app:layout_constraintEnd_toEndOf="@+id/imageview_album_art_big"
-        app:layout_constraintStart_toStartOf="@+id/imageview_album_art_big"
-        app:layout_constraintTop_toBottomOf="@+id/imageview_album_art_big" />
-
-    <TextView
-        android:id="@+id/textview_artist_name"
-        style="@style/TextAppearance.MaterialComponents.Caption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_8dp"
-        android:text="@string/title_placeholder_text"
-        app:layout_constraintEnd_toEndOf="@+id/textview_track_title"
-        app:layout_constraintStart_toStartOf="@+id/textview_track_title"
-        app:layout_constraintTop_toBottomOf="@+id/textview_track_title" />
-
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_16dp"
         android:elevation="@dimen/margin_8dp"
         android:translationZ="@dimen/margin_8dp"
         app:cardCornerRadius="@dimen/margin_8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_artist_name"
+        app:layout_constraintTop_toBottomOf="@id/nav_host"
         app:layout_constraintVertical_bias="1">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -128,25 +86,25 @@
                 android:layout_width="@dimen/album_art_small_width"
                 android:layout_height="@dimen/album_art_small_height"
                 android:layout_marginBottom="@dimen/margin_64dp"
+                android:contentDescription="@string/description_shuffle_tracks"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_shuffle"
-                app:layout_constraintEnd_toStartOf="@id/icon_previous"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/icon_previous"
                 app:layout_constraintStart_toStartOf="@id/seek_bar"
-                app:layout_constraintTop_toBottomOf="@id/icon_queue"
-                android:contentDescription="@string/description_shuffle_tracks" />
+                app:layout_constraintTop_toBottomOf="@id/icon_queue" />
 
             <ImageView
                 android:id="@+id/icon_previous"
                 android:layout_width="@dimen/album_art_small_width"
                 android:layout_height="@dimen/album_art_small_height"
-                android:src="@drawable/ic_previous"
-                android:scaleType="centerInside"
                 android:layout_marginStart="@dimen/margin_8dp"
                 android:layout_marginEnd="@dimen/margin_8dp"
-                app:layout_constraintEnd_toStartOf="@id/icon_play_pause"
                 android:contentDescription="@string/description_previous_track"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_previous"
                 app:layout_constraintBottom_toBottomOf="@id/icon_shuffle"
+                app:layout_constraintEnd_toStartOf="@id/icon_play_pause"
                 app:layout_constraintStart_toEndOf="@+id/icon_shuffle"
                 app:layout_constraintTop_toTopOf="@id/icon_shuffle" />
 
@@ -155,10 +113,10 @@
                 android:id="@+id/icon_play_pause"
                 android:layout_width="@dimen/album_art_small_width"
                 android:layout_height="@dimen/album_art_small_height"
+                android:layout_marginStart="@dimen/margin_8dp"
+                android:contentDescription="@string/description_play_pause"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_play"
-                android:contentDescription="@string/description_play_pause"
-                android:layout_marginStart="@dimen/margin_8dp"
                 app:layout_constraintBottom_toBottomOf="@+id/icon_previous"
                 app:layout_constraintEnd_toStartOf="@id/icon_next"
                 app:layout_constraintStart_toEndOf="@+id/icon_previous"
@@ -168,22 +126,22 @@
                 android:id="@+id/icon_next"
                 android:layout_width="@dimen/album_art_small_width"
                 android:layout_height="@dimen/album_art_small_height"
+                android:layout_marginStart="@dimen/margin_8dp"
+                android:contentDescription="@string/description_next_track"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_next"
-                android:layout_marginStart="@dimen/margin_8dp"
                 app:layout_constraintBottom_toBottomOf="@+id/icon_play_pause"
-                app:layout_constraintStart_toEndOf="@+id/icon_play_pause"
-                app:layout_constraintTop_toTopOf="@+id/icon_play_pause"
                 app:layout_constraintEnd_toStartOf="@id/icon_repeat"
-                android:contentDescription="@string/description_next_track" />
+                app:layout_constraintStart_toEndOf="@+id/icon_play_pause"
+                app:layout_constraintTop_toTopOf="@+id/icon_play_pause" />
 
             <ImageView
                 android:id="@+id/icon_repeat"
                 android:layout_width="@dimen/album_art_small_width"
                 android:layout_height="@dimen/album_art_small_height"
+                android:contentDescription="@string/description_repeat"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_repeat"
-                android:contentDescription="@string/description_repeat"
                 app:layout_constraintBottom_toBottomOf="@+id/icon_next"
                 app:layout_constraintEnd_toEndOf="@+id/seek_bar"
                 app:layout_constraintStart_toEndOf="@+id/icon_next"

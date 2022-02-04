@@ -14,4 +14,5 @@
     <dimen name="margin_48dp">48dp</dimen>
     <dimen name="margin_2dp">2dp</dimen>
     <dimen name="margin_64dp">64dp</dimen>
+    <dimen name="album_art_large">300dp</dimen>
 </resources>

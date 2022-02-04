@@ -18,4 +18,6 @@
     <string name="description_play_pause">Play or Pause Track</string>
     <string name="description_next_track">Next Track</string>
     <string name="description_repeat">Repeat Track</string>
+    <string name="action_play_album_tracks">Play album tracks</string>
+    <string name="title_select_tracks">Select Tracks</string>
 </resources>
