@@ -26,11 +26,11 @@ import androidx.media.MediaBrowserServiceCompat
  *  Because of these reasons, rather than constructing additional classes, this is treated as
  *  a black box (which is why there's very little logic here).
  *
- *  This is also why the parameters to construct a [MusicServiceConnection] are simple
+ *  This is also why the parameters to construct a [ServiceConnection] are simple
  *  parameters, rather than private properties. They're only required to build the
  *  [MediaBrowserConnectionCallback] and [MediaBrowserCompat] objects.
  */
-class MusicServiceConnection(context: Context, serviceComponent: ComponentName) {
+class ServiceConnection(context: Context, serviceComponent: ComponentName) {
     val isConnected = MutableLiveData<Boolean>()
         .apply { postValue(false) }
 
