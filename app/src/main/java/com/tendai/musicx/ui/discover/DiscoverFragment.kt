@@ -8,6 +8,10 @@ import com.tendai.musicx.ui.BaseFragment
 
 class DiscoverFragment : BaseFragment<FragmentDiscoverBinding>() {
 
+    companion object {
+        fun newInstance() = DiscoverFragment()
+    }
+
     override fun bindFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,

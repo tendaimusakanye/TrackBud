@@ -8,6 +8,10 @@ import com.tendai.musicx.ui.BaseFragment
 
 class TracksFragment : BaseFragment<FragmentTracksBinding>() {
 
+    companion object {
+        fun newInstance() = TracksFragment()
+    }
+
     override fun bindFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,

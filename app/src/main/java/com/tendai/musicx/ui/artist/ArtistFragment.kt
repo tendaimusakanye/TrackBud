@@ -8,6 +8,10 @@ import com.tendai.musicx.ui.BaseFragment
 
 class ArtistFragment : BaseFragment<FragmentArtistBinding>() {
 
+    companion object {
+        fun newInstance() = ArtistFragment()
+    }
+
     override fun bindFragment(
         inflater: LayoutInflater,
         container: ViewGroup?,
