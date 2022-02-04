@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tendai.musicx.ui.customviews.CreatePlaylistButton xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tendai.musicx.customviews.CreatePlaylistButton xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
@@ -26,4 +26,4 @@
         android:contentDescription="@string/description_create_new_playlist"
         android:src="@drawable/ic_add" />
 
-</com.tendai.musicx.ui.customviews.CreatePlaylistButton>
+</com.tendai.musicx.customviews.CreatePlaylistButton>

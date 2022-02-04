@@ -1,4 +1,4 @@
-package com.tendai.musicx.ui.customviews
+package com.tendai.musicx.customviews
 
 import android.content.Context
 import android.util.AttributeSet
