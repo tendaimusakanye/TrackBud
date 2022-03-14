@@ -64,5 +64,3 @@ If you have any recommendations, suggestions, improvements or if you identify an
 
 [TimberX](https://github.com/naman14/TimberX)
 
-## Licence
-I still don't know how these open source licences work. I will add one soon. 
