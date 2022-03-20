@@ -2,6 +2,7 @@ package com.tendai.musicx.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import com.tendai.musicx.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -13,7 +14,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         _binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     override fun onDestroy() {
