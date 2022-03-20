@@ -82,10 +82,12 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         }
         // Setting  the media session token
         sessionToken = mediaSession.sessionToken
+
+        setUpListeners()
         playbackManager.updatePlaybackState()
 
         //todo: request Storage permissions...
-        setUpListeners()
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
