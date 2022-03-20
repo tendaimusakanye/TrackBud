@@ -8,8 +8,11 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.core.os.bundleOf
 import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
+import com.tendai.common.ClientServiceConnection.MediaBrowserConnectionCallback
+import javax.inject.Inject
 
 /**
  * Class that manages a connection to a [MediaBrowserServiceCompat] instance, typically a
@@ -26,14 +29,16 @@ import androidx.media.MediaBrowserServiceCompat
  *  Because of these reasons, rather than constructing additional classes, this is treated as
  *  a black box (which is why there's very little logic here).
  *
- *  This is also why the parameters to construct a [ServiceConnection] are simple
+ *  This is also why the parameters to construct a [ClientServiceConnection] are simple
  *  parameters, rather than private properties. They're only required to build the
  *  [MediaBrowserConnectionCallback] and [MediaBrowserCompat] objects.
  */
-class ServiceConnection(context: Context, serviceComponent: ComponentName) {
+class ClientServiceConnection @Inject constructor(
+    context: Context,
+    serviceComponent: ComponentName
+) {
     val isConnected = MutableLiveData<Boolean>()
         .apply { postValue(false) }
-
     val rootMediaId: String get() = mediaBrowser.root
 
     val playbackState = MutableLiveData<PlaybackStateCompat>()
@@ -64,12 +69,14 @@ class ServiceConnection(context: Context, serviceComponent: ComponentName) {
 
     fun subscribe(
         parentId: String,
-        options: Bundle,
-        callback: MediaBrowserCompat.SubscriptionCallback
-    ) = mediaBrowser.subscribe(parentId, options, callback)
+        options: Bundle = bundleOf(),
+        subscriptionCallback: MediaBrowserCompat.SubscriptionCallback
+    ) = mediaBrowser.subscribe(parentId, options, subscriptionCallback)
 
-    fun unsubscribe(parentId: String, callback: MediaBrowserCompat.SubscriptionCallback) =
-        mediaBrowser.unsubscribe(parentId, callback)
+    fun unsubscribe(
+        parentId: String,
+        subscriptionCallback: MediaBrowserCompat.SubscriptionCallback
+    ) = mediaBrowser.unsubscribe(parentId, subscriptionCallback)
 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
