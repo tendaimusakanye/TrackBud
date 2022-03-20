@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/now_playing_nav_graph"
+    app:startDestination="@id/mediaControlsFragment2">
+
+    <fragment
+        android:id="@+id/queueFragment"
+        android:name="com.tendai.musicx.ui.nowplaying.QueueFragment"
+        android:label="fragment_queue"
+        tools:layout="@layout/fragment_queue" />
+    <fragment
+        android:id="@+id/mediaControlsFragment2"
+        android:name="com.tendai.musicx.ui.nowplaying.MediaControlsFragment"
+        android:label="MediaControlsFragment">
+        <action
+            android:id="@+id/action_mediaControlsFragment2_to_queueFragment"
+            app:destination="@id/queueFragment" />
+    </fragment>
+</navigation>

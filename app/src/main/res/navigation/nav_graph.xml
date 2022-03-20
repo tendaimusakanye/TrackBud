@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.tendai.musicx.ui.main.MainFragment"
+        android:label="MainFragment">
+        <action
+            android:id="@+id/to_artistFragment"
+            app:destination="@id/artistDetailFragment" />
+        <action
+            android:id="@+id/to_albumDetailsFragment"
+            app:destination="@id/albumDetailsFragment" />
+        <action
+            android:id="@+id/to_addToPlaylistFragment"
+            app:destination="@id/addToPlaylistFragment" />
+        <action
+            android:id="@+id/to_playlistDetailsFragment"
+            app:destination="@id/playlistDetailsFragment" />
+        <action
+            android:id="@+id/to_mediaControlsFragment"
+            app:destination="@id/mediaControlsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/artistDetailFragment"
+        android:name="com.tendai.musicx.ui.artist.ArtistDetailFragment"
+        android:label="ArtistDetailFragment">
+        <action
+            android:id="@+id/to_albumDetailsFragment"
+            app:destination="@id/albumDetailsFragment" />
+        <action
+            android:id="@+id/to_mediaControlsFragment"
+            app:destination="@id/mediaControlsFragment" />
+        <argument
+            android:name="artistId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/albumDetailsFragment"
+        android:name="com.tendai.musicx.ui.album.AlbumDetailsFragment"
+        android:label="AlbumDetailsFragment">
+        <action
+            android:id="@+id/to_mediaControlsFragment"
+            app:destination="@id/mediaControlsFragment" />
+        <argument
+            android:name="albumId"
+            app:argType="long" />
+        <argument
+            android:name="albumArtist"
+            app:argType="string" />
+        <argument
+            android:name="albumName"
+            app:argType="string" />
+    </fragment>
+    <dialog
+        android:id="@+id/addToPlaylistFragment"
+        android:name="com.tendai.musicx.ui.playlist.AddToPlaylistFragment"
+        android:label="AddToPlaylistFragment">
+        <action
+            android:id="@+id/to_playlistDetailsFragment"
+            app:destination="@id/playlistDetailsFragment" />
+    </dialog>
+    <fragment
+        android:id="@+id/playlistDetailsFragment"
+        android:name="com.tendai.musicx.ui.playlist.PlaylistDetailsFragment"
+        android:label="PlaylistDetailsFragment">
+        <action
+            android:id="@+id/to_mediaControlsFragment"
+            app:destination="@id/mediaControlsFragment" />
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
+        <argument
+            android:name="playlistName"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/mediaControlsFragment"
+        android:name="com.tendai.musicx.ui.nowplaying.MediaControlsFragment"
+        android:label="MediaControlsFragment" />
+</navigation>
