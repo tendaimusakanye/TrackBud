@@ -32,6 +32,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 class MediaNotificationManager @Inject constructor(
+    private val controller: MediaControllerCompat,
+    private var sessionToken: MediaSessionCompat.Token,
     private val service: MusicService,
     private val serviceScope: CoroutineScope,
     private val notificationManager: NotificationManager

@@ -2,6 +2,7 @@ package com.tendai.common.di
 
 import android.app.NotificationManager
 import android.content.Context
+import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import com.tendai.common.MediaNotificationManager
 import com.tendai.common.MusicService
@@ -79,11 +80,27 @@ object ServiceModule {
     @Provides
     @JvmStatic
     fun provideMediaNotificationManager(
+        controllerCompat: MediaControllerCompat,
+        sessionToken: MediaSessionCompat.Token,
         context: Context,
         serviceScope: CoroutineScope,
         notificationManager: NotificationManager
     ): MediaNotificationManager =
-        MediaNotificationManager(context as MusicService, serviceScope, notificationManager)
+        MediaNotificationManager(
+            controllerCompat,
+            sessionToken,
+            context as MusicService,
+            serviceScope,
+            notificationManager
+        )
+
+    @Singleton
+    @Provides
+    @JvmStatic
+    fun provideMediaControllerCompat(
+        context: Context,
+        sessionToken: MediaSessionCompat.Token
+    ): MediaControllerCompat = MediaControllerCompat(context as MusicService, sessionToken)
 
 
     @Singleton
