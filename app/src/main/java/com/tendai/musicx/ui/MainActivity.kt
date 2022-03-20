@@ -21,5 +21,5 @@ class MainActivity : AppCompatActivity() {
         _binding = null
     }
 }
-
-// TODO: Rename package musicx to trackbud
+// TODO: Make app color status bar
+// TODO: Rename package musicx to track bud
