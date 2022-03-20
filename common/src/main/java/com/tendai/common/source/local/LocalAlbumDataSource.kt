@@ -1,8 +1,12 @@
 package com.tendai.common.source.local
 
+import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
+import android.net.Uri
+import android.os.Build
 import android.provider.BaseColumns._ID
+import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Albums.*
 import android.provider.MediaStore.Audio.Artists.Albums.getContentUri
 import android.provider.MediaStore.Audio.Media.ARTIST_ID
@@ -18,6 +22,11 @@ class LocalAlbumDataSource @Inject constructor(private val context: Context) : L
     private val projection = arrayOf(
         _ID, ALBUM, ARTIST, ARTIST_ID, FIRST_YEAR, NUMBER_OF_SONGS
     )
+    private val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    } else {
+        ALBUMS_URI
+    }
 
     //getAlbums for the discover page
     // Do not use the let scope function on the cursor as it does not close the cursor in case of
@@ -25,9 +34,11 @@ class LocalAlbumDataSource @Inject constructor(private val context: Context) : L
     override fun getAlbums(limit: Int): List<Album> {
         val cursor = getCursor(
             contentResolver = contentResolver,
-            uri = ALBUMS_URI,
+            uri = uri,
             projection = projection,
-            sortOrder = "LIMIT $limit"
+            null,
+            null,
+            "$ALBUM ASC LIMIT $limit"
         )
         return cursor!!.use { result ->
             result.mapToList { mapToAlbum(it) }
@@ -55,7 +66,7 @@ class LocalAlbumDataSource @Inject constructor(private val context: Context) : L
     override fun getAlbumDetails(albumId: Long): Album {
         val cursor = getCursor(
             contentResolver = contentResolver,
-            uri = ALBUMS_URI,
+            uri = uri,
             projection = projection,
             selection = "$_ID = ?",
             selectionArgs = arrayOf(albumId.toString())
