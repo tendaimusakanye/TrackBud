@@ -1,7 +1,6 @@
 package com.tendai.common.source.local
 
 import android.content.ContentResolver
-import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import com.tendai.common.source.model.Album
@@ -74,12 +73,7 @@ interface LocalDataSource {
         )
 }
 
-fun getAlbumArtUri(albumId: Long): Uri {
-    val uri = Uri.parse(ALBUM_ART_PATH)
-    return ContentUris.withAppendedId(uri, albumId)
-}
 
-private const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
 
 
 

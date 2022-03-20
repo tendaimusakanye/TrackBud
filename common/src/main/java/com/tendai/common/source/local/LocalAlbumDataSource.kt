@@ -83,7 +83,12 @@ class LocalAlbumDataSource @Inject constructor(private val context: Context) : L
                 albumArtUri = getAlbumArtUri(getLong(getColumnIndex(_ID)))
             )
         }
-}
 
+    private fun getAlbumArtUri(albumId: Long): Uri {
+        val uri = Uri.parse(ALBUM_ART_PATH)
+        return ContentUris.withAppendedId(uri, albumId)
+    }
+}
+private const val ALBUM_ART_PATH = "content://media/external/audio/albumart"
 private const val TAG = "LocalAlbumDataSource"
 
