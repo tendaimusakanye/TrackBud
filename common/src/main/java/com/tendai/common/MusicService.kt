@@ -125,6 +125,10 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         return BrowserRoot(rootId, extras)
     }
 
+    override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaItem>>) {
+        result.detach()
+    }
+
     // The logic in this function is based on the UI Design of my application.
     override fun onLoadChildren(
         parentId: String,
@@ -144,6 +148,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
             result.sendResult(null)
             // TODO: Show some sort of notification to open an activity and request the permission
         }
+        result.detach()
     }
 
     override fun onDestroy() {
