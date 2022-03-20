@@ -61,7 +61,7 @@ abstract class MusicService : MediaBrowserServiceCompat() {
     lateinit var mediaSession: MediaSessionCompat
 
     private val serviceComponent: ServiceComponent by lazy {
-        DaggerServiceComponent.factory().create(applicationContext)
+        DaggerServiceComponent.factory().create(this)
     }
 
     override fun onCreate() {
