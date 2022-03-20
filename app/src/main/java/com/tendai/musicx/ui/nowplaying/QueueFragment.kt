@@ -13,5 +13,4 @@ class QueueFragment : BaseFragment<FragmentQueueBinding>() {
         container: ViewGroup?,
         attachToRoot: Boolean
     ): ViewBinding = FragmentQueueBinding.inflate(inflater, container, attachToRoot)
-
 }

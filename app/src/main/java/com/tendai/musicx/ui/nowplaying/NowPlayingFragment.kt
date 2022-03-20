@@ -13,5 +13,4 @@ class NowPlayingFragment : BaseFragment<FragmentNowPlayingBinding>() {
         container: ViewGroup?,
         attachToRoot: Boolean
     ): ViewBinding = FragmentNowPlayingBinding.inflate(inflater, container, false)
-
 }

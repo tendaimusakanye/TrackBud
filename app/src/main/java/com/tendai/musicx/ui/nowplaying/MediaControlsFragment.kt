@@ -13,5 +13,4 @@ class MediaControlsFragment : BaseFragment<FragmentMediaControlsBinding>() {
         container: ViewGroup?,
         attachToRoot: Boolean
     ): ViewBinding = FragmentMediaControlsBinding.inflate(inflater, container, attachToRoot)
-
 }

@@ -7,9 +7,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/margin_8dp"
     android:clickable="true"
-    android:elevation="@dimen/margin_8dp"
     android:focusable="true"
-    android:translationZ="@dimen/margin_8dp"
+    android:elevation="@dimen/margin_4dp"
     app:cardCornerRadius="@dimen/margin_8dp">
 
     <LinearLayout
@@ -24,7 +23,7 @@
             android:clickable="false"
             android:clipToOutline="true"
             android:contentDescription="@string/description_open_album"
-            android:scaleType="centerCrop"
+            android:scaleType="centerInside"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView

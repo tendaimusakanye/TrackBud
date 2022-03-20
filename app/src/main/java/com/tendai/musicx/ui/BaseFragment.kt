@@ -10,8 +10,8 @@ import androidx.viewbinding.ViewBinding
 
 abstract class BaseFragment<V : ViewBinding> : Fragment() {
 
-    private var _binding: ViewBinding? =
-        null  // TODO: 2/1/22 Why this fails when _binding is of type V
+    private var _binding: ViewBinding? = null  // TODO: 2/1/22 Why this fails when _binding is of type V
+    @Suppress("UNCHECKED_CAST")
     protected val binding: V
         get() = _binding!! as V
 
@@ -35,3 +35,4 @@ abstract class BaseFragment<V : ViewBinding> : Fragment() {
         attachToRoot: Boolean
     ): ViewBinding
 }
+
