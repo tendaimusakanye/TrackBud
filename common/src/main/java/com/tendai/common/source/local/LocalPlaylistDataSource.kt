@@ -11,16 +11,16 @@ import android.util.Log
 import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Playlist
 import javax.inject.Inject
-import javax.inject.Singleton
 import android.provider.MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI as PLAYLIST_URI
 
 class LocalPlaylistDataSource @Inject constructor(context: Context) : LocalDataSource,
     LocalDataSource.Playlists {
 
     private val contentResolver = context.contentResolver
+
     //playlist_Id should automatically be inserted I think. Yet to see.
     private val newPlaylistProjection = arrayOf(
-        PLAYLIST_ID, NAME
+        _ID, NAME
     )
 
     // is the _ID necessary in the playOrder projection ?
@@ -35,7 +35,7 @@ class LocalPlaylistDataSource @Inject constructor(context: Context) : LocalDataS
                 contentResolver,
                 PLAYLIST_URI,
                 newPlaylistProjection,
-                sortOrder = "LIMIT $limit"
+                sortOrder = " $_ID ASC LIMIT $limit"
             )
         return cursor!!.use { result ->
             result.mapToList { mapToPlaylist(it) }
