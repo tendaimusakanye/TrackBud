@@ -16,6 +16,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 }
 
 // TODO: Rename package musicx to trackbud
