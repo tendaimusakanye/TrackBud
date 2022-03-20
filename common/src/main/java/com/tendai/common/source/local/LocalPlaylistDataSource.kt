@@ -95,7 +95,7 @@ class LocalPlaylistDataSource @Inject constructor(context: Context) : LocalDataS
                         contentValues[i].put(AUDIO_ID, trackIds[i])
                         contentValues[i].put(PLAY_ORDER, playOrder++)
                     }
-                }
+                } // TODO: 1/27/22 Add exception here
                 contentResolver.bulkInsert(uri, contentValues)
             } else {
                 -1

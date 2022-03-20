@@ -111,7 +111,7 @@ class MusicService : MediaBrowserServiceCompat() {
         clientPackageName: String,
         clientUid: Int,
         rootHints: Bundle?
-    ): BrowserRoot? {
+    ): BrowserRoot {
 
         val isRecentRequest =
             rootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) ?: false
@@ -277,6 +277,7 @@ class MusicService : MediaBrowserServiceCompat() {
     }
 }
 
+
 const val EXTRA_ALBUM_ID = "com.tendai.common.EXTRA_ALBUM_ID"
 const val EXTRA_PLAYLIST_ID = "com.tendai.common.EXTRA_PLAYLIST_ID"
 const val EXTRA_ARTIST_ID = "com.tendai.common.EXTRA_ARTIST_ID"
@@ -291,6 +292,7 @@ const val DISCOVER_ROOT = "DISCOVER"
 const val TRACKS_ROOT = "TRACKS"
 const val RECENT_ROOT = "RECENT_SONG"
 const val ARTISTS_ROOT = "ARTISTS"
+const val NO_ROOT = "NO_ROOT"
 
 const val ACTION_PLAY_PAUSE = "com.tendai.common.ACTION_PLAY_PAUSE"
 const val ACTION_NEXT = "com.tendai.common.ACTION_NEXT"

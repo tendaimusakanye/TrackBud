@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class Queue @Inject constructor(
     private val serviceScope: CoroutineScope,
@@ -38,11 +37,13 @@ class Queue @Inject constructor(
                     queueTitle = "Tracks"
                 }
                 extras.getBoolean(IS_ALBUM) -> {
-                    tracksMetadata = trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
+                    tracksMetadata =
+                        trackRepository.getTracksInAlbum(extras.getLong(EXTRA_ALBUM_ID))
                     queueTitle = tracksMetadata[0].description.description
                 }
                 extras.getBoolean(IS_ARTIST_TRACKS) -> {
-                    tracksMetadata = trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
+                    tracksMetadata =
+                        trackRepository.getTracksForArtist(extras.getLong(EXTRA_ARTIST_ID))
                     queueTitle = tracksMetadata[0].description.subtitle
                 }
                 extras.getBoolean(IS_PLAYLIST) -> {
@@ -90,7 +91,11 @@ class Queue @Inject constructor(
         return metadata!!
     }
 
-    override fun getCurrentItemPlaying(): MediaSessionCompat.QueueItem? = playingQueue[currentIndex]
+    override fun getCurrentItemPlaying(): MediaSessionCompat.QueueItem? {
+        if (playingQueue.isEmpty()) return null
+
+        return playingQueue[currentIndex]
+    }
 
     override fun setCurrentQueueItem(id: Long) {
         playingQueue.forEachIndexed { index, queueItem ->
@@ -315,7 +320,7 @@ class Queue @Inject constructor(
             return true
         }
 
-        fun refreshWindow(flag: CharSequence): Boolean {
+        fun refreshWindow(flag: String): Boolean {
             return if (flag == FLAG_NEXT) {
                 currentIndex == queueWindow.last && nextShuffleIndexCount == 0
             } else {
