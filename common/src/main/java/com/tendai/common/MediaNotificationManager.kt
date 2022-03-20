@@ -11,25 +11,24 @@ import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import android.os.RemoteException
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.annotation.IdRes
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class MediaNotificationManager @Inject constructor(
     private val controller: MediaControllerCompat,
@@ -42,6 +41,7 @@ class MediaNotificationManager @Inject constructor(
         get() = BitmapFactory.decodeResource(service.resources, R.drawable.ic_placeholder_art)
 
     private val controllerCallback = object : MediaControllerCompat.Callback() {
+
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             state?.let { newState ->
                 playbackState = newState
@@ -69,29 +69,11 @@ class MediaNotificationManager @Inject constructor(
                 }
             }
         }
-
-        override fun onSessionDestroyed() {
-            try {
-                updateSessionToken()
-            } catch (e: RemoteException) {
-                Log.e(TAG, "could not connect to media controller")
-            }
-        }
     }
 
     private var started = false
-    private lateinit var sessionToken: MediaSessionCompat.Token
     private lateinit var metadata: MediaMetadataCompat
-    private lateinit var controller: MediaControllerCompat
     private lateinit var playbackState: PlaybackStateCompat
-
-    init {
-        try {
-            updateSessionToken()
-        } catch (e: RemoteException) {
-            Log.e(TAG, "Could not create Media Controller")
-        }
-    }
 
     fun startNotification() {
         if (!started) {
@@ -175,7 +157,7 @@ class MediaNotificationManager @Inject constructor(
         }
     }
 
-
+    // TODO: 1/31/22 Or use glide ?
     private fun createBitmap(uri: Uri?): Bitmap? {
         return uri?.let {
             var inputStream: InputStream? = null
@@ -254,22 +236,6 @@ class MediaNotificationManager @Inject constructor(
         return NotificationCompat.Action(playPauseResId, label, pendingIntent)
     }
 
-
-    @Throws(RemoteException::class)
-    private fun updateSessionToken() {
-        val freshToken = service.sessionToken
-        if (sessionToken != freshToken
-        ) {
-            controller.unregisterCallback(controllerCallback)
-            freshToken?.let {
-                sessionToken = it
-                controller = MediaControllerCompat(service, sessionToken)
-            }
-            if (started) {
-                controller.registerCallback(controllerCallback)
-            }
-        }
-    }
 }
 
 const val NOTIFICATION_ID = 98716
