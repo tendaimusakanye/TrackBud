@@ -28,7 +28,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-abstract class MusicService : MediaBrowserServiceCompat() {
+class MusicService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var serviceJob: Job
