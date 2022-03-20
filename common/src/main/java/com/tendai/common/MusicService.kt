@@ -1,8 +1,10 @@
 package com.tendai.common
 
+import android.Manifest
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat.MediaItem
 import android.support.v4.media.MediaMetadataCompat
@@ -13,6 +15,7 @@ import androidx.media.session.MediaButtonReceiver
 import com.tendai.common.di.DaggerServiceComponent
 import com.tendai.common.di.ServiceComponent
 import com.tendai.common.di.ServiceModule
+import com.tendai.common.extensions.checkSelfPermissionCompat
 import com.tendai.common.extensions.flag
 import com.tendai.common.playback.PlaybackManager
 import com.tendai.common.playback.QueueManager
@@ -126,65 +129,18 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         result: Result<MutableList<MediaItem>>,
         options: Bundle
     ) {
-        serviceScope.launch {
-            var metadatas = listOf<MediaMetadataCompat>()
-            when (parentId) {
-                RECENT_ROOT -> {
-                    //TODO("Handle saving the most recent song & building a proper queue for the item
-                    // allowed browsing types in onGet Root")
-                }
-                TRACKS_ROOT -> {
-                    metadatas = trackRepository.getTracks()
-                }
-                DISCOVER_ROOT -> {
-                    when {
-                        (!options.getBoolean(IS_ALBUM) && !options.getBoolean(IS_PLAYLIST)) -> {
-                            val children = mutableListOf<MediaMetadataCompat>()
-                            val albums = albumRepository.getAlbums(5)
-                            val playlists = playlistRepository.getAllPlaylists(5)
 
-                            children += albums
-                            children += playlists
-                            metadatas = children
-                        }
-                        options.getBoolean(IS_ALBUM) -> {
-                            metadatas = trackRepository.getTracksInAlbum(
-                                options.getLong(EXTRA_ALBUM_ID)
-                            )
-                        }
-                        options.getBoolean(IS_PLAYLIST) -> {
-                            metadatas = trackRepository.getTracksInPlaylist(
-                                options.getLong(EXTRA_PLAYLIST_ID)
-                            )
-                        }
-                    }
-                }
-                ARTISTS_ROOT -> {
-                    when {
-                        options.getBoolean(IS_ALL_ARTISTS) -> {
-                            metadatas = artistRepository.getAllArtists()
-                        }
-                        options.getBoolean(IS_ARTIST_TRACKS) -> {
-                            metadatas = trackRepository.getTracksForArtist(
-                                options.getLong(EXTRA_ARTIST_ID)
-                            )
-                        }
-                        options.getBoolean(IS_ARTIST_ALBUMS) -> {
-                            metadatas = albumRepository.getAlbumsByArtist(
-                                options.getLong(EXTRA_ARTIST_ID)
-                            )
-                        }
-                    }
-                }
+        val readPermission = checkSelfPermissionCompat(Manifest.permission.READ_EXTERNAL_STORAGE)
+//        val writePermission = checkSelfPermissionCompat(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+        if (readPermission == PackageManager.PERMISSION_GRANTED) {
+            serviceScope.launch {
+                val mediaItems = retrieveMediaItems(parentId, options)
+                result.sendResult(mediaItems)
             }
-            if (options.getBoolean(BrowserRoot.EXTRA_RECENT)) {
-                //TODO("")
-            } else {
-                val mediaItems = metadatas.distinctBy { it.description.title }.map {
-                    MediaItem(it.description, it.flag)
-                }
-                result.sendResult(mediaItems.toMutableList())
-            }
+        } else {
+            result.sendResult(null)
+            // TODO: Show some sort of notification to open an activity and request the permission
         }
     }
 
@@ -199,6 +155,77 @@ abstract class MusicService : MediaBrowserServiceCompat() {
         mediaNotificationManager.stopNotification()
         //cancels the coroutines when going away. I guess it iS to avoid memory leaks.
         serviceJob.cancel()
+    }
+
+    private suspend fun retrieveMediaItems(
+        parentId: String,
+        options: Bundle
+    ): MutableList<MediaItem> {
+        var metadata = listOf<MediaMetadataCompat>()
+
+        when (parentId) {
+            RECENT_ROOT -> {
+                //TODO("Handle saving the most recent song & building a proper queue for the item
+                // allowed browsing types in onGet Root")
+            }
+            TRACKS_ROOT -> {
+                metadata = trackRepository.getTracks()
+            }
+            DISCOVER_ROOT -> {
+                when {
+                    (!options.getBoolean(IS_ALBUM) && !options.getBoolean(IS_PLAYLIST)) -> {
+                        val children = mutableListOf<MediaMetadataCompat>()
+                        val albums = albumRepository.getAlbums(5)
+                        val playlists = playlistRepository.getAllPlaylists(5)
+
+                        children += albums
+                        children += playlists
+                        metadata = children
+                    }
+                    options.getBoolean(IS_ALBUM) -> {
+                        metadata = trackRepository.getTracksInAlbum(
+                            options.getLong(EXTRA_ALBUM_ID)
+                        )
+                    }
+                    options.getBoolean(IS_PLAYLIST) -> {
+                        metadata = trackRepository.getTracksInPlaylist(
+                            options.getLong(EXTRA_PLAYLIST_ID)
+                        )
+                    }
+                }
+            }
+            ARTISTS_ROOT -> {
+                when {
+                    options.getBoolean(IS_ALL_ARTISTS) -> {
+                        metadata = artistRepository.getAllArtists()
+                    }
+                    options.getBoolean(IS_ARTIST_TRACKS) -> {
+                        metadata = trackRepository.getTracksForArtist(
+                            options.getLong(EXTRA_ARTIST_ID)
+                        )
+                    }
+                    options.getBoolean(IS_ARTIST_ALBUMS) -> {
+                        metadata = albumRepository.getAlbumsByArtist(
+                            options.getLong(EXTRA_ARTIST_ID)
+                        )
+                    }
+                    options.getBoolean(IS_ALBUM) -> {
+                        metadata = trackRepository.getTracksInAlbum(
+                            options.getLong(EXTRA_ALBUM_ID)
+                        )
+                    }
+                }
+            }
+        }
+        return if (options.getBoolean(BrowserRoot.EXTRA_RECENT)) {
+            //TODO("")
+            mutableListOf()
+        } else {
+            metadata
+                .distinctBy { it.description.title }
+                .map { MediaItem(it.description, it.flag) }
+                .toMutableList()
+        }
     }
 
     private fun setUpListeners() {
