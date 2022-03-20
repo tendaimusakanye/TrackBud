@@ -1,7 +1,9 @@
 package com.tendai.common.source.local
 
+import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
+import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.AudioColumns.IS_MUSIC
 import android.provider.MediaStore.Audio.AudioColumns.TRACK
@@ -12,7 +14,6 @@ import android.provider.MediaStore.MediaColumns.DURATION
 import com.tendai.common.extensions.mapToList
 import com.tendai.common.source.model.Track
 import javax.inject.Inject
-import javax.inject.Singleton
 import android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI as TRACKS_URI
 
 class LocalTracksDataSource @Inject constructor(private val context: Context) : LocalDataSource,
@@ -31,7 +32,7 @@ class LocalTracksDataSource @Inject constructor(private val context: Context) : 
             contentResolver,
             TRACKS_URI,
             projection,
-            "$_ID = ? AND ${IS_MUSIC}= 1 AND $TITLE != ''",
+            "$_ID = ? AND ${IS_MUSIC}!=0 AND $TITLE != ''",
             selectionArgs = arrayOf(trackId.toString())
         )
         return cursor!!.use {
@@ -46,7 +47,7 @@ class LocalTracksDataSource @Inject constructor(private val context: Context) : 
             contentResolver,
             TRACKS_URI,
             projection,
-            "${IS_MUSIC}=1 AND $TITLE != ''"
+            "${IS_MUSIC}!=0 AND $TITLE != ''"
         )
         return cursor!!.use { result ->
             fromPlaylist = false
@@ -59,7 +60,7 @@ class LocalTracksDataSource @Inject constructor(private val context: Context) : 
             contentResolver,
             TRACKS_URI,
             projection,
-            "${IS_MUSIC}=1 AND $TITLE != ''AND $ARTIST_ID = ?",
+            "${IS_MUSIC}!=0 AND $TITLE != ''AND $ARTIST_ID = ?",
             selectionArgs = arrayOf(artistId.toString())
         )
         return cursor!!.use { result ->
@@ -73,7 +74,7 @@ class LocalTracksDataSource @Inject constructor(private val context: Context) : 
             contentResolver,
             TRACKS_URI,
             projection,
-            "${IS_MUSIC}=1 AND $TITLE != ''AND $ALBUM_ID = ?",
+            "${IS_MUSIC}!=0 AND $TITLE != ''AND $ALBUM_ID = ?",
             selectionArgs = arrayOf(albumId.toString())
         )
         return cursor!!.use { result ->
