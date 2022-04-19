@@ -3,8 +3,8 @@ TrackBud is a full-fledged music player for Android (Mobile ,TV, Wear) and is cu
 
 P.S. I am still working of finding a better name 🤣
 
-Server side logic is almost complete.
-Client side logic ( UI for TV, Wear, Mobile ) is still at 0%.
+Server side logic is complete.
+Client side logic ( UI for TV, Wear, Mobile ) is half done. 
 ## Features
 * Local Audio Playback
 * Eleagant UI 🤣
@@ -42,13 +42,8 @@ It communicates with the [QueueManager](https://github.com/tendaimusakanye/Track
 and delegates playing the audio file to the [LocalPlayback](https://github.com/tendaimusakanye/TrackBud/blob/master/common/src/main/java/com/tendai/common/playback/LocalPlayback.kt) class.
 
 ## Screenshots
-The screenshots below are still Adobe Xd designs.
+To be added soon.
 
-![](https://db3pap007files.storage.live.com/y4mpGTWORFNu0GaK9rjdTomDbgHZPkzM1kv76YaHuU6pDAfYGD5SiAWTY0uN27sJi46OUXqkvFuPcMEUuiSJpuER0ChYsNKb1obE4AaBx6kt01xRqxWQKk9micBzEVqDtOIeiyiPiLPAVolqjUlosbwtX-_Oso7X2A_MnIiA5jMpjRTwo7T8rDvWIzo0ObaY9ff?width=310&height=547&cropmode=none)
-
-![](https://db3pap007files.storage.live.com/y4mzv5x9QsBl6CfDCDZ6juiyLgIKMkmugRd_unnSWQsN66vyaFO6iCLOJQQWoL2dIPFq3sdNqUCVlwdz8aT5Ze-4si5Q5jkVsWajrwxBfQMuiwkcjazO99Xt9ogV7A98LVJMy392lue0UmF2BX7log3d5ubRNFHDVMPrcapOiGNQxVuyuDfWDImZ2R8rhYBweOO?width=313&height=546&cropmode=none)
-
-![](https://db3pap007files.storage.live.com/y4mCchFc5MKZza6dq-06anM_rlJjt_FbLYYsdwxkKPQDnNBKiEgvxgw7z_XLswQpIdnBRpIWB1Nevyxo3DRZ2KWGCInBrPkqw1_7tZhy91tewuYuhnanb8GOtK-O84VZYGIbGxMFKCuMxGLq5J1NNX9L-yHkGAGspcVYH0UHr7ZsY-IARrn7MRGqkdZulVq4b8O?width=308&height=550&cropmode=none)
 ## Contribute
 Anyone can contribute
 
